@@ -5,7 +5,8 @@
   },
   "deploy": {
     "org": "mkjems",
-    "app": "multiplayer"
+    "app": "multiplayer",
+    "entrypoint": "server.ts"
   }
 }
 
