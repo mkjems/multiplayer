@@ -86,7 +86,8 @@
     let myId = null;
     let players = [];
 
-    const ws = new WebSocket(`ws://${location.host}/ws/game/${gameId}`);
+    const protocol = location.protocol === "https:" ? "wss" : "ws";
+    const ws = new WebSocket(`${protocol}://${location.host}/ws/game/${gameId}`);
 
     ws.onopen = () => {
       ws.send(JSON.stringify({ type: "join_game", gameId, playerName }));

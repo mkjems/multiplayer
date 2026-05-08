@@ -153,7 +153,8 @@
 
     document.getElementById("display-name").textContent = playerName;
 
-    const ws = new WebSocket(`ws://${location.host}/ws/lobby`);
+    const protocol = location.protocol === "https:" ? "wss" : "ws";
+    const ws = new WebSocket(`${protocol}://${location.host}/ws/lobby`);
 
     ws.onopen = () => {
       ws.send(JSON.stringify({ type: "join_lobby" }));
