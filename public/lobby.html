@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lobby — Multiplayer</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #0f0f1a;
+      font-family: system-ui, sans-serif;
+      color: #e0e0e0;
+      padding: 40px 24px;
+    }
+
+    header {
+      max-width: 800px;
+      margin: 0 auto 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #6c63ff, #3ecfcf);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .player-name {
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    .player-name span {
+      color: #e0e0e0;
+      font-weight: 600;
+    }
+
+    h2 {
+      max-width: 800px;
+      margin: 0 auto 20px;
+      font-size: 1.1rem;
+      color: #aaa;
+      font-weight: 500;
+    }
+
+    .games {
+      max-width: 800px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .game-card {
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 12px;
+      padding: 24px;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.1s, box-shadow 0.2s;
+    }
+
+    .game-card:hover {
+      border-color: #6c63ff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(108,99,255,0.15);
+    }
+
+    .game-card.full {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .game-card.full:hover {
+      transform: none;
+      border-color: #2a2a4a;
+      box-shadow: none;
+    }
+
+    .game-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .game-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.8rem;
+      color: #888;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #2ecc71;
+      flex-shrink: 0;
+    }
+
+    .status-dot.waiting { background: #f39c12; }
+
+    .player-count {
+      margin-left: auto;
+      font-weight: 600;
+      color: #aaa;
+    }
+
+    .loading {
+      max-width: 800px;
+      margin: 0 auto;
+      color: #555;
+      font-size: 0.9rem;
+    }
+
+    .live-badge {
+      font-size: 0.7rem;
+      background: rgba(108,99,255,0.15);
+      color: #6c63ff;
+      border: 1px solid #6c63ff44;
+      border-radius: 4px;
+      padding: 2px 6px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Multiplayer <span class="live-badge">LIVE</span></h1>
+    <div class="player-name">Playing as <span id="display-name">—</span></div>
+  </header>
+
+  <h2>Choose a game</h2>
+  <div class="games" id="games">
+    <div class="loading">Connecting to lobby...</div>
+  </div>
+
+  <script>
+    const playerName = sessionStorage.getItem("playerName");
+    if (!playerName) {
+      window.location.href = "/";
+    }
+
+    document.getElementById("display-name").textContent = playerName;
+
+    const ws = new WebSocket(`ws://${location.host}/ws/lobby`);
+
+    ws.onopen = () => {
+      ws.send(JSON.stringify({ type: "join_lobby" }));
+    };
+
+    ws.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+      if (msg.type === "lobby_state") renderGames(msg.games);
+    };
+
+    ws.onclose = () => {
+      document.getElementById("games").innerHTML =
+        '<div class="loading">Lost connection to lobby. Refresh to reconnect.</div>';
+    };
+
+    function renderGames(games) {
+      const container = document.getElementById("games");
+      if (!games.length) {
+        container.innerHTML = '<div class="loading">No games available.</div>';
+        return;
+      }
+
+      container.innerHTML = games.map((g) => {
+        const full = g.playerCount >= g.maxPlayers;
+        const statusClass = g.status === "waiting" ? "waiting" : "";
+        return `
+          <div class="game-card ${full ? "full" : ""}" data-id="${g.id}" ${full ? "" : 'role="button" tabindex="0"'}>
+            <div class="game-name">${escHtml(g.name)}</div>
+            <div class="game-meta">
+              <span class="status-dot ${statusClass}"></span>
+              <span>${full ? "Full" : g.status === "waiting" ? "Waiting for players" : "In progress"}</span>
+              <span class="player-count">${g.playerCount} / ${g.maxPlayers}</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      container.querySelectorAll(".game-card:not(.full)").forEach((card) => {
+        card.addEventListener("click", () => joinGame(card.dataset.id));
+        card.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") joinGame(card.dataset.id);
+        });
+      });
+    }
+
+    function joinGame(gameId) {
+      sessionStorage.setItem("gameId", gameId);
+      window.location.href = `/game.html`;
+    }
+
+    function escHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game — Multiplayer</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #0f0f1a;
+      font-family: system-ui, sans-serif;
+      color: #e0e0e0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 24px;
+      border-bottom: 1px solid #2a2a4a;
+      background: #1a1a2e;
+    }
+
+    nav a {
+      color: #888;
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+
+    nav a:hover { color: #e0e0e0; }
+
+    nav .game-title {
+      font-weight: 600;
+      color: #e0e0e0;
+      margin-right: auto;
+    }
+
+    .arena {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    canvas {
+      border: 1px solid #2a2a4a;
+      border-radius: 8px;
+      background: #12121f;
+    }
+
+    .hint {
+      text-align: center;
+      padding: 12px;
+      font-size: 0.8rem;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <span class="game-title" id="game-title">Game</span>
+    <span id="player-count" style="font-size:0.8rem;color:#888;"></span>
+    <a href="/lobby.html">← Back to lobby</a>
+  </nav>
+
+  <div class="arena">
+    <canvas id="canvas" width="800" height="500"></canvas>
+  </div>
+  <p class="hint">WASD or arrow keys to move</p>
+
+  <script>
+    const playerName = sessionStorage.getItem("playerName");
+    const gameId = sessionStorage.getItem("gameId");
+    if (!playerName || !gameId) window.location.href = "/";
+
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const titleEl = document.getElementById("game-title");
+    const countEl = document.getElementById("player-count");
+
+    let myId = null;
+    let players = [];
+
+    const ws = new WebSocket(`ws://${location.host}/ws/game/${gameId}`);
+
+    ws.onopen = () => {
+      ws.send(JSON.stringify({ type: "join_game", gameId, playerName }));
+    };
+
+    ws.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+      if (msg.type === "game_joined") {
+        myId = msg.playerId;
+        titleEl.textContent = gameId.charAt(0).toUpperCase() + gameId.slice(1);
+      } else if (msg.type === "game_state") {
+        players = msg.players;
+        countEl.textContent = `${players.length} player${players.length !== 1 ? "s" : ""}`;
+      }
+    };
+
+    ws.onclose = () => {
+      ctx.fillStyle = "#0f0f1a";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#888";
+      ctx.font = "16px system-ui";
+      ctx.textAlign = "center";
+      ctx.fillText("Disconnected — go back to lobby", canvas.width / 2, canvas.height / 2);
+    };
+
+    // Input
+    const keys = new Set();
+    document.addEventListener("keydown", (e) => keys.add(e.key));
+    document.addEventListener("keyup", (e) => keys.delete(e.key));
+
+    let lastInput = { dx: 0, dy: 0 };
+
+    function sendInput() {
+      const dx = (keys.has("ArrowRight") || keys.has("d") ? 1 : 0)
+               - (keys.has("ArrowLeft") || keys.has("a") ? 1 : 0);
+      const dy = (keys.has("ArrowDown") || keys.has("s") ? 1 : 0)
+               - (keys.has("ArrowUp") || keys.has("w") ? 1 : 0);
+      if (dx !== lastInput.dx || dy !== lastInput.dy) {
+        lastInput = { dx, dy };
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: "move", dx, dy }));
+        }
+      }
+    }
+
+    // Render loop
+    function render() {
+      sendInput();
+
+      ctx.fillStyle = "#12121f";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      for (const p of players) {
+        // Shadow for own player
+        if (p.id === myId) {
+          ctx.save();
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = 16;
+        }
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 16, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+
+        if (p.id === myId) ctx.restore();
+
+        // Name label
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 12px system-ui";
+        ctx.textAlign = "center";
+        ctx.fillText(p.name, p.x, p.y - 22);
+      }
+
+      requestAnimationFrame(render);
+    }
+
+    requestAnimationFrame(render);
+
+    window.addEventListener("beforeunload", () => {
+      ws.send(JSON.stringify({ type: "leave_game" }));
+    });
+  </script>
+</body>
+</html>
