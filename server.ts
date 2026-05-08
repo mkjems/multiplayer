@@ -100,20 +100,31 @@ async function serveFile(path: string): Promise<Response> {
   }
 }
 
-Deno.serve({ port: 8000 }, (req) => {
+function tryUpgrade(req: Request): { socket: WebSocket; response: Response } | null {
+  if (req.headers.get("upgrade")?.toLowerCase() !== "websocket") return null;
+  try {
+    return Deno.upgradeWebSocket(req);
+  } catch {
+    return null;
+  }
+}
+
+Deno.serve((req) => {
   const url = new URL(req.url);
 
   if (url.pathname === "/ws/lobby") {
-    const { socket, response } = Deno.upgradeWebSocket(req);
-    handleLobbySocket(socket);
-    return response;
+    const upgrade = tryUpgrade(req);
+    if (!upgrade) return new Response("WebSocket upgrade required", { status: 426 });
+    handleLobbySocket(upgrade.socket);
+    return upgrade.response;
   }
 
   const gameMatch = url.pathname.match(/^\/ws\/game\/(.+)$/);
   if (gameMatch) {
-    const { socket, response } = Deno.upgradeWebSocket(req);
-    handleGameSocket(socket, gameMatch[1]);
-    return response;
+    const upgrade = tryUpgrade(req);
+    if (!upgrade) return new Response("WebSocket upgrade required", { status: 426 });
+    handleGameSocket(upgrade.socket, gameMatch[1]);
+    return upgrade.response;
   }
 
   // Static file serving
