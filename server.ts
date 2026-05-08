@@ -7,18 +7,40 @@ createRoom("race", "Speed Race", 4);
 
 const lobbyClients = new Set<WebSocket>();
 
-function broadcastLobby() {
+export function broadcastLobby() {
   const msg = JSON.stringify({ type: "lobby_state", games: listRooms() });
   for (const ws of lobbyClients) {
-    if (ws.readyState === WebSocket.OPEN) ws.send(msg);
+    try {
+      if (ws.readyState === WebSocket.OPEN) ws.send(msg);
+    } catch {
+      lobbyClients.delete(ws);
+    }
   }
 }
 
-setInterval(broadcastLobby, 2000);
+function sendLobbyState(ws: WebSocket) {
+  try {
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: "lobby_state", games: listRooms() }));
+    }
+  } catch { /* ignore */ }
+}
 
 function handleLobbySocket(ws: WebSocket) {
   lobbyClients.add(ws);
-  ws.onopen = () => ws.send(JSON.stringify({ type: "lobby_state", games: listRooms() }));
+
+  // Send immediately — onopen may already have fired on Deploy
+  sendLobbyState(ws);
+  ws.onopen = () => sendLobbyState(ws);
+
+  ws.onmessage = (e) => {
+    try {
+      const msg = JSON.parse(e.data);
+      if (msg.type === "ping") ws.send(JSON.stringify({ type: "pong" }));
+    } catch { /* ignore */ }
+  };
+
+  ws.onerror = () => lobbyClients.delete(ws);
   ws.onclose = () => lobbyClients.delete(ws);
 }
 

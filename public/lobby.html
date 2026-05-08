@@ -165,7 +165,13 @@
       if (msg.type === "lobby_state") renderGames(msg.games);
     };
 
+    // Keep connection alive on Deploy (edge isolates drop idle WS connections)
+    const heartbeat = setInterval(() => {
+      if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "ping" }));
+    }, 15000);
+
     ws.onclose = () => {
+      clearInterval(heartbeat);
       document.getElementById("games").innerHTML =
         '<div class="loading">Lost connection to lobby. Refresh to reconnect.</div>';
     };
