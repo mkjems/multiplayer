@@ -1,4 +1,10 @@
 
+Coding standards
+================
+
+Colors should not be hardcoded - create a variable with a descriptive name. 
+
+
 Agent Human collaboration
 =========================
 
@@ -29,7 +35,7 @@ Payers will start on a empty lot where there are no rock or cacti or opponent.
 
 The players move around using the arrow keys and can also control the angle of the arm (keys a and z) from plus 60 degrees up to minus 60 degrees down.
 
-The players a represented using a round dot. The name appears under the player.
+The players are represented using a round dot. The name appears under the player.
 
 The rocks are represented by a solid grey shape made up of multiple (3-7) straight sides of varying length.  
 
@@ -41,9 +47,9 @@ When the player is moving left the arm is to the left.
 Up and down movement does not change the arm.
 
 When pressing 'x' the gun is fired and a bullet is created that flies through the air. when it hits a rock it ricochets of and continues flying
-The bullets should originate from the end of the 'gun' 
+The bullets should originate from the mussel of the 'gun' 
 
-when a bullet hits a cactus a piece of the cactus is removed where the bullet hit.  
+When a bullet hits a cactus a piece of the cactus is removed where the bullet hit.  
 
 Each player has 6 bullets.
 
