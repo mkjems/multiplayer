@@ -32,6 +32,13 @@
       background-clip: text;
     }
 
+    .player-info {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-end;
+      gap: 40px;
+    }
+
     .player-name {
       font-size: 0.85rem;
       color: #888;
@@ -137,7 +144,10 @@
 
   <header>
     <h1>Multiplayer <span class="live-badge">LIVE</span></h1>
-    <div class="player-name">Playing as <span id="display-name">—</span></div>
+    <div class="player-info">
+      <div class="player-name" id="lobby-count" style="display:none"><span id="lobby-count-number">0</span> people in lobby</div>
+      <div class="player-name">Playing as <span id="display-name">—</span></div>
+    </div>
   </header>
 
   <h2>Choose a game</h2>

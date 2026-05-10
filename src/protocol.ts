@@ -8,7 +8,7 @@ export type ClientMessage =
   | { type: "reload" };
 
 export type ServerMessage =
-  | { type: "lobby_state"; games: GameInfo[] }
+  | { type: "lobby_state"; games: GameInfo[]; lobbyCount: number }
   | { type: "game_joined"; playerId: string; gameId: string }
   | { type: "arena"; rocks: RockData[]; cacti: CactusData[] }
   | { type: "game_state"; players: PlayerSnapshot[]; bullets: BulletSnapshot[]; cacti: CactusData[] }

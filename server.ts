@@ -8,7 +8,7 @@ createRoom("race", "Speed Race", 4);
 const lobbyClients = new Set<WebSocket>();
 
 export function broadcastLobby() {
-  const msg = JSON.stringify({ type: "lobby_state", games: listRooms() });
+  const msg = JSON.stringify({ type: "lobby_state", games: listRooms(), lobbyCount: lobbyClients.size });
   for (const ws of lobbyClients) {
     try {
       if (ws.readyState === WebSocket.OPEN) ws.send(msg);
@@ -21,7 +21,7 @@ export function broadcastLobby() {
 function sendLobbyState(ws: WebSocket) {
   try {
     if (ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ type: "lobby_state", games: listRooms() }));
+      ws.send(JSON.stringify({ type: "lobby_state", games: listRooms(), lobbyCount: lobbyClients.size }));
     }
   } catch { /* ignore */ }
 }

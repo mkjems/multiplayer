@@ -11,6 +11,7 @@ const RELOAD_TIME = 2000;
 const ARENA_W = 800;
 const ARENA_H = 500;
 const ARM_MAX = Math.PI / 3;
+const ARM_LENGTH = 28;
 
 // Arena generation — rock placement
 const ROCK_COUNT = 5;
@@ -269,8 +270,8 @@ export function shoot(room: GameRoom, playerId: string) {
   room.bullets.push({
     id: crypto.randomUUID(),
     ownerId: playerId,
-    x: player.x + dir * (PLAYER_RADIUS + 2),
-    y: player.y,
+    x: player.x + dir * ARM_LENGTH * Math.cos(player.armAngle),
+    y: player.y - ARM_LENGTH * Math.sin(player.armAngle),
     vx, vy,
     born: now,
   });

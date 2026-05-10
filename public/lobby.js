@@ -14,7 +14,13 @@ ws.onopen = () => {
 
 ws.onmessage = (e) => {
   const msg = JSON.parse(e.data);
-  if (msg.type === "lobby_state") renderGames(msg.games);
+  if (msg.type === "lobby_state") {
+    renderGames(msg.games);
+    const countEl = document.getElementById("lobby-count");
+    const numberEl = document.getElementById("lobby-count-number");
+    numberEl.textContent = msg.lobbyCount;
+    countEl.style.display = "";
+  }
 };
 
 // Keep connection alive on Deploy (edge isolates drop idle WS connections)

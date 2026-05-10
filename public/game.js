@@ -23,12 +23,19 @@ const COLOR_PLAYER_DEAD      = "#555555";
 const COLOR_PLAYER_DEAD_NAME = "#777";
 const COLOR_DISCONNECT_BG    = "#0f0f1a"; // matches --color-bg-page
 const COLOR_DISCONNECT_TEXT  = "#888";    // matches --color-text-secondary
+const COLOR_HIT_FLASH        = "#ffffff";
+const COLOR_VIGNETTE         = "220,50,50";
 
 // Cactus segment geometry — must match server constants in src/game.ts
 const CACTUS_HALF_WIDTH      = 8;
 const CACTUS_SEGMENT_STRIDE  = 14;
 const CACTUS_SEGMENT_WIDTH   = 16;
 const CACTUS_SEGMENT_HEIGHT  = 12;
+const ARM_LENGTH             = 28; // must match src/game.ts
+const HIT_FLASH_DURATION     = 300;  // ms
+const SHAKE_DURATION         = 400;  // ms
+const SHAKE_MAGNITUDE        = 5;    // max pixel offset
+const VIGNETTE_DURATION      = 600;  // ms
 
 const playerName = sessionStorage.getItem("playerName");
 const gameId = sessionStorage.getItem("gameId");
@@ -51,7 +58,18 @@ let bullets = [];
 let rocks = [];
 let cacti = [];
 let gameOverAt = null;
-const deathTimes = new Map(); // playerId → timestamp when alive went false
+const deathTimes = new Map();     // playerId → timestamp when alive went false
+const hitTimes = new Map();       // playerId → timestamp of last hit
+const previousHealth = new Map(); // playerId → last known health
+
+// Shake/vignette state (local player hit only)
+let shakeUntil = 0;
+let vignetteUntil = 0;
+
+function triggerShake() {
+  shakeUntil = Date.now() + SHAKE_DURATION;
+  vignetteUntil = Date.now() + VIGNETTE_DURATION;
+}
 
 // Local arm angle tracking (predicted, for responsive rendering)
 let localArmAngle = 0;
@@ -78,6 +96,12 @@ ws.onmessage = (e) => {
     const now = Date.now();
     for (const p of msg.players) {
       if (!p.alive && !deathTimes.has(p.id)) deathTimes.set(p.id, now);
+      const prev = previousHealth.get(p.id) ?? p.health;
+      if (p.health < prev) {
+        hitTimes.set(p.id, now);
+        if (p.id === myId) triggerShake();
+      }
+      previousHealth.set(p.id, p.health);
     }
     players = msg.players;
     bullets = msg.bullets;
@@ -226,11 +250,24 @@ function drawPlayer(p) {
 
   if (isMe) ctx.restore();
 
+  // Hit flash overlay
+  const hitTime = hitTimes.get(p.id);
+  if (hitTime) {
+    const flashT = (Date.now() - hitTime) / HIT_FLASH_DURATION;
+    if (flashT < 1) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 14, 0, Math.PI * 2);
+      ctx.fillStyle = COLOR_HIT_FLASH;
+      ctx.globalAlpha = (1 - flashT) * 0.7;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  }
+
   // Arm
-  const armLen = 28;
   ctx.beginPath();
   ctx.moveTo(p.x, p.y);
-  ctx.lineTo(p.x + dir * armLen * Math.cos(angle), p.y - armLen * Math.sin(angle));
+  ctx.lineTo(p.x + dir * ARM_LENGTH * Math.cos(angle), p.y - ARM_LENGTH * Math.sin(angle));
   ctx.strokeStyle = COLOR_ARM;
   ctx.lineWidth = 3;
   ctx.lineCap = "round";
@@ -297,8 +334,33 @@ function drawHUD() {
   ctx.fillText(String(me.kills), canvas.width - 14, py + 10);
 }
 
+function drawVignette() {
+  const now = Date.now();
+  if (now >= vignetteUntil) return;
+  const alpha = (1 - (now - (vignetteUntil - VIGNETTE_DURATION)) / VIGNETTE_DURATION) * 0.55;
+  const gradient = ctx.createRadialGradient(
+    canvas.width / 2, canvas.height / 2, canvas.height * 0.25,
+    canvas.width / 2, canvas.height / 2, canvas.height * 0.85
+  );
+  gradient.addColorStop(0, `rgba(${COLOR_VIGNETTE},0)`);
+  gradient.addColorStop(1, `rgba(${COLOR_VIGNETTE},${alpha})`);
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
 function render() {
   sendInput();
+
+  const now = Date.now();
+  ctx.save();
+  if (now < shakeUntil) {
+    const progress = (shakeUntil - now) / SHAKE_DURATION;
+    const magnitude = SHAKE_MAGNITUDE * progress;
+    ctx.translate(
+      (Math.random() * 2 - 1) * magnitude,
+      (Math.random() * 2 - 1) * magnitude
+    );
+  }
 
   ctx.fillStyle = COLOR_GROUND;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -309,6 +371,9 @@ function render() {
   for (const p of players) drawPlayer(p);
 
   drawHUD();
+  ctx.restore();
+
+  drawVignette();
 
   requestAnimationFrame(render);
 }
