@@ -1,5 +1,8 @@
 
+Agent Human collaboration
+=========================
 
+Agent should not touch the TODO.md unless I give permission
 
 
 
