@@ -57,6 +57,7 @@ interface Bullet {
   vx: number;
   vy: number;
   born: number;
+  bounces: number;
 }
 
 interface Rock {
@@ -274,6 +275,7 @@ export function shoot(room: GameRoom, playerId: string) {
     y: player.y - ARM_LENGTH * Math.sin(player.armAngle),
     vx, vy,
     born: now,
+    bounces: 0,
   });
 }
 
@@ -419,6 +421,7 @@ function tick(room: GameRoom) {
         [bullet.vx, bullet.vy] = reflect(bullet.vx, bullet.vy, hit.nx, hit.ny);
         bullet.x += hit.nx * (BULLET_RADIUS + 2);
         bullet.y += hit.ny * (BULLET_RADIUS + 2);
+        bullet.bounces++;
         break;
       }
     }
@@ -478,7 +481,7 @@ function tick(room: GameRoom) {
   }
 
   const players: PlayerSnapshot[] = [...room.players.values()].map(toSnapshot);
-  const bullets: BulletSnapshot[] = room.bullets.map(b => ({ id: b.id, x: b.x, y: b.y }));
+  const bullets: BulletSnapshot[] = room.bullets.map(b => ({ id: b.id, x: b.x, y: b.y, bounces: b.bounces }));
   const cacti: CactusData[] = room.cacti.map(c => ({ id: c.id, x: c.x, y: c.y, segments: [...c.segments] }));
   broadcast(room, JSON.stringify({ type: "game_state", players, bullets, cacti }));
 }

@@ -42,6 +42,7 @@ export interface BulletSnapshot {
   id: string;
   x: number;
   y: number;
+  bounces: number;
 }
 
 export interface RockData {

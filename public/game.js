@@ -61,6 +61,7 @@ let gameOverAt = null;
 const deathTimes = new Map();     // playerId → timestamp when alive went false
 const hitTimes = new Map();       // playerId → timestamp of last hit
 const previousHealth = new Map(); // playerId → last known health
+const previousBounces = new Map(); // bulletId → last known bounce count
 
 // Shake/vignette state (local player hit only)
 let shakeUntil = 0;
@@ -95,16 +96,28 @@ ws.onmessage = (e) => {
   } else if (msg.type === "game_state") {
     const now = Date.now();
     for (const p of msg.players) {
-      if (!p.alive && !deathTimes.has(p.id)) deathTimes.set(p.id, now);
+      if (!p.alive && !deathTimes.has(p.id)) {
+        deathTimes.set(p.id, now);
+        Sounds.playDeath();
+      }
       const prev = previousHealth.get(p.id) ?? p.health;
       if (p.health < prev) {
         hitTimes.set(p.id, now);
-        if (p.id === myId) triggerShake();
+        if (p.id === myId) { triggerShake(); Sounds.playHit(true); }
+        else Sounds.playHit(false);
       }
       previousHealth.set(p.id, p.health);
     }
     players = msg.players;
     bullets = msg.bullets;
+    for (const b of msg.bullets) {
+      const prev = previousBounces.get(b.id) ?? 0;
+      if (b.bounces > prev) Sounds.playRicochet();
+      previousBounces.set(b.id, b.bounces);
+    }
+    for (const id of previousBounces.keys()) {
+      if (!msg.bullets.some(b => b.id === id)) previousBounces.delete(id);
+    }
     cacti = msg.cacti;
     countEl.textContent = `${players.length} player${players.length !== 1 ? "s" : ""}`;
     const me = players.find(p => p.id === myId);
@@ -114,13 +127,13 @@ ws.onmessage = (e) => {
     winnerText.textContent = `🏆 ${msg.winnerName} wins!`;
     overlay.classList.add("visible");
     // Redirect to lobby after 5 seconds
-    let remaining = 5;
+    let remaining = 8;
     countdownText.textContent = `Returning to lobby in ${remaining}s…`;
     const interval = setInterval(() => {
       remaining--;
       if (remaining <= 0) {
         clearInterval(interval);
-        window.location.href = "/lobby.html";
+        globalThis.location.href = "/lobby.html";
       } else {
         countdownText.textContent = `Returning to lobby in ${remaining}s…`;
       }
@@ -145,12 +158,19 @@ document.addEventListener("keydown", (e) => {
   keys.add(k);
   if (k === "x") {
     if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "shoot" }));
+    Sounds.playShoot();
   }
   if (k === "r") {
     if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "reload" }));
+    Sounds.playReload();
   }
 });
 document.addEventListener("keyup", (e) => keys.delete(e.key.toLowerCase()));
+
+const muteBtn = document.getElementById("mute-btn");
+muteBtn.addEventListener("click", () => {
+  muteBtn.textContent = Sounds.toggleMute() ? "🔇" : "🔊";
+});
 
 let lastMove = { dx: 0, dy: 0 };
 let lastAngleSent = 0;

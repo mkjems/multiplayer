@@ -38,6 +38,17 @@
     nav span { font-size: 0.8rem; color: var(--color-text-secondary); }
     nav a { color: var(--color-text-secondary); text-decoration: none; font-size: 0.85rem; }
     nav a:hover { color: var(--color-text-primary); }
+    #mute-btn {
+      background: none;
+      border: 1px solid var(--color-border);
+      color: var(--color-text-secondary);
+      font-size: 1rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    #mute-btn:hover { color: var(--color-text-primary); }
     .arena {
       flex: 1;
       display: flex;
@@ -84,6 +95,7 @@
   <nav>
     <span class="game-title" id="game-title">Game</span>
     <span id="player-count"></span>
+    <button id="mute-btn" title="Toggle sound">🔊</button>
     <a href="/lobby.html">← Back to lobby</a>
   </nav>
 
@@ -97,6 +109,7 @@
     <p id="countdown-text"></p>
   </div>
 
+  <script src="sounds.js"></script>
   <script src="game.js"></script>
 </body>
 </html>
