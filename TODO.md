@@ -1,7 +1,9 @@
 # TODO
 
 ## Sprint 4
+- There are a lot of hard coded values in generateArena function. Please give them descriptive variable names.  
 - Players cannot start on, or walk through, rocks and cacti (collision blocking)
+- Move client scripts into separate files.
 
 ## Sprint 5 
 - Bullet should originate from mussel of gun.
@@ -17,7 +19,9 @@
 - Animated bullet trail
 
 ## Backlog
-
+- Sound effect when player chooses room
+- Sound effect when player chooses name
+- Make game more exciting brainstorm
 
 ## Ideas / Maybes
 - Lobby shows game type icons
