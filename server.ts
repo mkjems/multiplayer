@@ -2,8 +2,8 @@ import { createRoom, getRoom, joinRoom, leaveRoom, applyInput, listRooms, setArm
 import type { ClientMessage } from "./src/protocol.ts";
 
 // Seed some default rooms
-createRoom("dots", "Dot Arena", 8);
-createRoom("race", "Speed Race", 4);
+createRoom("dots", "Dot Arena", 3);
+createRoom("race", "Speed Race", 2);
 
 const lobbyClients = new Set<WebSocket>();
 

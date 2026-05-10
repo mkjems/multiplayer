@@ -1,42 +1,41 @@
 // Color palette — canvas/JS colors (CSS equivalents live in game.html :root)
-const COLOR_GROUND           = "#c8b78a";
-const COLOR_ROCK_FILL        = "#4a4a5a";
-const COLOR_ROCK_STROKE      = "#6a6a7a";
-const COLOR_CACTUS_FILL      = "#2d7a2d";
-const COLOR_CACTUS_STROKE    = "#1a5c1a";
-const COLOR_ARM              = "#fff";
-const COLOR_HEALTH_BG        = "#333";
-const COLOR_HEALTH_HIGH      = "#2ecc71";
-const COLOR_HEALTH_MID       = "#f39c12";
-const COLOR_HEALTH_LOW       = "#e74c3c";
-const COLOR_BULLET_FILL      = "#f9ca24";
-const COLOR_BULLET_STROKE    = "#f0932b";
-const COLOR_AMMO_FULL        = "#f9ca24";
-const COLOR_AMMO_EMPTY       = "#333";
-const COLOR_HUD_LABEL        = "#888";
-const COLOR_RELOAD_TEXT      = "#f39c12";
-const COLOR_KILLS_ACTIVE     = "#f9ca24";
-const COLOR_KILLS_ZERO       = "#555";
-const COLOR_PLAYER_NAME      = "#fff";
-const COLOR_PLAYER_KILLS     = "#f9ca24";
-const COLOR_PLAYER_DEAD      = "#555555";
+const COLOR_GROUND = "#232121";
+const COLOR_ROCK_FILL = "#4a4a5a";
+const COLOR_ROCK_STROKE = "#6a6a7a";
+const COLOR_CACTUS_FILL = "#2d7a2d";
+const COLOR_CACTUS_STROKE = "#1a5c1a";
+const COLOR_HEALTH_BG = "#333";
+const COLOR_HEALTH_HIGH = "#2ecc71";
+const COLOR_HEALTH_MID = "#f39c12";
+const COLOR_HEALTH_LOW = "#e74c3c";
+const COLOR_BULLET_FILL = "#f9ca24";
+const COLOR_BULLET_STROKE = "#f0932b";
+const COLOR_AMMO_FULL = "#f9ca24";
+const COLOR_AMMO_EMPTY = "#333";
+const COLOR_HUD_LABEL = "#888";
+const COLOR_RELOAD_TEXT = "#f39c12";
+const COLOR_KILLS_ACTIVE = "#f9ca24";
+const COLOR_KILLS_ZERO = "#555";
+const COLOR_PLAYER_NAME = "#fff";
+const COLOR_PLAYER_KILLS = "#f9ca24";
+const COLOR_PLAYER_DEAD = "#555555";
 const COLOR_PLAYER_DEAD_NAME = "#777";
-const COLOR_DISCONNECT_BG    = "#0f0f1a"; // matches --color-bg-page
-const COLOR_DISCONNECT_TEXT  = "#888";    // matches --color-text-secondary
-const COLOR_HIT_FLASH        = "#ffffff";
-const COLOR_VIGNETTE         = "220,50,50";
+const COLOR_DISCONNECT_BG = "#0f0f1a"; // matches --color-bg-page
+const COLOR_DISCONNECT_TEXT = "#888"; // matches --color-text-secondary
+const COLOR_HIT_FLASH = "#ffffff";
+const COLOR_VIGNETTE = "220,50,50";
 
 // Cactus segment geometry — must match server constants in src/game.ts
-const CACTUS_HALF_WIDTH      = 8;
-const CACTUS_SEGMENT_STRIDE  = 14;
-const CACTUS_SEGMENT_WIDTH   = 16;
-const CACTUS_SEGMENT_HEIGHT  = 12;
-const ARM_LENGTH             = 28; // must match src/game.ts
-const HIT_FLASH_DURATION     = 300;  // ms
-const SHAKE_DURATION         = 400;  // ms
-const SHAKE_MAGNITUDE        = 5;    // max pixel offset
-const VIGNETTE_DURATION      = 600;  // ms
-const TRAIL_MAX_POSITIONS    = 8;    // positions per bullet (at 20 Hz ≈ 400 ms of history)
+const CACTUS_HALF_WIDTH = 8;
+const CACTUS_SEGMENT_STRIDE = 14;
+const CACTUS_SEGMENT_WIDTH = 16;
+const CACTUS_SEGMENT_HEIGHT = 12;
+const ARM_LENGTH = 28; // must match src/game.ts
+const HIT_FLASH_DURATION = 300; // ms
+const SHAKE_DURATION = 400; // ms
+const SHAKE_MAGNITUDE = 5; // max pixel offset
+const VIGNETTE_DURATION = 600; // ms
+const TRAIL_MAX_POSITIONS = 8; // positions per bullet (at 20 Hz ≈ 400 ms of history)
 
 const playerName = sessionStorage.getItem("playerName");
 const gameId = sessionStorage.getItem("gameId");
@@ -59,11 +58,11 @@ let bullets = [];
 let rocks = [];
 let cacti = [];
 let gameOverAt = null;
-const deathTimes = new Map();     // playerId → timestamp when alive went false
-const hitTimes = new Map();       // playerId → timestamp of last hit
+const deathTimes = new Map(); // playerId → timestamp when alive went false
+const hitTimes = new Map(); // playerId → timestamp of last hit
 const previousHealth = new Map(); // playerId → last known health
 const previousBounces = new Map(); // bulletId → last known bounce count
-const bulletTrails = new Map();    // bulletId → [{x, y}, …] (oldest first)
+const bulletTrails = new Map(); // bulletId → [{x, y}, …] (oldest first)
 const previousCactiSegments = new Map(); // cactusId → segments boolean[]
 
 // Shake/vignette state (local player hit only)
@@ -106,8 +105,10 @@ ws.onmessage = (e) => {
       const prev = previousHealth.get(p.id) ?? p.health;
       if (p.health < prev) {
         hitTimes.set(p.id, now);
-        if (p.id === myId) { triggerShake(); Sounds.playHit(true); }
-        else Sounds.playHit(false);
+        if (p.id === myId) {
+          triggerShake();
+          Sounds.playHit(true);
+        } else Sounds.playHit(false);
       }
       previousHealth.set(p.id, p.health);
     }
@@ -119,7 +120,7 @@ ws.onmessage = (e) => {
       previousBounces.set(b.id, b.bounces);
     }
     for (const id of previousBounces.keys()) {
-      if (!msg.bullets.some(b => b.id === id)) previousBounces.delete(id);
+      if (!msg.bullets.some((b) => b.id === id)) previousBounces.delete(id);
     }
     for (const b of msg.bullets) {
       const prevBounces = previousBounces.get(b.id) ?? 0;
@@ -133,27 +134,32 @@ ws.onmessage = (e) => {
       }
     }
     for (const id of bulletTrails.keys()) {
-      if (!msg.bullets.some(b => b.id === id)) bulletTrails.delete(id);
+      if (!msg.bullets.some((b) => b.id === id)) bulletTrails.delete(id);
     }
     for (const cactus of msg.cacti) {
       const prev = previousCactiSegments.get(cactus.id);
       if (prev) {
         for (let i = 0; i < cactus.segments.length; i++) {
-          if (prev[i] && !cactus.segments[i]) { Sounds.playCactusHit(); break; }
+          if (prev[i] && !cactus.segments[i]) {
+            Sounds.playCactusHit();
+            break;
+          }
         }
       }
       previousCactiSegments.set(cactus.id, [...cactus.segments]);
     }
     cacti = msg.cacti;
-    countEl.textContent = `${players.length} player${players.length !== 1 ? "s" : ""}`;
-    const me = players.find(p => p.id === myId);
+    countEl.textContent = `${players.length} player${
+      players.length !== 1 ? "s" : ""
+    }`;
+    const me = players.find((p) => p.id === myId);
     if (me) localFacing = me.facing;
   } else if (msg.type === "game_over") {
     gameOverAt = Date.now();
     winnerText.textContent = `🏆 ${msg.winnerName} wins!`;
     overlay.classList.add("visible");
     // Redirect to lobby after 5 seconds
-    let remaining = 8;
+    let remaining = 5;
     countdownText.textContent = `Returning to lobby in ${remaining}s…`;
     const interval = setInterval(() => {
       remaining--;
@@ -174,7 +180,11 @@ ws.onclose = () => {
   ctx.fillStyle = COLOR_DISCONNECT_TEXT;
   ctx.font = "16px system-ui";
   ctx.textAlign = "center";
-  ctx.fillText("Disconnected — go back to lobby", canvas.width / 2, canvas.height / 2);
+  ctx.fillText(
+    "Disconnected — go back to lobby",
+    canvas.width / 2,
+    canvas.height / 2,
+  );
 };
 
 // Input
@@ -183,13 +193,17 @@ document.addEventListener("keydown", (e) => {
   const k = e.key.toLowerCase();
   keys.add(k);
   if (k === "x") {
-    if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "shoot" }));
-    const me = players.find(p => p.id === myId);
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: "shoot" }));
+    }
+    const me = players.find((p) => p.id === myId);
     if (me && me.ammo <= 0) Sounds.playReload();
     else Sounds.playShoot();
   }
   if (k === "r") {
-    if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "reload" }));
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: "reload" }));
+    }
     Sounds.playReload();
   }
 });
@@ -205,19 +219,27 @@ let lastAngleSent = 0;
 
 function sendInput() {
   const dx = (keys.has("arrowright") ? 1 : 0) - (keys.has("arrowleft") ? 1 : 0);
-  const dy = (keys.has("arrowdown")  ? 1 : 0) - (keys.has("arrowup")   ? 1 : 0);
+  const dy = (keys.has("arrowdown") ? 1 : 0) - (keys.has("arrowup") ? 1 : 0);
 
   if (dx !== lastMove.dx || dy !== lastMove.dy) {
     lastMove = { dx, dy };
-    if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "move", dx, dy }));
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: "move", dx, dy }));
+    }
   }
 
   if (dx > 0) localFacing = "right";
   else if (dx < 0) localFacing = "left";
 
   let changed = false;
-  if (keys.has("a")) { localArmAngle = Math.min(ARM_MAX, localArmAngle + ARM_STEP); changed = true; }
-  if (keys.has("z")) { localArmAngle = Math.max(-ARM_MAX, localArmAngle - ARM_STEP); changed = true; }
+  if (keys.has("a")) {
+    localArmAngle = Math.min(ARM_MAX, localArmAngle + ARM_STEP);
+    changed = true;
+  }
+  if (keys.has("z")) {
+    localArmAngle = Math.max(-ARM_MAX, localArmAngle - ARM_STEP);
+    changed = true;
+  }
 
   if (changed && Date.now() - lastAngleSent > 40) {
     lastAngleSent = Date.now();
@@ -232,7 +254,9 @@ function drawRock(rock) {
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(rock.vertices[0].x, rock.vertices[0].y);
-  for (let i = 1; i < rock.vertices.length; i++) ctx.lineTo(rock.vertices[i].x, rock.vertices[i].y);
+  for (let i = 1; i < rock.vertices.length; i++) {
+    ctx.lineTo(rock.vertices[i].x, rock.vertices[i].y);
+  }
   ctx.closePath();
   ctx.fillStyle = COLOR_ROCK_FILL;
   ctx.fill();
@@ -245,7 +269,8 @@ function drawRock(rock) {
 function drawCactus(cactus) {
   for (let i = 0; i < cactus.segments.length; i++) {
     if (!cactus.segments[i]) continue;
-    const sx = cactus.x - CACTUS_HALF_WIDTH, sy = cactus.y + i * CACTUS_SEGMENT_STRIDE;
+    const sx = cactus.x - CACTUS_HALF_WIDTH,
+      sy = cactus.y + i * CACTUS_SEGMENT_STRIDE;
     ctx.fillStyle = COLOR_CACTUS_FILL;
     ctx.fillRect(sx, sy, CACTUS_SEGMENT_WIDTH, CACTUS_SEGMENT_HEIGHT);
     ctx.strokeStyle = COLOR_CACTUS_STROKE;
@@ -255,9 +280,15 @@ function drawCactus(cactus) {
 }
 
 function lerpColor(c1, c2, t) {
-  const r1 = parseInt(c1.slice(1,3),16), g1 = parseInt(c1.slice(3,5),16), b1 = parseInt(c1.slice(5,7),16);
-  const r2 = parseInt(c2.slice(1,3),16), g2 = parseInt(c2.slice(3,5),16), b2 = parseInt(c2.slice(5,7),16);
-  const r = Math.round(r1+(r2-r1)*t), g = Math.round(g1+(g2-g1)*t), b = Math.round(b1+(b2-b1)*t);
+  const r1 = parseInt(c1.slice(1, 3), 16),
+    g1 = parseInt(c1.slice(3, 5), 16),
+    b1 = parseInt(c1.slice(5, 7), 16);
+  const r2 = parseInt(c2.slice(1, 3), 16),
+    g2 = parseInt(c2.slice(3, 5), 16),
+    b2 = parseInt(c2.slice(5, 7), 16);
+  const r = Math.round(r1 + (r2 - r1) * t),
+    g = Math.round(g1 + (g2 - g1) * t),
+    b = Math.round(b1 + (b2 - b1) * t);
   return `rgb(${r},${g},${b})`;
 }
 
@@ -315,9 +346,12 @@ function drawPlayer(p) {
   // Arm
   ctx.beginPath();
   ctx.moveTo(p.x, p.y);
-  ctx.lineTo(p.x + dir * ARM_LENGTH * Math.cos(angle), p.y - ARM_LENGTH * Math.sin(angle));
-  ctx.strokeStyle = COLOR_ARM;
-  ctx.lineWidth = 3;
+  ctx.lineTo(
+    p.x + dir * ARM_LENGTH * Math.cos(angle),
+    p.y - ARM_LENGTH * Math.sin(angle),
+  );
+  ctx.strokeStyle = p.color;
+  ctx.lineWidth = 5;
   ctx.lineCap = "round";
   ctx.stroke();
 
@@ -325,7 +359,11 @@ function drawPlayer(p) {
   const barW = 36, barH = 4, bx = p.x - 18, by = p.y - 26;
   ctx.fillStyle = COLOR_HEALTH_BG;
   ctx.fillRect(bx, by, barW, barH);
-  ctx.fillStyle = p.health > 60 ? COLOR_HEALTH_HIGH : p.health > 30 ? COLOR_HEALTH_MID : COLOR_HEALTH_LOW;
+  ctx.fillStyle = p.health > 60
+    ? COLOR_HEALTH_HIGH
+    : p.health > 30
+    ? COLOR_HEALTH_MID
+    : COLOR_HEALTH_LOW;
   ctx.fillRect(bx, by, barW * (p.health / 100), barH);
 
   // Name + kills
@@ -379,7 +417,7 @@ function drawBullet(b) {
 }
 
 function drawHUD() {
-  const me = players.find(p => p.id === myId);
+  const me = players.find((p) => p.id === myId);
   if (!me || !me.alive) return;
 
   const size = 8, gap = 4, px = 14, py = canvas.height - 20;
@@ -394,7 +432,13 @@ function drawHUD() {
     ctx.fillText("AMMO", px, py - 2);
     for (let i = 0; i < 6; i++) {
       ctx.beginPath();
-      ctx.arc(px + i * (size + gap) + size / 2, py + size / 2, size / 2, 0, Math.PI * 2);
+      ctx.arc(
+        px + i * (size + gap) + size / 2,
+        py + size / 2,
+        size / 2,
+        0,
+        Math.PI * 2,
+      );
       ctx.fillStyle = i < me.ammo ? COLOR_AMMO_FULL : COLOR_AMMO_EMPTY;
       ctx.fill();
     }
@@ -413,10 +457,16 @@ function drawHUD() {
 function drawVignette() {
   const now = Date.now();
   if (now >= vignetteUntil) return;
-  const alpha = (1 - (now - (vignetteUntil - VIGNETTE_DURATION)) / VIGNETTE_DURATION) * 0.55;
+  const alpha =
+    (1 - (now - (vignetteUntil - VIGNETTE_DURATION)) / VIGNETTE_DURATION) *
+    0.55;
   const gradient = ctx.createRadialGradient(
-    canvas.width / 2, canvas.height / 2, canvas.height * 0.25,
-    canvas.width / 2, canvas.height / 2, canvas.height * 0.85
+    canvas.width / 2,
+    canvas.height / 2,
+    canvas.height * 0.25,
+    canvas.width / 2,
+    canvas.height / 2,
+    canvas.height * 0.85,
   );
   gradient.addColorStop(0, `rgba(${COLOR_VIGNETTE},0)`);
   gradient.addColorStop(1, `rgba(${COLOR_VIGNETTE},${alpha})`);
@@ -434,7 +484,7 @@ function render() {
     const magnitude = SHAKE_MAGNITUDE * progress;
     ctx.translate(
       (Math.random() * 2 - 1) * magnitude,
-      (Math.random() * 2 - 1) * magnitude
+      (Math.random() * 2 - 1) * magnitude,
     );
   }
 

@@ -25,7 +25,9 @@ ws.onmessage = (e) => {
 
 // Keep connection alive on Deploy (edge isolates drop idle WS connections)
 const heartbeat = setInterval(() => {
-  if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "ping" }));
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: "ping" }));
+  }
 }, 15000);
 
 ws.onclose = () => {
@@ -45,11 +47,19 @@ function renderGames(games) {
     const full = g.playerCount >= g.maxPlayers;
     const statusClass = g.status === "waiting" ? "waiting" : "";
     return `
-      <div class="game-card ${full ? "full" : ""}" data-id="${g.id}" ${full ? "" : 'role="button" tabindex="0"'}>
+      <div class="game-card ${full ? "full" : ""}" data-id="${g.id}" ${
+      full ? "" : 'role="button" tabindex="0"'
+    }>
         <div class="game-name">${escHtml(g.name)}</div>
         <div class="game-meta">
           <span class="status-dot ${statusClass}"></span>
-          <span>${full ? "Full" : g.status === "waiting" ? "Waiting for players" : "In progress"}</span>
+          <span>${
+      full
+        ? "Full"
+        : g.status === "waiting"
+        ? "Waiting for players"
+        : "In progress"
+    }</span>
           <span class="player-count">${g.playerCount} / ${g.maxPlayers}</span>
         </div>
       </div>

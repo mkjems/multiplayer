@@ -2,23 +2,23 @@ import { createPlayer, toSnapshot, type Player } from "./player.ts";
 import type { GameInfo, PlayerSnapshot, BulletSnapshot, RockData, CactusData } from "./protocol.ts";
 
 const SPEED = 3;
-const BULLET_SPEED = 8;
+const BULLET_SPEED = 12;
 const TICK_MS = 50;
 const PLAYER_RADIUS = 16;
-const BULLET_RADIUS = 3;
+const BULLET_RADIUS = 4;
 const SHOOT_COOL_DOWN = 400;
 const RELOAD_TIME = 2000;
-const ARENA_W = 800;
-const ARENA_H = 500;
+const ARENA_W = 1000;
+const ARENA_H = 650;
 const ARM_MAX = Math.PI / 3;
 const ARM_LENGTH = 28;
 
 // Arena generation — rock placement
-const ROCK_COUNT = 5;
-const ROCK_MIN_SIDES = 5;
+const ROCK_COUNT = 6;
+const ROCK_MIN_SIDES = 6;
 const ROCK_EXTRA_SIDES = 5;
 const ROCK_MIN_RADIUS = 20;
-const ROCK_MAX_RADIUS = 55;
+const ROCK_MAX_RADIUS = 85;
 const FALLBACK_ROCK_COLS = 3;
 const FALLBACK_ROCK_ORIGIN_X = 120;
 const FALLBACK_ROCK_COL_STEP = 230;
@@ -47,7 +47,7 @@ export const CACTUS_SEGMENT_COUNT = 5;
 export const CACTUS_HALF_WIDTH = 8;
 export const CACTUS_SEGMENT_STRIDE = 14;
 export const CACTUS_SEGMENT_WIDTH = 16;
-export const CACTUS_SEGMENT_HEIGHT = 12;
+export const CACTUS_SEGMENT_HEIGHT = 14;
 
 interface Bullet {
   id: string;

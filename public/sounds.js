@@ -209,5 +209,14 @@ const Sounds = (() => {
     return muted;
   }
 
-  return { isMuted, toggleMute, playShoot, playCactusHit, playRicochet, playHit, playDeath, playReload };
+  return {
+    isMuted,
+    toggleMute,
+    playShoot,
+    playCactusHit,
+    playRicochet,
+    playHit,
+    playDeath,
+    playReload,
+  };
 })();

@@ -1,115 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Game — Multiplayer</title>
-  <style>
-    :root {
-      --color-bg-page:     #0f0f1a;
-      --color-bg-nav:      #1a1a2e;
-      --color-border:      #2a2a4a;
-      --color-text-primary: #e0e0e0;
-      --color-text-secondary: #888;
-      --color-text-muted:  #444;
-      --color-text-dim:    #aaa;
-      --color-overlay-bg:  rgba(0,0,0,0.75);
-      --color-winner-gold: #f9ca24;
-      --color-winner-orange: #f0932b;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      min-height: 100vh;
-      background: var(--color-bg-page);
-      font-family: system-ui, sans-serif;
-      color: var(--color-text-primary);
-      display: flex;
-      flex-direction: column;
-    }
-    nav {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 10px 20px;
-      border-bottom: 1px solid var(--color-border);
-      background: var(--color-bg-nav);
-    }
-    nav .game-title { font-weight: 600; margin-right: auto; }
-    nav span { font-size: 0.8rem; color: var(--color-text-secondary); }
-    nav a { color: var(--color-text-secondary); text-decoration: none; font-size: 0.85rem; }
-    nav a:hover { color: var(--color-text-primary); }
-    #mute-btn {
-      background: none;
-      border: 1px solid var(--color-border);
-      color: var(--color-text-secondary);
-      font-size: 1rem;
-      padding: 3px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      line-height: 1;
-    }
-    #mute-btn:hover { color: var(--color-text-primary); }
-    .arena {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    canvas {
-      border: 1px solid var(--color-border);
-      border-radius: 4px;
-      image-rendering: pixelated;
-      position: relative;
-    }
-    .hint {
-      text-align: center;
-      padding: 8px;
-      font-size: 0.75rem;
-      color: var(--color-text-muted);
-    }
-    #overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: var(--color-overlay-bg);
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 16px;
-      z-index: 10;
-    }
-    #overlay.visible { display: flex; }
-    #overlay h2 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--color-winner-gold), var(--color-winner-orange));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    #overlay p { color: var(--color-text-dim); font-size: 1rem; }
-  </style>
-</head>
-<body>
-  <nav>
-    <span class="game-title" id="game-title">Game</span>
-    <span id="player-count"></span>
-    <button id="mute-btn" title="Toggle sound">🔊</button>
-    <a href="/lobby.html">← Back to lobby</a>
-  </nav>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game — Multiplayer</title>
+    <link rel="stylesheet" href="game.css" />
+  </head>
+  <body>
+    <nav>
+      <span class="game-title" id="game-title">Game</span>
+      <span id="player-count"></span>
+      <button id="mute-btn" title="Toggle sound">🔊</button>
+      <a href="/lobby.html">← Back to lobby</a>
+    </nav>
 
-  <div class="arena">
-    <canvas id="canvas" width="800" height="500"></canvas>
-  </div>
-  <p class="hint">Move: Arrows &nbsp;|&nbsp; Aim: A (up) Z (down) &nbsp;|&nbsp; Shoot: X &nbsp;|&nbsp; Reload: R</p>
+    <div class="arena">
+      <canvas id="canvas" width="1000" height="650"></canvas>
+    </div>
+    <p class="hint">
+      Move: Arrows &nbsp;|&nbsp; Aim: A (up) Z (down) &nbsp;|&nbsp; Shoot: X
+      &nbsp;|&nbsp; Reload: R
+    </p>
 
-  <div id="overlay">
-    <h2 id="winner-text"></h2>
-    <p id="countdown-text"></p>
-  </div>
+    <div id="overlay">
+      <h2 id="winner-text"></h2>
+      <p id="countdown-text"></p>
+    </div>
 
-  <script src="sounds.js"></script>
-  <script src="game.js"></script>
-</body>
+    <script src="sounds.js"></script>
+    <script src="game.js"></script>
+  </body>
 </html>
