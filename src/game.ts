@@ -6,11 +6,47 @@ const BULLET_SPEED = 8;
 const TICK_MS = 50;
 const PLAYER_RADIUS = 16;
 const BULLET_RADIUS = 3;
-const SHOOT_COOLDOWN = 400;
+const SHOOT_COOL_DOWN = 400;
 const RELOAD_TIME = 2000;
 const ARENA_W = 800;
 const ARENA_H = 500;
 const ARM_MAX = Math.PI / 3;
+
+// Arena generation — rock placement
+const ROCK_COUNT = 5;
+const ROCK_MIN_SIDES = 5;
+const ROCK_EXTRA_SIDES = 5;
+const ROCK_MIN_RADIUS = 20;
+const ROCK_MAX_RADIUS = 55;
+const FALLBACK_ROCK_COLS = 3;
+const FALLBACK_ROCK_ORIGIN_X = 120;
+const FALLBACK_ROCK_COL_STEP = 230;
+const FALLBACK_ROCK_ORIGIN_Y = 150;
+const FALLBACK_ROCK_ROW_STEP = 200;
+const FALLBACK_ROCK_MAX_RADIUS = 35;
+const FALLBACK_ROCK_SIDES = 5;
+
+// Arena generation — cactus placement
+const CACTUS_COUNT = 4;
+const CACTUS_PLACEMENT_RADIUS = 18;
+const CACTUS_PLACEMENT_MARGIN_Y = 60;
+const FALLBACK_CACTUS_COLS = 2;
+const FALLBACK_CACTUS_ORIGIN_X = 200;
+const FALLBACK_CACTUS_COL_STEP = 380;
+const FALLBACK_CACTUS_ORIGIN_Y = 180;
+const FALLBACK_CACTUS_ROW_STEP = 140;
+
+// Arena generation — shared
+const PLACEMENT_MAX_ATTEMPTS = 60;
+const OBJECT_MIN_SPACING = 40;
+const ARENA_PLACEMENT_MARGIN = 80;
+
+// Cactus segment geometry (used for collision and rendering)
+export const CACTUS_SEGMENT_COUNT = 5;
+export const CACTUS_HALF_WIDTH = 8;
+export const CACTUS_SEGMENT_STRIDE = 14;
+export const CACTUS_SEGMENT_WIDTH = 16;
+export const CACTUS_SEGMENT_HEIGHT = 12;
 
 interface Bullet {
   id: string;
@@ -70,18 +106,18 @@ function generateArena(): { rocks: Rock[]; cacti: Cactus[] } {
 
   function tooClose(x: number, y: number, r: number): boolean {
     for (const o of placed) {
-      if (Math.hypot(x - o.x, y - o.y) < r + o.r + 40) return true;
+      if (Math.hypot(x - o.x, y - o.y) < r + o.r + OBJECT_MIN_SPACING) return true;
     }
     return false;
   }
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < ROCK_COUNT; i++) {
     let rock: Rock | null = null;
-    for (let t = 0; t < 60; t++) {
-      const sides = 3 + Math.floor(Math.random() * 5);
-      const cx = 80 + Math.random() * (ARENA_W - 160);
-      const cy = 80 + Math.random() * (ARENA_H - 160);
-      const vertices = generatePolygonVertices(cx, cy, 20, 45, sides);
+    for (let t = 0; t < PLACEMENT_MAX_ATTEMPTS; t++) {
+      const sides = ROCK_MIN_SIDES + Math.floor(Math.random() * ROCK_EXTRA_SIDES);
+      const cx = ARENA_PLACEMENT_MARGIN + Math.random() * (ARENA_W - ARENA_PLACEMENT_MARGIN * 2);
+      const cy = ARENA_PLACEMENT_MARGIN + Math.random() * (ARENA_H - ARENA_PLACEMENT_MARGIN * 2);
+      const vertices = generatePolygonVertices(cx, cy, ROCK_MIN_RADIUS, ROCK_MAX_RADIUS, sides);
       const br = Math.max(...vertices.map(v => Math.hypot(v.x - cx, v.y - cy)));
       if (!tooClose(cx, cy, br)) {
         rock = { id: `rock_${i}`, x: cx, y: cy, boundingRadius: br, vertices };
@@ -90,9 +126,9 @@ function generateArena(): { rocks: Rock[]; cacti: Cactus[] } {
       }
     }
     if (!rock) {
-      const cx = 120 + (i % 3) * 230;
-      const cy = 150 + Math.floor(i / 3) * 200;
-      const vertices = generatePolygonVertices(cx, cy, 20, 35, 5);
+      const cx = FALLBACK_ROCK_ORIGIN_X + (i % FALLBACK_ROCK_COLS) * FALLBACK_ROCK_COL_STEP;
+      const cy = FALLBACK_ROCK_ORIGIN_Y + Math.floor(i / FALLBACK_ROCK_COLS) * FALLBACK_ROCK_ROW_STEP;
+      const vertices = generatePolygonVertices(cx, cy, ROCK_MIN_RADIUS, FALLBACK_ROCK_MAX_RADIUS, FALLBACK_ROCK_SIDES);
       const br = Math.max(...vertices.map(v => Math.hypot(v.x - cx, v.y - cy)));
       rock = { id: `rock_${i}`, x: cx, y: cy, boundingRadius: br, vertices };
       placed.push({ x: cx, y: cy, r: br });
@@ -100,22 +136,22 @@ function generateArena(): { rocks: Rock[]; cacti: Cactus[] } {
     rocks.push(rock);
   }
 
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < CACTUS_COUNT; i++) {
     let cactus: Cactus | null = null;
-    for (let t = 0; t < 60; t++) {
-      const x = 80 + Math.random() * (ARENA_W - 160);
-      const y = 60 + Math.random() * (ARENA_H - 160);
-      if (!tooClose(x, y, 18)) {
-        cactus = { id: `cactus_${i}`, x, y, segments: [true, true, true, true, true] };
-        placed.push({ x, y, r: 18 });
+    for (let t = 0; t < PLACEMENT_MAX_ATTEMPTS; t++) {
+      const x = ARENA_PLACEMENT_MARGIN + Math.random() * (ARENA_W - ARENA_PLACEMENT_MARGIN * 2);
+      const y = CACTUS_PLACEMENT_MARGIN_Y + Math.random() * (ARENA_H - ARENA_PLACEMENT_MARGIN * 2);
+      if (!tooClose(x, y, CACTUS_PLACEMENT_RADIUS)) {
+        cactus = { id: `cactus_${i}`, x, y, segments: Array(CACTUS_SEGMENT_COUNT).fill(true) };
+        placed.push({ x, y, r: CACTUS_PLACEMENT_RADIUS });
         break;
       }
     }
     if (!cactus) {
-      const x = 200 + (i % 2) * 380;
-      const y = 180 + Math.floor(i / 2) * 140;
-      cactus = { id: `cactus_${i}`, x, y, segments: [true, true, true, true, true] };
-      placed.push({ x, y, r: 18 });
+      const x = FALLBACK_CACTUS_ORIGIN_X + (i % FALLBACK_CACTUS_COLS) * FALLBACK_CACTUS_COL_STEP;
+      const y = FALLBACK_CACTUS_ORIGIN_Y + Math.floor(i / FALLBACK_CACTUS_COLS) * FALLBACK_CACTUS_ROW_STEP;
+      cactus = { id: `cactus_${i}`, x, y, segments: Array(CACTUS_SEGMENT_COUNT).fill(true) };
+      placed.push({ x, y, r: CACTUS_PLACEMENT_RADIUS });
     }
     cacti.push(cactus);
   }
@@ -162,8 +198,37 @@ export function listRooms(): GameInfo[] {
   }));
 }
 
+function findSafeSpawnPosition(room: GameRoom): { x: number; y: number } {
+  for (let attempt = 0; attempt < PLACEMENT_MAX_ATTEMPTS; attempt++) {
+    const x = ARENA_PLACEMENT_MARGIN + Math.random() * (ARENA_W - ARENA_PLACEMENT_MARGIN * 2);
+    const y = ARENA_PLACEMENT_MARGIN + Math.random() * (ARENA_H - ARENA_PLACEMENT_MARGIN * 2);
+
+    let safe = true;
+    for (const rock of room.rocks) {
+      if (Math.hypot(x - rock.x, y - rock.y) < rock.boundingRadius + PLAYER_RADIUS + OBJECT_MIN_SPACING) {
+        safe = false;
+        break;
+      }
+    }
+    if (!safe) continue;
+
+    for (const cactus of room.cacti) {
+      if (Math.hypot(x - cactus.x, y - cactus.y) < CACTUS_PLACEMENT_RADIUS + PLAYER_RADIUS + OBJECT_MIN_SPACING) {
+        safe = false;
+        break;
+      }
+    }
+    if (safe) return { x, y };
+  }
+  return { x: PLAYER_RADIUS * 3, y: PLAYER_RADIUS * 3 };
+}
+
 export function joinRoom(room: GameRoom, playerId: string, playerName: string, socket: WebSocket) {
-  room.players.set(playerId, createPlayer(playerId, playerName));
+  const player = createPlayer(playerId, playerName);
+  const spawn = findSafeSpawnPosition(room);
+  player.x = spawn.x;
+  player.y = spawn.y;
+  room.players.set(playerId, player);
   room.sockets.set(playerId, socket);
 }
 
@@ -192,7 +257,7 @@ export function shoot(room: GameRoom, playerId: string) {
   const player = room.players.get(playerId);
   if (!player || !player.alive || player.reloading || player.ammo <= 0) return;
   const now = Date.now();
-  if (now - player.lastShot < SHOOT_COOLDOWN) return;
+  if (now - player.lastShot < SHOOT_COOL_DOWN) return;
 
   player.ammo--;
   player.lastShot = now;
@@ -263,6 +328,56 @@ function reflect(vx: number, vy: number, nx: number, ny: number): [number, numbe
   return [vx - 2 * dot * nx, vy - 2 * dot * ny];
 }
 
+function resolvePlayerRockCollision(player: Player, rock: Rock): void {
+  if (Math.hypot(player.x - rock.x, player.y - rock.y) > rock.boundingRadius + PLAYER_RADIUS) return;
+
+  const vertices = rock.vertices;
+  const n = vertices.length;
+  let minDist = Infinity;
+  let pushX = 0, pushY = 0;
+
+  for (let i = 0; i < n; i++) {
+    const a = vertices[i], b = vertices[(i + 1) % n];
+    const cp = closestPointOnSegment(player.x, player.y, a.x, a.y, b.x, b.y);
+    const dx = player.x - cp.x, dy = player.y - cp.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist < PLAYER_RADIUS && dist < minDist) {
+      minDist = dist;
+      if (dist > 0) {
+        const overlap = PLAYER_RADIUS - dist;
+        pushX = (dx / dist) * overlap;
+        pushY = (dy / dist) * overlap;
+      } else {
+        const ex = b.x - a.x, ey = b.y - a.y, el = Math.hypot(ex, ey);
+        pushX = (-ey / el) * PLAYER_RADIUS;
+        pushY = (ex / el) * PLAYER_RADIUS;
+      }
+    }
+  }
+
+  if (minDist < Infinity) {
+    player.x += pushX;
+    player.y += pushY;
+  }
+}
+
+function resolvePlayerCactusCollision(player: Player, cactus: Cactus): void {
+  for (let i = 0; i < cactus.segments.length; i++) {
+    if (!cactus.segments[i]) continue;
+    const rx = cactus.x - CACTUS_HALF_WIDTH;
+    const ry = cactus.y + i * CACTUS_SEGMENT_STRIDE;
+    const cx = Math.max(rx, Math.min(rx + CACTUS_SEGMENT_WIDTH, player.x));
+    const cy = Math.max(ry, Math.min(ry + CACTUS_SEGMENT_HEIGHT, player.y));
+    const dx = player.x - cx, dy = player.y - cy;
+    const dist = Math.hypot(dx, dy);
+    if (dist < PLAYER_RADIUS && dist > 0) {
+      const overlap = PLAYER_RADIUS - dist;
+      player.x += (dx / dist) * overlap;
+      player.y += (dy / dist) * overlap;
+    }
+  }
+}
+
 function tick(room: GameRoom) {
   const now = Date.now();
 
@@ -272,6 +387,11 @@ function tick(room: GameRoom) {
 
     player.x = Math.max(PLAYER_RADIUS, Math.min(ARENA_W - PLAYER_RADIUS, player.x + player.dx * SPEED));
     player.y = Math.max(PLAYER_RADIUS, Math.min(ARENA_H - PLAYER_RADIUS, player.y + player.dy * SPEED));
+
+    for (const rock of room.rocks) resolvePlayerRockCollision(player, rock);
+    for (const cactus of room.cacti) resolvePlayerCactusCollision(player, cactus);
+    player.x = Math.max(PLAYER_RADIUS, Math.min(ARENA_W - PLAYER_RADIUS, player.x));
+    player.y = Math.max(PLAYER_RADIUS, Math.min(ARENA_H - PLAYER_RADIUS, player.y));
 
     // Complete reload
     if (player.reloading && now - player.reloadStart >= RELOAD_TIME) {
@@ -307,8 +427,8 @@ function tick(room: GameRoom) {
       outer: for (const cactus of room.cacti) {
         for (let i = 0; i < cactus.segments.length; i++) {
           if (!cactus.segments[i]) continue;
-          const sx = cactus.x - 8, sy = cactus.y + i * 14;
-          if (bullet.x >= sx && bullet.x <= sx + 16 && bullet.y >= sy && bullet.y <= sy + 12) {
+          const sx = cactus.x - CACTUS_HALF_WIDTH, sy = cactus.y + i * CACTUS_SEGMENT_STRIDE;
+          if (bullet.x >= sx && bullet.x <= sx + CACTUS_SEGMENT_WIDTH && bullet.y >= sy && bullet.y <= sy + CACTUS_SEGMENT_HEIGHT) {
             cactus.segments[i] = false;
             alive = false;
             break outer;

@@ -4,7 +4,8 @@ Coding standards
 
 Colors should not be hardcoded - create a variable with a descriptive name. 
 If functions rely on hardcoded internal values it is better to create a variable in the function with a descriptive name.
-Larger scripts in html files are better to keep in separate files 
+Larger scripts in html files are better to keep in separate files
+Try to avoid abbreviations in the variable names you have control over. 
 
 Agent Human collaboration
 =========================
