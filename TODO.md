@@ -1,16 +1,16 @@
 # TODO
 
-# sprint 7
+# Sprint 7
 - Sound effect when cactus is hit - 'Chuck'
-- Play different (disappointing) sound effect when player is trying to shoot empty gun (different from shot and reload)
+- Make shooting sound more like a high pitched gun and less like a deep canon.  
+- Play a different (disappointing) 'empty gun click' sound effect when player is trying to shoot empty gun (different from shot and reload)
+- Sound effect when player chooses room
+- Sound effect when player chooses name
 - Animated bullet trail
 
 ## Backlog
 - Gun should also be part of collision geometry. Mussel should not poke through rock/cacti.
 - Bullet to rock collision detection is not always reliable.
-- Sound effect when player chooses room
-- Sound effect when player chooses name
-- Make shooting sound more like a gun and less like a canon.  
 - Cacti should have one or two arms and variation in height
 - Players should not be able to move through other players (collision detection)
 - Spike, How to make game more exciting
@@ -19,3 +19,4 @@
 
 ## Ideas / Maybes
 - Lobby shows game type icons
+- Should we use real sprites for the characters (Yes)
