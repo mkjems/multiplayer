@@ -2,12 +2,15 @@ export type ClientMessage =
   | { type: "join_lobby" }
   | { type: "join_game"; gameId: string; playerName: string }
   | { type: "leave_game" }
-  | { type: "move"; dx: number; dy: number };
+  | { type: "move"; dx: number; dy: number }
+  | { type: "arm_angle"; angle: number }
+  | { type: "shoot" };
 
 export type ServerMessage =
   | { type: "lobby_state"; games: GameInfo[] }
   | { type: "game_joined"; playerId: string; gameId: string }
-  | { type: "game_state"; players: PlayerSnapshot[] }
+  | { type: "arena"; rocks: RockData[]; cacti: CactusData[] }
+  | { type: "game_state"; players: PlayerSnapshot[]; bullets: BulletSnapshot[]; cacti: CactusData[] }
   | { type: "error"; message: string };
 
 export interface GameInfo {
@@ -24,4 +27,28 @@ export interface PlayerSnapshot {
   x: number;
   y: number;
   color: string;
+  health: number;
+  ammo: number;
+  armAngle: number;
+  facing: "left" | "right";
+}
+
+export interface BulletSnapshot {
+  id: string;
+  x: number;
+  y: number;
+}
+
+export interface RockData {
+  id: string;
+  x: number;
+  y: number;
+  radius: number;
+}
+
+export interface CactusData {
+  id: string;
+  x: number;
+  y: number;
+  segments: boolean[]; // true = alive, index 0 = top, 5 segments
 }

@@ -1,4 +1,4 @@
-import { createRoom, getRoom, joinRoom, leaveRoom, applyInput, listRooms } from "./src/game.ts";
+import { createRoom, getRoom, joinRoom, leaveRoom, applyInput, listRooms, setArmAngle, shoot, getRockData, getCactiData } from "./src/game.ts";
 import type { ClientMessage } from "./src/protocol.ts";
 
 // Seed some default rooms
@@ -64,9 +64,14 @@ function handleGameSocket(ws: WebSocket, roomId: string) {
       playerId = crypto.randomUUID();
       joinRoom(room, playerId, msg.playerName, ws);
       ws.send(JSON.stringify({ type: "game_joined", playerId, gameId: roomId }));
+      ws.send(JSON.stringify({ type: "arena", rocks: getRockData(room), cacti: getCactiData(room) }));
       broadcastLobby();
     } else if (msg.type === "move" && playerId) {
       applyInput(room, playerId, msg.dx, msg.dy);
+    } else if (msg.type === "arm_angle" && playerId) {
+      setArmAngle(room, playerId, msg.angle);
+    } else if (msg.type === "shoot" && playerId) {
+      shoot(room, playerId);
     } else if (msg.type === "leave_game" && playerId) {
       leaveRoom(room, playerId);
       broadcastLobby();

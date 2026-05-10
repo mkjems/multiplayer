@@ -37,7 +37,7 @@ Open [http://localhost:8000](http://localhost:8000) in your browser (try two tab
 └── public/
     ├── index.html      # Landing page — enter your name
     ├── lobby.html      # Game selection — live player counts
-    └── game.html       # Canvas game client (WASD / arrow keys)
+    └── game.html       # Canvas game client (arrow keys)
 ```
 
 ---

@@ -6,7 +6,6 @@
   <title>Game — Multiplayer</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       min-height: 100vh;
       background: #0f0f1a;
@@ -15,77 +14,76 @@
       display: flex;
       flex-direction: column;
     }
-
     nav {
       display: flex;
       align-items: center;
       gap: 16px;
-      padding: 12px 24px;
+      padding: 10px 20px;
       border-bottom: 1px solid #2a2a4a;
       background: #1a1a2e;
     }
-
-    nav a {
-      color: #888;
-      text-decoration: none;
-      font-size: 0.85rem;
-      transition: color 0.2s;
-    }
-
+    nav .game-title { font-weight: 600; margin-right: auto; }
+    nav span { font-size: 0.8rem; color: #888; }
+    nav a { color: #888; text-decoration: none; font-size: 0.85rem; }
     nav a:hover { color: #e0e0e0; }
-
-    nav .game-title {
-      font-weight: 600;
-      color: #e0e0e0;
-      margin-right: auto;
-    }
-
     .arena {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 16px;
     }
-
     canvas {
       border: 1px solid #2a2a4a;
-      border-radius: 8px;
-      background: #12121f;
+      border-radius: 4px;
+      image-rendering: pixelated;
     }
-
     .hint {
       text-align: center;
-      padding: 12px;
-      font-size: 0.8rem;
-      color: #555;
+      padding: 8px;
+      font-size: 0.75rem;
+      color: #444;
     }
   </style>
 </head>
 <body>
   <nav>
     <span class="game-title" id="game-title">Game</span>
-    <span id="player-count" style="font-size:0.8rem;color:#888;"></span>
+    <span id="player-count"></span>
     <a href="/lobby.html">← Back to lobby</a>
   </nav>
 
   <div class="arena">
     <canvas id="canvas" width="800" height="500"></canvas>
   </div>
-  <p class="hint">WASD or arrow keys to move</p>
+  <p class="hint">Move: Arrows &nbsp;|&nbsp; Aim: A (up) Z (down) &nbsp;|&nbsp; Shoot: X</p>
 
   <script>
     const playerName = sessionStorage.getItem("playerName");
     const gameId = sessionStorage.getItem("gameId");
     if (!playerName || !gameId) window.location.href = "/";
 
+    document.getElementById("game-title").textContent =
+      gameId.charAt(0).toUpperCase() + gameId.slice(1);
+
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
-    const titleEl = document.getElementById("game-title");
     const countEl = document.getElementById("player-count");
 
+    // Game state
     let myId = null;
     let players = [];
+    let bullets = [];
+    let rocks = [];
+    let cacti = [];
 
+    // Local arm angle tracking (predicted, for responsive rendering)
+    let localArmAngle = 0;
+    let localFacing = "right";
+    const ARM_MAX = Math.PI / 3;
+    const ARM_STEP = (2 * Math.PI) / 180; // 2° per frame
+
+    // WebSocket
     const protocol = location.protocol === "https:" ? "wss" : "ws";
     const ws = new WebSocket(`${protocol}://${location.host}/ws/game/${gameId}`);
 
@@ -97,10 +95,17 @@
       const msg = JSON.parse(e.data);
       if (msg.type === "game_joined") {
         myId = msg.playerId;
-        titleEl.textContent = gameId.charAt(0).toUpperCase() + gameId.slice(1);
+      } else if (msg.type === "arena") {
+        rocks = msg.rocks;
+        cacti = msg.cacti;
       } else if (msg.type === "game_state") {
         players = msg.players;
+        bullets = msg.bullets;
+        cacti = msg.cacti; // updated segments
         countEl.textContent = `${players.length} player${players.length !== 1 ? "s" : ""}`;
+        // Sync local arm angle and facing from server for own player
+        const me = players.find(p => p.id === myId);
+        if (me) localFacing = me.facing;
       }
     };
 
@@ -115,52 +120,184 @@
 
     // Input
     const keys = new Set();
-    document.addEventListener("keydown", (e) => keys.add(e.key));
-    document.addEventListener("keyup", (e) => keys.delete(e.key));
+    document.addEventListener("keydown", (e) => {
+      keys.add(e.key.toLowerCase());
+      if (e.key.toLowerCase() === "x") {
+        if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "shoot" }));
+      }
+    });
+    document.addEventListener("keyup", (e) => keys.delete(e.key.toLowerCase()));
 
-    let lastInput = { dx: 0, dy: 0 };
+    let lastMove = { dx: 0, dy: 0 };
+    let lastAngleSent = 0;
+    let lastAngleValue = 0;
 
     function sendInput() {
-      const dx = (keys.has("ArrowRight") || keys.has("d") ? 1 : 0)
-               - (keys.has("ArrowLeft") || keys.has("a") ? 1 : 0);
-      const dy = (keys.has("ArrowDown") || keys.has("s") ? 1 : 0)
-               - (keys.has("ArrowUp") || keys.has("w") ? 1 : 0);
-      if (dx !== lastInput.dx || dy !== lastInput.dy) {
-        lastInput = { dx, dy };
+      // Movement
+      const dx = (keys.has("arrowright") ? 1 : 0) - (keys.has("arrowleft") ? 1 : 0);
+      const dy = (keys.has("arrowdown")  ? 1 : 0) - (keys.has("arrowup")   ? 1 : 0);
+
+      if (dx !== lastMove.dx || dy !== lastMove.dy) {
+        lastMove = { dx, dy };
+        if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "move", dx, dy }));
+      }
+
+      // Update facing from movement (local prediction)
+      if (dx > 0) localFacing = "right";
+      else if (dx < 0) localFacing = "left";
+
+      // Arm angle — 'a'=aim up, 'z'=aim down
+      let changed = false;
+      if (keys.has("a")) {
+        localArmAngle = Math.min(ARM_MAX, localArmAngle + ARM_STEP);
+        changed = true;
+      }
+      if (keys.has("z")) {
+        localArmAngle = Math.max(-ARM_MAX, localArmAngle - ARM_STEP);
+        changed = true;
+      }
+
+      if (changed && Date.now() - lastAngleSent > 40) {
+        lastAngleSent = Date.now();
+        lastAngleValue = localArmAngle;
         if (ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify({ type: "move", dx, dy }));
+          ws.send(JSON.stringify({ type: "arm_angle", angle: localArmAngle }));
         }
       }
     }
 
-    // Render loop
+    // Rendering helpers
+    function drawRock(rock) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(rock.x, rock.y, rock.radius, 0, Math.PI * 2);
+      ctx.fillStyle = "#4a4a5a";
+      ctx.fill();
+      ctx.strokeStyle = "#6a6a7a";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      // Small highlight
+      ctx.beginPath();
+      ctx.arc(rock.x - rock.radius * 0.25, rock.y - rock.radius * 0.25, rock.radius * 0.3, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255,0.08)";
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawCactus(cactus) {
+      const segW = 16, segH = 12, segGap = 14;
+      for (let i = 0; i < cactus.segments.length; i++) {
+        if (!cactus.segments[i]) continue;
+        const sx = cactus.x - segW / 2;
+        const sy = cactus.y + i * segGap;
+        ctx.fillStyle = "#2d7a2d";
+        ctx.fillRect(sx, sy, segW, segH);
+        ctx.strokeStyle = "#1a5c1a";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(sx, sy, segW, segH);
+      }
+    }
+
+    function drawPlayer(p) {
+      const isMe = p.id === myId;
+      const angle = isMe ? localArmAngle : p.armAngle;
+      const facing = isMe ? localFacing : p.facing;
+      const dir = facing === "right" ? 1 : -1;
+
+      // Glow for own player
+      if (isMe) {
+        ctx.save();
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 14;
+      }
+
+      // Player dot
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 14, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+
+      if (isMe) ctx.restore();
+
+      // Arm line
+      const armLen = 28;
+      const ax = p.x + dir * armLen * Math.cos(angle);
+      const ay = p.y - armLen * Math.sin(angle);
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(ax, ay);
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 3;
+      ctx.lineCap = "round";
+      ctx.stroke();
+
+      // Health bar
+      const barW = 36, barH = 4;
+      const bx = p.x - barW / 2;
+      const by = p.y - 26;
+      ctx.fillStyle = "#333";
+      ctx.fillRect(bx, by, barW, barH);
+      const healthColor = p.health > 60 ? "#2ecc71" : p.health > 30 ? "#f39c12" : "#e74c3c";
+      ctx.fillStyle = healthColor;
+      ctx.fillRect(bx, by, barW * (p.health / 100), barH);
+
+      // Name
+      ctx.fillStyle = "#fff";
+      ctx.font = `bold 11px system-ui`;
+      ctx.textAlign = "center";
+      ctx.fillText(p.name, p.x, p.y + 26);
+    }
+
+    function drawBullet(b) {
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = "#f9ca24";
+      ctx.fill();
+      ctx.strokeStyle = "#f0932b";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    function drawAmmoHUD() {
+      const me = players.find(p => p.id === myId);
+      if (!me) return;
+      const total = 20;
+      const size = 8, gap = 4, px = 14, py = canvas.height - 20;
+      ctx.font = "bold 10px system-ui";
+      ctx.fillStyle = "#888";
+      ctx.textAlign = "left";
+      ctx.fillText("AMMO", px, py - 2);
+      for (let i = 0; i < total; i++) {
+        const x = px + i * (size + gap);
+        ctx.beginPath();
+        ctx.arc(x + size / 2, py + size / 2, size / 2, 0, Math.PI * 2);
+        ctx.fillStyle = i < me.ammo ? "#f9ca24" : "#333";
+        ctx.fill();
+      }
+    }
+
+    // Main render loop
     function render() {
       sendInput();
 
-      ctx.fillStyle = "#12121f";
+      // Background
+      ctx.fillStyle = "#c8b78a"; // sandy ground
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      for (const p of players) {
-        // Shadow for own player
-        if (p.id === myId) {
-          ctx.save();
-          ctx.shadowColor = p.color;
-          ctx.shadowBlur = 16;
-        }
+      // Draw rocks
+      for (const rock of rocks) drawRock(rock);
 
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 16, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.fill();
+      // Draw cacti
+      for (const cactus of cacti) drawCactus(cactus);
 
-        if (p.id === myId) ctx.restore();
+      // Draw bullets
+      for (const b of bullets) drawBullet(b);
 
-        // Name label
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 12px system-ui";
-        ctx.textAlign = "center";
-        ctx.fillText(p.name, p.x, p.y - 22);
-      }
+      // Draw players
+      for (const p of players) drawPlayer(p);
+
+      // Ammo HUD
+      drawAmmoHUD();
 
       requestAnimationFrame(render);
     }

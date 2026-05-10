@@ -15,6 +15,11 @@ export interface Player {
   color: string;
   dx: number;
   dy: number;
+  health: number;
+  ammo: number;
+  armAngle: number;    // radians, clamped to ±π/3 (±60°)
+  facing: "left" | "right";
+  lastShot: number;    // timestamp ms
 }
 
 export function createPlayer(id: string, name: string): Player {
@@ -22,13 +27,28 @@ export function createPlayer(id: string, name: string): Player {
     id,
     name,
     x: 100 + Math.random() * 600,
-    y: 100 + Math.random() * 400,
+    y: 100 + Math.random() * 300,
     color: COLORS[colorIndex++ % COLORS.length],
     dx: 0,
     dy: 0,
+    health: 100,
+    ammo: 20,
+    armAngle: 0,
+    facing: "right",
+    lastShot: 0,
   };
 }
 
 export function toSnapshot(player: Player): PlayerSnapshot {
-  return { id: player.id, name: player.name, x: player.x, y: player.y, color: player.color };
+  return {
+    id: player.id,
+    name: player.name,
+    x: player.x,
+    y: player.y,
+    color: player.color,
+    health: player.health,
+    ammo: player.ammo,
+    armAngle: player.armAngle,
+    facing: player.facing,
+  };
 }
