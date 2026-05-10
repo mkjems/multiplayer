@@ -1,13 +1,8 @@
 # TODO
 
-## Sprint 8
-
-- Give the character momentum/inertia, Instead of instant stop/start, apply acceleration and friction. The dot slides a tiny bit when you release the key.
-- Consider a dust cloud trailing behind the player when moving fast.
-- Put client css in their own separate file 
-
 
 ## Backlog
+- When a game is finished inside a room. The room should be regenerated. 
 - When new players join the should be placed as far away for the other players as possible but 30px from the edge  
 - Gun should also be part of collision geometry. Mussel should not poke through rock/cacti.
 - Bullet to rock collision detection is not always reliable.

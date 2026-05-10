@@ -15,6 +15,8 @@ export interface Player {
   color: string;
   dx: number;
   dy: number;
+  vx: number;
+  vy: number;
   health: number;
   ammo: number;
   armAngle: number;
@@ -35,6 +37,8 @@ export function createPlayer(id: string, name: string): Player {
     color: COLORS[colorIndex++ % COLORS.length],
     dx: 0,
     dy: 0,
+    vx: 0,
+    vy: 0,
     health: 100,
     ammo: 6,
     armAngle: 0,

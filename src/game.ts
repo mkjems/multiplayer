@@ -1,7 +1,9 @@
 import { createPlayer, toSnapshot, type Player } from "./player.ts";
 import type { GameInfo, PlayerSnapshot, BulletSnapshot, RockData, CactusData } from "./protocol.ts";
 
-const SPEED = 3;
+const MAX_SPEED = 4;
+const ACCELERATION = 0.35;
+const FRICTION = 0.75;
 const BULLET_SPEED = 12;
 const TICK_MS = 50;
 const PLAYER_RADIUS = 16;
@@ -11,7 +13,7 @@ const RELOAD_TIME = 2000;
 const ARENA_W = 1000;
 const ARENA_H = 650;
 const ARM_MAX = Math.PI / 3;
-const ARM_LENGTH = 28;
+const ARM_LENGTH = 20;
 
 // Arena generation — rock placement
 const ROCK_COUNT = 6;
@@ -388,8 +390,13 @@ function tick(room: GameRoom) {
   for (const player of room.players.values()) {
     if (!player.alive) continue;
 
-    player.x = Math.max(PLAYER_RADIUS, Math.min(ARENA_W - PLAYER_RADIUS, player.x + player.dx * SPEED));
-    player.y = Math.max(PLAYER_RADIUS, Math.min(ARENA_H - PLAYER_RADIUS, player.y + player.dy * SPEED));
+    player.vx = player.dx !== 0 ? player.vx + (player.dx * MAX_SPEED - player.vx) * ACCELERATION : player.vx * FRICTION;
+    player.vy = player.dy !== 0 ? player.vy + (player.dy * MAX_SPEED - player.vy) * ACCELERATION : player.vy * FRICTION;
+    if (Math.abs(player.vx) < 0.05) player.vx = 0;
+    if (Math.abs(player.vy) < 0.05) player.vy = 0;
+
+    player.x = Math.max(PLAYER_RADIUS, Math.min(ARENA_W - PLAYER_RADIUS, player.x + player.vx));
+    player.y = Math.max(PLAYER_RADIUS, Math.min(ARENA_H - PLAYER_RADIUS, player.y + player.vy));
 
     for (const rock of room.rocks) resolvePlayerRockCollision(player, rock);
     for (const cactus of room.cacti) resolvePlayerCactusCollision(player, cactus);
