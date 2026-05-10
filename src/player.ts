@@ -17,9 +17,12 @@ export interface Player {
   dy: number;
   health: number;
   ammo: number;
-  armAngle: number;    // radians, clamped to ±π/3 (±60°)
+  armAngle: number;
   facing: "left" | "right";
-  lastShot: number;    // timestamp ms
+  lastShot: number;
+  alive: boolean;
+  reloading: boolean;
+  reloadStart: number;
 }
 
 export function createPlayer(id: string, name: string): Player {
@@ -32,10 +35,13 @@ export function createPlayer(id: string, name: string): Player {
     dx: 0,
     dy: 0,
     health: 100,
-    ammo: 20,
+    ammo: 6,
     armAngle: 0,
     facing: "right",
     lastShot: 0,
+    alive: true,
+    reloading: false,
+    reloadStart: 0,
   };
 }
 
@@ -50,5 +56,7 @@ export function toSnapshot(player: Player): PlayerSnapshot {
     ammo: player.ammo,
     armAngle: player.armAngle,
     facing: player.facing,
+    alive: player.alive,
+    reloading: player.reloading,
   };
 }

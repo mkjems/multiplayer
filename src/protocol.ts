@@ -4,13 +4,15 @@ export type ClientMessage =
   | { type: "leave_game" }
   | { type: "move"; dx: number; dy: number }
   | { type: "arm_angle"; angle: number }
-  | { type: "shoot" };
+  | { type: "shoot" }
+  | { type: "reload" };
 
 export type ServerMessage =
   | { type: "lobby_state"; games: GameInfo[] }
   | { type: "game_joined"; playerId: string; gameId: string }
   | { type: "arena"; rocks: RockData[]; cacti: CactusData[] }
   | { type: "game_state"; players: PlayerSnapshot[]; bullets: BulletSnapshot[]; cacti: CactusData[] }
+  | { type: "game_over"; winnerName: string }
   | { type: "error"; message: string };
 
 export interface GameInfo {
@@ -31,6 +33,8 @@ export interface PlayerSnapshot {
   ammo: number;
   armAngle: number;
   facing: "left" | "right";
+  alive: boolean;
+  reloading: boolean;
 }
 
 export interface BulletSnapshot {

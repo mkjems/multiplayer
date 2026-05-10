@@ -6,10 +6,11 @@ const BULLET_SPEED = 8;
 const TICK_MS = 50;
 const PLAYER_RADIUS = 16;
 const BULLET_RADIUS = 3;
-const SHOOT_COOLDOWN = 400; // ms between shots
+const SHOOT_COOLDOWN = 400;
+const RELOAD_TIME = 2000;
 const ARENA_W = 800;
 const ARENA_H = 500;
-const ARM_MAX = Math.PI / 3; // 60 degrees
+const ARM_MAX = Math.PI / 3;
 
 interface Bullet {
   id: string;
@@ -44,6 +45,7 @@ export interface GameRoom {
   bullets: Bullet[];
   rocks: Rock[];
   cacti: Cactus[];
+  gameOver: boolean;
   interval: number | null;
 }
 
@@ -56,8 +58,7 @@ function generateArena(): { rocks: Rock[]; cacti: Cactus[] } {
 
   function tooClose(x: number, y: number, r: number): boolean {
     for (const o of placed) {
-      const d = Math.hypot(x - o.x, y - o.y);
-      if (d < r + o.r + 40) return true;
+      if (Math.hypot(x - o.x, y - o.y) < r + o.r + 40) return true;
     }
     return false;
   }
@@ -123,6 +124,7 @@ export function createRoom(id: string, name: string, maxPlayers = 8): GameRoom {
     bullets: [],
     rocks,
     cacti,
+    gameOver: false,
     interval: null,
   };
   rooms.set(id, room);
@@ -152,11 +154,12 @@ export function joinRoom(room: GameRoom, playerId: string, playerName: string, s
 export function leaveRoom(room: GameRoom, playerId: string) {
   room.players.delete(playerId);
   room.sockets.delete(playerId);
+  if (room.players.size === 0) room.gameOver = false;
 }
 
 export function applyInput(room: GameRoom, playerId: string, dx: number, dy: number) {
   const player = room.players.get(playerId);
-  if (!player) return;
+  if (!player || !player.alive) return;
   player.dx = dx;
   player.dy = dy;
   if (dx > 0) player.facing = "right";
@@ -165,13 +168,13 @@ export function applyInput(room: GameRoom, playerId: string, dx: number, dy: num
 
 export function setArmAngle(room: GameRoom, playerId: string, angle: number) {
   const player = room.players.get(playerId);
-  if (!player) return;
+  if (!player || !player.alive) return;
   player.armAngle = Math.max(-ARM_MAX, Math.min(ARM_MAX, angle));
 }
 
 export function shoot(room: GameRoom, playerId: string) {
   const player = room.players.get(playerId);
-  if (!player || player.ammo <= 0) return;
+  if (!player || !player.alive || player.reloading || player.ammo <= 0) return;
   const now = Date.now();
   if (now - player.lastShot < SHOOT_COOLDOWN) return;
 
@@ -187,10 +190,26 @@ export function shoot(room: GameRoom, playerId: string) {
     ownerId: playerId,
     x: player.x + dir * (PLAYER_RADIUS + 2),
     y: player.y,
-    vx,
-    vy,
+    vx, vy,
     born: now,
   });
+}
+
+export function reloadPlayer(room: GameRoom, playerId: string) {
+  const player = room.players.get(playerId);
+  if (!player || !player.alive || player.reloading || player.ammo >= 6) return;
+  player.reloading = true;
+  player.reloadStart = Date.now();
+}
+
+function broadcast(room: GameRoom, msg: string) {
+  for (const [id, socket] of room.sockets) {
+    try {
+      if (socket.readyState === WebSocket.OPEN) socket.send(msg);
+    } catch {
+      leaveRoom(room, id);
+    }
+  }
 }
 
 function reflect(vx: number, vy: number, nx: number, ny: number): [number, number] {
@@ -201,11 +220,21 @@ function reflect(vx: number, vy: number, nx: number, ny: number): [number, numbe
 function tick(room: GameRoom) {
   const now = Date.now();
 
+  // Move alive players
   for (const player of room.players.values()) {
+    if (!player.alive) continue;
+
     player.x = Math.max(PLAYER_RADIUS, Math.min(ARENA_W - PLAYER_RADIUS, player.x + player.dx * SPEED));
     player.y = Math.max(PLAYER_RADIUS, Math.min(ARENA_H - PLAYER_RADIUS, player.y + player.dy * SPEED));
+
+    // Complete reload
+    if (player.reloading && now - player.reloadStart >= RELOAD_TIME) {
+      player.ammo = 6;
+      player.reloading = false;
+    }
   }
 
+  // Bullet physics
   const surviving: Bullet[] = [];
 
   for (const bullet of room.bullets) {
@@ -229,7 +258,7 @@ function tick(room: GameRoom) {
       }
     }
 
-    // Cactus hit — destroy segment
+    // Cactus hit
     if (alive) {
       outer: for (const cactus of room.cacti) {
         for (let i = 0; i < cactus.segments.length; i++) {
@@ -247,9 +276,11 @@ function tick(room: GameRoom) {
     // Player hit
     if (alive) {
       for (const player of room.players.values()) {
+        if (!player.alive) continue;
         if (player.id === bullet.ownerId && now - bullet.born < 200) continue;
         if (Math.hypot(bullet.x - player.x, bullet.y - player.y) < PLAYER_RADIUS + BULLET_RADIUS) {
           player.health = Math.max(0, player.health - 20);
+          if (player.health <= 0) player.alive = false;
           alive = false;
           break;
         }
@@ -263,16 +294,19 @@ function tick(room: GameRoom) {
 
   if (room.sockets.size === 0) return;
 
+  // Win condition: 1 alive, 1+ dead
+  if (!room.gameOver) {
+    const allPlayers = [...room.players.values()];
+    const alivePlayers = allPlayers.filter(p => p.alive);
+    const deadPlayers = allPlayers.filter(p => !p.alive);
+    if (alivePlayers.length === 1 && deadPlayers.length >= 1) {
+      room.gameOver = true;
+      broadcast(room, JSON.stringify({ type: "game_over", winnerName: alivePlayers[0].name }));
+    }
+  }
+
   const players: PlayerSnapshot[] = [...room.players.values()].map(toSnapshot);
   const bullets: BulletSnapshot[] = room.bullets.map(b => ({ id: b.id, x: b.x, y: b.y }));
   const cacti: CactusData[] = room.cacti.map(c => ({ id: c.id, x: c.x, y: c.y, segments: [...c.segments] }));
-  const msg = JSON.stringify({ type: "game_state", players, bullets, cacti });
-
-  for (const [id, socket] of room.sockets) {
-    try {
-      if (socket.readyState === WebSocket.OPEN) socket.send(msg);
-    } catch {
-      leaveRoom(room, id);
-    }
-  }
+  broadcast(room, JSON.stringify({ type: "game_state", players, bullets, cacti }));
 }

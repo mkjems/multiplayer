@@ -1,4 +1,4 @@
-import { createRoom, getRoom, joinRoom, leaveRoom, applyInput, listRooms, setArmAngle, shoot, getRockData, getCactiData } from "./src/game.ts";
+import { createRoom, getRoom, joinRoom, leaveRoom, applyInput, listRooms, setArmAngle, shoot, reloadPlayer, getRockData, getCactiData } from "./src/game.ts";
 import type { ClientMessage } from "./src/protocol.ts";
 
 // Seed some default rooms
@@ -72,6 +72,8 @@ function handleGameSocket(ws: WebSocket, roomId: string) {
       setArmAngle(room, playerId, msg.angle);
     } else if (msg.type === "shoot" && playerId) {
       shoot(room, playerId);
+    } else if (msg.type === "reload" && playerId) {
+      reloadPlayer(room, playerId);
     } else if (msg.type === "leave_game" && playerId) {
       leaveRoom(room, playerId);
       broadcastLobby();
