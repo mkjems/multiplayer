@@ -23,30 +23,50 @@ const Sounds = (() => {
     const t = ctx.currentTime;
 
     const noiseSource = ctx.createBufferSource();
-    noiseSource.buffer = makeNoise(0.06);
+    noiseSource.buffer = makeNoise(0.045);
     const noiseBandpass = ctx.createBiquadFilter();
     noiseBandpass.type = "bandpass";
-    noiseBandpass.frequency.value = 650;
-    noiseBandpass.Q.value = 1.8;
+    noiseBandpass.frequency.value = 2200;
+    noiseBandpass.Q.value = 1.2;
     const noiseGain = ctx.createGain();
-    noiseGain.gain.setValueAtTime(0.8, t);
-    noiseGain.gain.linearRampToValueAtTime(0, t + 0.07);
+    noiseGain.gain.setValueAtTime(1.0, t);
+    noiseGain.gain.linearRampToValueAtTime(0, t + 0.05);
     noiseSource.connect(noiseBandpass);
     noiseBandpass.connect(noiseGain);
     noiseGain.connect(ctx.destination);
     noiseSource.start(t);
 
     const osc = ctx.createOscillator();
-    osc.type = "triangle";
-    osc.frequency.setValueAtTime(190, t);
-    osc.frequency.exponentialRampToValueAtTime(52, t + 0.14);
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(900, t);
+    osc.frequency.exponentialRampToValueAtTime(180, t + 0.10);
     const oscGain = ctx.createGain();
-    oscGain.gain.setValueAtTime(0.45, t);
-    oscGain.gain.linearRampToValueAtTime(0, t + 0.18);
+    oscGain.gain.setValueAtTime(0.35, t);
+    oscGain.gain.linearRampToValueAtTime(0, t + 0.12);
     osc.connect(oscGain);
     oscGain.connect(ctx.destination);
     osc.start(t);
-    osc.stop(t + 0.18);
+    osc.stop(t + 0.12);
+  }
+
+  function playCactusHit() {
+    if (muted) return;
+    const ctx = getCtx();
+    const t = ctx.currentTime;
+
+    const noiseSource = ctx.createBufferSource();
+    noiseSource.buffer = makeNoise(0.08);
+    const bandpass = ctx.createBiquadFilter();
+    bandpass.type = "bandpass";
+    bandpass.frequency.value = 400;
+    bandpass.Q.value = 2.5;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.55, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+    noiseSource.connect(bandpass);
+    bandpass.connect(gain);
+    gain.connect(ctx.destination);
+    noiseSource.start(t);
   }
 
   function playRicochet() {
@@ -189,5 +209,5 @@ const Sounds = (() => {
     return muted;
   }
 
-  return { isMuted, toggleMute, playShoot, playRicochet, playHit, playDeath, playReload };
+  return { isMuted, toggleMute, playShoot, playCactusHit, playRicochet, playHit, playDeath, playReload };
 })();

@@ -36,10 +36,11 @@ const HIT_FLASH_DURATION     = 300;  // ms
 const SHAKE_DURATION         = 400;  // ms
 const SHAKE_MAGNITUDE        = 5;    // max pixel offset
 const VIGNETTE_DURATION      = 600;  // ms
+const TRAIL_MAX_POSITIONS    = 8;    // positions per bullet (at 20 Hz ≈ 400 ms of history)
 
 const playerName = sessionStorage.getItem("playerName");
 const gameId = sessionStorage.getItem("gameId");
-if (!playerName || !gameId) window.location.href = "/";
+if (!playerName || !gameId) globalThis.location.href = "/";
 
 document.getElementById("game-title").textContent =
   gameId.charAt(0).toUpperCase() + gameId.slice(1);
@@ -62,6 +63,8 @@ const deathTimes = new Map();     // playerId → timestamp when alive went fals
 const hitTimes = new Map();       // playerId → timestamp of last hit
 const previousHealth = new Map(); // playerId → last known health
 const previousBounces = new Map(); // bulletId → last known bounce count
+const bulletTrails = new Map();    // bulletId → [{x, y}, …] (oldest first)
+const previousCactiSegments = new Map(); // cactusId → segments boolean[]
 
 // Shake/vignette state (local player hit only)
 let shakeUntil = 0;
@@ -118,6 +121,29 @@ ws.onmessage = (e) => {
     for (const id of previousBounces.keys()) {
       if (!msg.bullets.some(b => b.id === id)) previousBounces.delete(id);
     }
+    for (const b of msg.bullets) {
+      const prevBounces = previousBounces.get(b.id) ?? 0;
+      const trail = bulletTrails.get(b.id) ?? [];
+      if (b.bounces > prevBounces) {
+        bulletTrails.set(b.id, [{ x: b.x, y: b.y }]);
+      } else {
+        trail.push({ x: b.x, y: b.y });
+        if (trail.length > TRAIL_MAX_POSITIONS) trail.shift();
+        bulletTrails.set(b.id, trail);
+      }
+    }
+    for (const id of bulletTrails.keys()) {
+      if (!msg.bullets.some(b => b.id === id)) bulletTrails.delete(id);
+    }
+    for (const cactus of msg.cacti) {
+      const prev = previousCactiSegments.get(cactus.id);
+      if (prev) {
+        for (let i = 0; i < cactus.segments.length; i++) {
+          if (prev[i] && !cactus.segments[i]) { Sounds.playCactusHit(); break; }
+        }
+      }
+      previousCactiSegments.set(cactus.id, [...cactus.segments]);
+    }
     cacti = msg.cacti;
     countEl.textContent = `${players.length} player${players.length !== 1 ? "s" : ""}`;
     const me = players.find(p => p.id === myId);
@@ -158,7 +184,9 @@ document.addEventListener("keydown", (e) => {
   keys.add(k);
   if (k === "x") {
     if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "shoot" }));
-    Sounds.playShoot();
+    const me = players.find(p => p.id === myId);
+    if (me && me.ammo <= 0) Sounds.playReload();
+    else Sounds.playShoot();
   }
   if (k === "r") {
     if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "reload" }));
@@ -312,6 +340,34 @@ function drawPlayer(p) {
   }
 }
 
+function drawBulletTrail(b) {
+  const trail = bulletTrails.get(b.id);
+  if (!trail || trail.length < 2) return;
+
+  const segmentCount = trail.length - 1;
+  for (let i = 0; i < segmentCount; i++) {
+    const from = trail[i];
+    const to = trail[i + 1];
+    const progress = (i + 1) / segmentCount;
+
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.lineCap = "round";
+    ctx.lineWidth = 7 * progress;
+    ctx.strokeStyle = `rgba(249, 202, 36, ${0.15 * progress})`;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.lineCap = "round";
+    ctx.lineWidth = 2.5 * progress;
+    ctx.strokeStyle = `rgba(240, 147, 43, ${0.7 * progress})`;
+    ctx.stroke();
+  }
+}
+
 function drawBullet(b) {
   ctx.beginPath();
   ctx.arc(b.x, b.y, 3, 0, Math.PI * 2);
@@ -387,6 +443,7 @@ function render() {
 
   for (const rock of rocks) drawRock(rock);
   for (const cactus of cacti) drawCactus(cactus);
+  for (const b of bullets) drawBulletTrail(b);
   for (const b of bullets) drawBullet(b);
   for (const p of players) drawPlayer(p);
 
