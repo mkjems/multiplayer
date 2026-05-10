@@ -1,7 +1,8 @@
 # TODO
 
 ## Sprint 5 
-- Bullet should originate from mussel of gun.
+- Lobby should have show number of people in the lobby
+- Bullet should originate exactly from mussel of gun.
 - Visual feedback when a player is hit (flash / shake)
 
 ## sprint 6 
@@ -15,9 +16,11 @@
 - Animated bullet trail
 
 ## Backlog
+- Gun should also be part of collision geometry. Mussel should not poke through rock/cacti.
 - Sound effect when player chooses room
 - Sound effect when player chooses name
 - Make game more exciting brainstorm
+- cacti should have one or two arms variable height
 
 ## Ideas / Maybes
 - Lobby shows game type icons
