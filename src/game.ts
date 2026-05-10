@@ -280,7 +280,11 @@ function tick(room: GameRoom) {
         if (player.id === bullet.ownerId && now - bullet.born < 200) continue;
         if (Math.hypot(bullet.x - player.x, bullet.y - player.y) < PLAYER_RADIUS + BULLET_RADIUS) {
           player.health = Math.max(0, player.health - 20);
-          if (player.health <= 0) player.alive = false;
+          if (player.health <= 0) {
+            player.alive = false;
+            const killer = room.players.get(bullet.ownerId);
+            if (killer && killer.id !== player.id) killer.kills++;
+          }
           alive = false;
           break;
         }
@@ -301,7 +305,10 @@ function tick(room: GameRoom) {
     const deadPlayers = allPlayers.filter(p => !p.alive);
     if (alivePlayers.length === 1 && deadPlayers.length >= 1) {
       room.gameOver = true;
-      broadcast(room, JSON.stringify({ type: "game_over", winnerName: alivePlayers[0].name }));
+      const winnerName = alivePlayers[0].name;
+      setTimeout(() => {
+        broadcast(room, JSON.stringify({ type: "game_over", winnerName }));
+      }, 1800);
     }
   }
 

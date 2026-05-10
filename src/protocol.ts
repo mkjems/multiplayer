@@ -35,6 +35,7 @@ export interface PlayerSnapshot {
   facing: "left" | "right";
   alive: boolean;
   reloading: boolean;
+  kills: number;
 }
 
 export interface BulletSnapshot {

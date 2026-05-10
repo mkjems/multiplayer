@@ -23,6 +23,7 @@ export interface Player {
   alive: boolean;
   reloading: boolean;
   reloadStart: number;
+  kills: number;
 }
 
 export function createPlayer(id: string, name: string): Player {
@@ -42,6 +43,7 @@ export function createPlayer(id: string, name: string): Player {
     alive: true,
     reloading: false,
     reloadStart: 0,
+    kills: 0,
   };
 }
 
@@ -58,5 +60,6 @@ export function toSnapshot(player: Player): PlayerSnapshot {
     facing: player.facing,
     alive: player.alive,
     reloading: player.reloading,
+    kills: player.kills,
   };
 }

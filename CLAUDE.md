@@ -1,4 +1,8 @@
 
+
+
+
+
 THIS IS HOW THE GAME SHOULD BEHAVE
 ==================================
 
@@ -46,7 +50,11 @@ Players health decrease when hit by a bullet. (starts at 100%)
 
 When player health reaches 0 or below, player dies. 
 
+When a player dies the colored dot fade slowly to gray and a dramatic dying sound is heard. 
+
 A dead player is represented by smaller grey dot. A dead player can not move or shoot. 
 
 If there is only one alive player in a room, and at least one or more dead players, then the game is over. After a small celebration of the winner, everybody in the room is returned to the lobby. They are now all free to join a room to play again.
+
+
 
