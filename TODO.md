@@ -1,9 +1,5 @@
 # TODO
 
-## Sprint 3
-- There are a lot hardcoded colors in game.html with no variable name.
-- Rocks should be irregular polygon shapes, not circles (per CLAUDE.md spec)
-
 ## Sprint 4
 - Players cannot start on, or walk through, rocks and cacti (collision blocking)
 

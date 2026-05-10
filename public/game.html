@@ -5,12 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Game — Multiplayer</title>
   <style>
+    :root {
+      --color-bg-page:     #0f0f1a;
+      --color-bg-nav:      #1a1a2e;
+      --color-border:      #2a2a4a;
+      --color-text-primary: #e0e0e0;
+      --color-text-secondary: #888;
+      --color-text-muted:  #444;
+      --color-text-dim:    #aaa;
+      --color-overlay-bg:  rgba(0,0,0,0.75);
+      --color-winner-gold: #f9ca24;
+      --color-winner-orange: #f0932b;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       min-height: 100vh;
-      background: #0f0f1a;
+      background: var(--color-bg-page);
       font-family: system-ui, sans-serif;
-      color: #e0e0e0;
+      color: var(--color-text-primary);
       display: flex;
       flex-direction: column;
     }
@@ -19,13 +31,13 @@
       align-items: center;
       gap: 16px;
       padding: 10px 20px;
-      border-bottom: 1px solid #2a2a4a;
-      background: #1a1a2e;
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-bg-nav);
     }
     nav .game-title { font-weight: 600; margin-right: auto; }
-    nav span { font-size: 0.8rem; color: #888; }
-    nav a { color: #888; text-decoration: none; font-size: 0.85rem; }
-    nav a:hover { color: #e0e0e0; }
+    nav span { font-size: 0.8rem; color: var(--color-text-secondary); }
+    nav a { color: var(--color-text-secondary); text-decoration: none; font-size: 0.85rem; }
+    nav a:hover { color: var(--color-text-primary); }
     .arena {
       flex: 1;
       display: flex;
@@ -34,7 +46,7 @@
       padding: 16px;
     }
     canvas {
-      border: 1px solid #2a2a4a;
+      border: 1px solid var(--color-border);
       border-radius: 4px;
       image-rendering: pixelated;
       position: relative;
@@ -43,13 +55,13 @@
       text-align: center;
       padding: 8px;
       font-size: 0.75rem;
-      color: #444;
+      color: var(--color-text-muted);
     }
     #overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.75);
+      background: var(--color-overlay-bg);
       align-items: center;
       justify-content: center;
       flex-direction: column;
@@ -60,12 +72,12 @@
     #overlay h2 {
       font-size: 2.5rem;
       font-weight: 800;
-      background: linear-gradient(135deg, #f9ca24, #f0932b);
+      background: linear-gradient(135deg, var(--color-winner-gold), var(--color-winner-orange));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    #overlay p { color: #aaa; font-size: 1rem; }
+    #overlay p { color: var(--color-text-dim); font-size: 1rem; }
   </style>
 </head>
 <body>
@@ -86,6 +98,32 @@
   </div>
 
   <script>
+    // Color palette — canvas/JS colors (CSS equivalents live in :root above)
+    const COLOR_GROUND           = "#c8b78a";
+    const COLOR_ROCK_FILL        = "#4a4a5a";
+    const COLOR_ROCK_STROKE      = "#6a6a7a";
+    const COLOR_CACTUS_FILL      = "#2d7a2d";
+    const COLOR_CACTUS_STROKE    = "#1a5c1a";
+    const COLOR_ARM              = "#fff";
+    const COLOR_HEALTH_BG        = "#333";
+    const COLOR_HEALTH_HIGH      = "#2ecc71";
+    const COLOR_HEALTH_MID       = "#f39c12";
+    const COLOR_HEALTH_LOW       = "#e74c3c";
+    const COLOR_BULLET_FILL      = "#f9ca24";
+    const COLOR_BULLET_STROKE    = "#f0932b";
+    const COLOR_AMMO_FULL        = "#f9ca24";
+    const COLOR_AMMO_EMPTY       = "#333";
+    const COLOR_HUD_LABEL        = "#888";
+    const COLOR_RELOAD_TEXT      = "#f39c12";
+    const COLOR_KILLS_ACTIVE     = "#f9ca24";
+    const COLOR_KILLS_ZERO       = "#555";
+    const COLOR_PLAYER_NAME      = "#fff";
+    const COLOR_PLAYER_KILLS     = "#f9ca24";
+    const COLOR_PLAYER_DEAD      = "#555555";
+    const COLOR_PLAYER_DEAD_NAME = "#777";
+    const COLOR_DISCONNECT_BG    = "#0f0f1a"; // matches --color-bg-page
+    const COLOR_DISCONNECT_TEXT  = "#888";    // matches --color-text-secondary
+
     const playerName = sessionStorage.getItem("playerName");
     const gameId = sessionStorage.getItem("gameId");
     if (!playerName || !gameId) window.location.href = "/";
@@ -162,9 +200,9 @@
 
     ws.onclose = () => {
       if (gameOverAt) return; // Already handled by game_over overlay
-      ctx.fillStyle = "#0f0f1a";
+      ctx.fillStyle = COLOR_DISCONNECT_BG;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "#888";
+      ctx.fillStyle = COLOR_DISCONNECT_TEXT;
       ctx.font = "16px system-ui";
       ctx.textAlign = "center";
       ctx.fillText("Disconnected — go back to lobby", canvas.width / 2, canvas.height / 2);
@@ -215,16 +253,14 @@
     function drawRock(rock) {
       ctx.save();
       ctx.beginPath();
-      ctx.arc(rock.x, rock.y, rock.radius, 0, Math.PI * 2);
-      ctx.fillStyle = "#4a4a5a";
+      ctx.moveTo(rock.vertices[0].x, rock.vertices[0].y);
+      for (let i = 1; i < rock.vertices.length; i++) ctx.lineTo(rock.vertices[i].x, rock.vertices[i].y);
+      ctx.closePath();
+      ctx.fillStyle = COLOR_ROCK_FILL;
       ctx.fill();
-      ctx.strokeStyle = "#6a6a7a";
+      ctx.strokeStyle = COLOR_ROCK_STROKE;
       ctx.lineWidth = 2;
       ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(rock.x - rock.radius * 0.25, rock.y - rock.radius * 0.25, rock.radius * 0.3, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(255,255,255,0.08)";
-      ctx.fill();
       ctx.restore();
     }
 
@@ -232,9 +268,9 @@
       for (let i = 0; i < cactus.segments.length; i++) {
         if (!cactus.segments[i]) continue;
         const sx = cactus.x - 8, sy = cactus.y + i * 14;
-        ctx.fillStyle = "#2d7a2d";
+        ctx.fillStyle = COLOR_CACTUS_FILL;
         ctx.fillRect(sx, sy, 16, 12);
-        ctx.strokeStyle = "#1a5c1a";
+        ctx.strokeStyle = COLOR_CACTUS_STROKE;
         ctx.lineWidth = 1;
         ctx.strokeRect(sx, sy, 16, 12);
       }
@@ -252,16 +288,15 @@
         const deathTime = deathTimes.get(p.id) ?? Date.now();
         const t = Math.min(1, (Date.now() - deathTime) / 1500);
         const radius = 14 - t * 6;
-        const color = lerpColor(p.color, '#555555', t);
+        const color = lerpColor(p.color, COLOR_PLAYER_DEAD, t);
         ctx.beginPath();
         ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
         ctx.fillStyle = color;
         ctx.fill();
-        ctx.fillStyle = `rgb(${Math.round(119*t+255*(1-t))},${Math.round(119*t+255*(1-t))},${Math.round(119*t+255*(1-t))})`;
         ctx.font = "bold 11px system-ui";
         ctx.textAlign = "center";
         ctx.globalAlpha = 0.4 + 0.6 * (1 - t * 0.5);
-        ctx.fillStyle = "#777";
+        ctx.fillStyle = COLOR_PLAYER_DEAD_NAME;
         ctx.fillText(p.name, p.x, p.y + 20);
         ctx.globalAlpha = 1;
         return;
@@ -290,25 +325,25 @@
       ctx.beginPath();
       ctx.moveTo(p.x, p.y);
       ctx.lineTo(p.x + dir * armLen * Math.cos(angle), p.y - armLen * Math.sin(angle));
-      ctx.strokeStyle = "#fff";
+      ctx.strokeStyle = COLOR_ARM;
       ctx.lineWidth = 3;
       ctx.lineCap = "round";
       ctx.stroke();
 
       // Health bar
       const barW = 36, barH = 4, bx = p.x - 18, by = p.y - 26;
-      ctx.fillStyle = "#333";
+      ctx.fillStyle = COLOR_HEALTH_BG;
       ctx.fillRect(bx, by, barW, barH);
-      ctx.fillStyle = p.health > 60 ? "#2ecc71" : p.health > 30 ? "#f39c12" : "#e74c3c";
+      ctx.fillStyle = p.health > 60 ? COLOR_HEALTH_HIGH : p.health > 30 ? COLOR_HEALTH_MID : COLOR_HEALTH_LOW;
       ctx.fillRect(bx, by, barW * (p.health / 100), barH);
 
       // Name + kills
-      ctx.fillStyle = "#fff";
+      ctx.fillStyle = COLOR_PLAYER_NAME;
       ctx.font = "bold 11px system-ui";
       ctx.textAlign = "center";
       ctx.fillText(p.name, p.x, p.y + 26);
       if (p.kills > 0) {
-        ctx.fillStyle = "#f9ca24";
+        ctx.fillStyle = COLOR_PLAYER_KILLS;
         ctx.font = "9px system-ui";
         ctx.fillText(`★ ${p.kills}`, p.x, p.y + 37);
       }
@@ -317,9 +352,9 @@
     function drawBullet(b) {
       ctx.beginPath();
       ctx.arc(b.x, b.y, 3, 0, Math.PI * 2);
-      ctx.fillStyle = "#f9ca24";
+      ctx.fillStyle = COLOR_BULLET_FILL;
       ctx.fill();
-      ctx.strokeStyle = "#f0932b";
+      ctx.strokeStyle = COLOR_BULLET_STROKE;
       ctx.lineWidth = 1;
       ctx.stroke();
     }
@@ -333,25 +368,25 @@
       ctx.textAlign = "left";
 
       if (me.reloading) {
-        ctx.fillStyle = "#f39c12";
+        ctx.fillStyle = COLOR_RELOAD_TEXT;
         ctx.fillText("RELOADING…", px, py + 8);
       } else {
-        ctx.fillStyle = "#888";
+        ctx.fillStyle = COLOR_HUD_LABEL;
         ctx.fillText("AMMO", px, py - 2);
         for (let i = 0; i < 6; i++) {
           ctx.beginPath();
           ctx.arc(px + i * (size + gap) + size / 2, py + size / 2, size / 2, 0, Math.PI * 2);
-          ctx.fillStyle = i < me.ammo ? "#f9ca24" : "#333";
+          ctx.fillStyle = i < me.ammo ? COLOR_AMMO_FULL : COLOR_AMMO_EMPTY;
           ctx.fill();
         }
       }
 
       // Kill counter
       ctx.textAlign = "right";
-      ctx.fillStyle = "#888";
+      ctx.fillStyle = COLOR_HUD_LABEL;
       ctx.font = "bold 10px system-ui";
       ctx.fillText("KILLS", canvas.width - 14, py - 2);
-      ctx.fillStyle = me.kills > 0 ? "#f9ca24" : "#555";
+      ctx.fillStyle = me.kills > 0 ? COLOR_KILLS_ACTIVE : COLOR_KILLS_ZERO;
       ctx.font = "bold 18px system-ui";
       ctx.fillText(String(me.kills), canvas.width - 14, py + 10);
     }
@@ -359,7 +394,7 @@
     function render() {
       sendInput();
 
-      ctx.fillStyle = "#c8b78a";
+      ctx.fillStyle = COLOR_GROUND;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       for (const rock of rocks) drawRock(rock);

@@ -48,7 +48,7 @@ export interface RockData {
   id: string;
   x: number;
   y: number;
-  radius: number;
+  vertices: { x: number; y: number }[];
 }
 
 export interface CactusData {

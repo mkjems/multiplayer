@@ -26,7 +26,8 @@ interface Rock {
   id: string;
   x: number;
   y: number;
-  radius: number;
+  boundingRadius: number;
+  vertices: { x: number; y: number }[];
 }
 
 interface Cactus {
@@ -51,6 +52,17 @@ export interface GameRoom {
 
 const rooms = new Map<string, GameRoom>();
 
+function generatePolygonVertices(
+  cx: number, cy: number, minR: number, maxR: number, sides: number
+): { x: number; y: number }[] {
+  const angles = Array.from({ length: sides }, () => Math.random() * Math.PI * 2)
+    .sort((a, b) => a - b);
+  return angles.map(a => {
+    const r = minR + Math.random() * (maxR - minR);
+    return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+  });
+}
+
 function generateArena(): { rocks: Rock[]; cacti: Cactus[] } {
   const placed: Array<{ x: number; y: number; r: number }> = [];
   const rocks: Rock[] = [];
@@ -66,20 +78,24 @@ function generateArena(): { rocks: Rock[]; cacti: Cactus[] } {
   for (let i = 0; i < 5; i++) {
     let rock: Rock | null = null;
     for (let t = 0; t < 60; t++) {
-      const r = 25 + Math.random() * 20;
-      const x = 80 + Math.random() * (ARENA_W - 160);
-      const y = 80 + Math.random() * (ARENA_H - 160);
-      if (!tooClose(x, y, r)) {
-        rock = { id: `rock_${i}`, x, y, radius: r };
-        placed.push({ x, y, r });
+      const sides = 3 + Math.floor(Math.random() * 5);
+      const cx = 80 + Math.random() * (ARENA_W - 160);
+      const cy = 80 + Math.random() * (ARENA_H - 160);
+      const vertices = generatePolygonVertices(cx, cy, 20, 45, sides);
+      const br = Math.max(...vertices.map(v => Math.hypot(v.x - cx, v.y - cy)));
+      if (!tooClose(cx, cy, br)) {
+        rock = { id: `rock_${i}`, x: cx, y: cy, boundingRadius: br, vertices };
+        placed.push({ x: cx, y: cy, r: br });
         break;
       }
     }
     if (!rock) {
-      const x = 120 + (i % 3) * 230;
-      const y = 150 + Math.floor(i / 3) * 200;
-      rock = { id: `rock_${i}`, x, y, radius: 28 };
-      placed.push({ x, y, r: 28 });
+      const cx = 120 + (i % 3) * 230;
+      const cy = 150 + Math.floor(i / 3) * 200;
+      const vertices = generatePolygonVertices(cx, cy, 20, 35, 5);
+      const br = Math.max(...vertices.map(v => Math.hypot(v.x - cx, v.y - cy)));
+      rock = { id: `rock_${i}`, x: cx, y: cy, boundingRadius: br, vertices };
+      placed.push({ x: cx, y: cy, r: br });
     }
     rocks.push(rock);
   }
@@ -108,7 +124,7 @@ function generateArena(): { rocks: Rock[]; cacti: Cactus[] } {
 }
 
 export function getRockData(room: GameRoom): RockData[] {
-  return room.rocks.map(r => ({ id: r.id, x: r.x, y: r.y, radius: r.radius }));
+  return room.rocks.map(r => ({ id: r.id, x: r.x, y: r.y, vertices: r.vertices }));
 }
 
 export function getCactiData(room: GameRoom): CactusData[] {
@@ -212,6 +228,36 @@ function broadcast(room: GameRoom, msg: string) {
   }
 }
 
+function closestPointOnSegment(
+  px: number, py: number, ax: number, ay: number, bx: number, by: number
+): { x: number; y: number } {
+  const dx = bx - ax, dy = by - ay, len2 = dx * dx + dy * dy;
+  if (len2 === 0) return { x: ax, y: ay };
+  const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len2));
+  return { x: ax + t * dx, y: ay + t * dy };
+}
+
+function bulletPolygonNormal(
+  bx: number, by: number, rock: Rock
+): { nx: number; ny: number } | null {
+  if (Math.hypot(bx - rock.x, by - rock.y) > rock.boundingRadius + BULLET_RADIUS) return null;
+  const vertices = rock.vertices, n = vertices.length;
+  let bestDist = Infinity, bestNx = 0, bestNy = 0;
+  for (let i = 0; i < n; i++) {
+    const a = vertices[i], b = vertices[(i + 1) % n];
+    const cp = closestPointOnSegment(bx, by, a.x, a.y, b.x, b.y);
+    const dist = Math.hypot(bx - cp.x, by - cp.y);
+    if (dist < BULLET_RADIUS && dist < bestDist) {
+      bestDist = dist;
+      const ex = b.x - a.x, ey = b.y - a.y, el = Math.hypot(ex, ey);
+      let nx = -ey / el, ny = ex / el;
+      if (nx * (bx - rock.x) + ny * (by - rock.y) < 0) { nx = -nx; ny = -ny; }
+      bestNx = nx; bestNy = ny;
+    }
+  }
+  return bestDist < Infinity ? { nx: bestNx, ny: bestNy } : null;
+}
+
 function reflect(vx: number, vy: number, nx: number, ny: number): [number, number] {
   const dot = vx * nx + vy * ny;
   return [vx - 2 * dot * nx, vy - 2 * dot * ny];
@@ -247,13 +293,11 @@ function tick(room: GameRoom) {
 
     // Rock ricochet
     for (const rock of room.rocks) {
-      const dx = bullet.x - rock.x, dy = bullet.y - rock.y;
-      const dist = Math.hypot(dx, dy);
-      if (dist < rock.radius + BULLET_RADIUS) {
-        const nx = dx / dist, ny = dy / dist;
-        [bullet.vx, bullet.vy] = reflect(bullet.vx, bullet.vy, nx, ny);
-        bullet.x = rock.x + nx * (rock.radius + BULLET_RADIUS + 1);
-        bullet.y = rock.y + ny * (rock.radius + BULLET_RADIUS + 1);
+      const hit = bulletPolygonNormal(bullet.x, bullet.y, rock);
+      if (hit) {
+        [bullet.vx, bullet.vy] = reflect(bullet.vx, bullet.vy, hit.nx, hit.ny);
+        bullet.x += hit.nx * (BULLET_RADIUS + 2);
+        bullet.y += hit.ny * (BULLET_RADIUS + 2);
         break;
       }
     }
