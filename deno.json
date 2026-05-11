@@ -3,7 +3,7 @@
     "start": "deno run --allow-net --allow-read server.ts",
     "dev": "deno run --allow-net --allow-read --watch server.ts",
     "fmt": "deno fmt src/ && deno fmt server.ts && deno fmt public/",
-    "lint": "deno lint src/ && deno lint server.ts && deno lint public/"
+    "lint": "deno lint src/&& deno lint server.ts && deno lint public/"
   },
   "deploy": {
     "org": "mkjems",
