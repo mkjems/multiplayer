@@ -1,6 +1,7 @@
 // ═════════════════════════════════════════════════════════════════════════════
 // Game Constants
 // ═════════════════════════════════════════════════════════════════════════════
+
 // Color palette — canvas/JS colors (CSS equivalents live in game.html :root)
 export const COLOR_GROUND = "#232121";
 export const COLOR_ROCK_FILL = "#4a4a5a";
@@ -27,19 +28,23 @@ export const COLOR_DISCONNECT_BG = "#0f0f1a"; // matches --color-bg-page
 export const COLOR_DISCONNECT_TEXT = "#888"; // matches --color-text-secondary
 export const COLOR_HIT_FLASH = "#ffffff";
 export const COLOR_VIGNETTE = "220,50,50";
+
 // Gameplay geometry defaults. Server-provided arena config should override these.
 export const DEFAULT_CACTUS_HALF_WIDTH = 8;
 export const DEFAULT_CACTUS_SEGMENT_STRIDE = 14;
 export const DEFAULT_CACTUS_SEGMENT_WIDTH = 16;
 export const DEFAULT_CACTUS_SEGMENT_HEIGHT = 14;
+
 // Arm and weapon defaults. Server-provided arena config should override these.
 export const DEFAULT_ARM_LENGTH = 20;
 export const DEFAULT_ARM_MAX = Math.PI / 3;
 export const ARM_STEP = (2 * Math.PI) / 180; // 2° per frame
+
 // Animation and visual effect timings (milliseconds)
 export const HIT_FLASH_DURATION = 300;
 export const SHAKE_DURATION = 400;
 export const SHAKE_MAGNITUDE = 5; // max pixel offset
 export const VIGNETTE_DURATION = 600;
+
 // Bullet trail
 export const TRAIL_MAX_POSITIONS = 8; // positions per bullet (at 20 Hz ≈ 400 ms of history)
