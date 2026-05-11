@@ -14,9 +14,13 @@ export function setupInputHandler(network, sounds, gameState, constants) {
   const keys = new Set();
   let lastMove = { dx: 0, dy: 0 };
   let lastAngleSent = 0;
+  const muteBtn = document.getElementById("mute-btn");
+  if (!muteBtn) {
+    throw new Error("Missing required element: #mute-btn");
+  }
 
   // Handle key presses
-  document.addEventListener("keydown", (e) => {
+  const onKeyDown = (e) => {
     const k = e.key.toLowerCase();
     keys.add(k);
 
@@ -36,17 +40,20 @@ export function setupInputHandler(network, sounds, gameState, constants) {
       network.send({ type: "reload" });
       sounds.playReload();
     }
-  });
+  };
 
-  document.addEventListener("keyup", (e) => {
+  const onKeyUp = (e) => {
     keys.delete(e.key.toLowerCase());
-  });
+  };
 
   // Mute button
-  const muteBtn = document.getElementById("mute-btn");
-  muteBtn.addEventListener("click", () => {
+  const onMuteClick = () => {
     muteBtn.textContent = sounds.toggleMute() ? "🔇" : "🔊";
-  });
+  };
+
+  document.addEventListener("keydown", onKeyDown);
+  document.addEventListener("keyup", onKeyUp);
+  muteBtn.addEventListener("click", onMuteClick);
 
   // Called once per frame to process input and send to server
   function processInput() {
@@ -87,5 +94,12 @@ export function setupInputHandler(network, sounds, gameState, constants) {
     }
   }
 
-  return { processInput };
+  function dispose() {
+    keys.clear();
+    document.removeEventListener("keydown", onKeyDown);
+    document.removeEventListener("keyup", onKeyUp);
+    muteBtn.removeEventListener("click", onMuteClick);
+  }
+
+  return { processInput, dispose };
 }

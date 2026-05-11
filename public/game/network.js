@@ -8,7 +8,6 @@
  *
  * @param {string} gameId - Game room ID
  * @param {string} playerName - Player name
- * @param {object} sounds - Sound manager instance
  * @param {Function} onStateUpdate - Callback for game state updates
  * @param {Function} onGameOver - Callback for game over event
  * @param {Function} onDisconnect - Callback for connection lost (for rendering)
@@ -17,13 +16,13 @@
 export function createNetworkManager(
   gameId,
   playerName,
-  sounds,
   onStateUpdate,
   onGameOver,
   onDisconnect,
 ) {
   const protocol = location.protocol === "https:" ? "wss" : "ws";
   const ws = new WebSocket(`${protocol}://${location.host}/ws/game/${gameId}`);
+  let isClosedByClient = false;
 
   ws.onopen = () => {
     ws.send(JSON.stringify({ type: "join_game", gameId, playerName }));
@@ -31,14 +30,14 @@ export function createNetworkManager(
 
   ws.onmessage = (e) => {
     const msg = JSON.parse(e.data);
-    onStateUpdate(msg, sounds);
+    onStateUpdate(msg);
     if (msg.type === "game_over") {
       onGameOver(msg);
     }
   };
 
   ws.onclose = () => {
-    onDisconnect();
+    if (!isClosedByClient) onDisconnect();
   };
 
   return {
@@ -51,6 +50,10 @@ export function createNetworkManager(
     },
 
     close() {
+      isClosedByClient = true;
+      ws.onopen = null;
+      ws.onmessage = null;
+      ws.onclose = null;
       ws.close();
     },
   };

@@ -14,6 +14,9 @@
  */
 export function createRenderer(canvas, gameState, effects, constants) {
   const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    throw new Error("Canvas 2D context is not available");
+  }
 
   // Helper: interpolate between two colors
   function lerpColor(c1, c2, t) {
