@@ -1,5 +1,11 @@
-import { createPlayer, toSnapshot, type Player } from "./player.ts";
-import type { GameInfo, PlayerSnapshot, BulletSnapshot, RockData, CactusData } from "./protocol.ts";
+import { createPlayer, type Player, toSnapshot } from "./player.ts";
+import type {
+  BulletSnapshot,
+  CactusData,
+  GameInfo,
+  PlayerSnapshot,
+  RockData,
+} from "./protocol.ts";
 
 const MAX_SPEED = 4;
 const ACCELERATION = 0.35;
@@ -93,11 +99,18 @@ export interface GameRoom {
 const rooms = new Map<string, GameRoom>();
 
 function generatePolygonVertices(
-  cx: number, cy: number, minR: number, maxR: number, sides: number
+  cx: number,
+  cy: number,
+  minR: number,
+  maxR: number,
+  sides: number,
 ): { x: number; y: number }[] {
-  const angles = Array.from({ length: sides }, () => Math.random() * Math.PI * 2)
+  const angles = Array.from(
+    { length: sides },
+    () => Math.random() * Math.PI * 2,
+  )
     .sort((a, b) => a - b);
-  return angles.map(a => {
+  return angles.map((a) => {
     const r = minR + Math.random() * (maxR - minR);
     return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
   });
@@ -110,7 +123,9 @@ function generateArena(): { rocks: Rock[]; cacti: Cactus[] } {
 
   function tooClose(x: number, y: number, r: number): boolean {
     for (const o of placed) {
-      if (Math.hypot(x - o.x, y - o.y) < r + o.r + OBJECT_MIN_SPACING) return true;
+      if (Math.hypot(x - o.x, y - o.y) < r + o.r + OBJECT_MIN_SPACING) {
+        return true;
+      }
     }
     return false;
   }
@@ -118,11 +133,22 @@ function generateArena(): { rocks: Rock[]; cacti: Cactus[] } {
   for (let i = 0; i < ROCK_COUNT; i++) {
     let rock: Rock | null = null;
     for (let t = 0; t < PLACEMENT_MAX_ATTEMPTS; t++) {
-      const sides = ROCK_MIN_SIDES + Math.floor(Math.random() * ROCK_EXTRA_SIDES);
-      const cx = ARENA_PLACEMENT_MARGIN + Math.random() * (ARENA_W - ARENA_PLACEMENT_MARGIN * 2);
-      const cy = ARENA_PLACEMENT_MARGIN + Math.random() * (ARENA_H - ARENA_PLACEMENT_MARGIN * 2);
-      const vertices = generatePolygonVertices(cx, cy, ROCK_MIN_RADIUS, ROCK_MAX_RADIUS, sides);
-      const br = Math.max(...vertices.map(v => Math.hypot(v.x - cx, v.y - cy)));
+      const sides = ROCK_MIN_SIDES +
+        Math.floor(Math.random() * ROCK_EXTRA_SIDES);
+      const cx = ARENA_PLACEMENT_MARGIN +
+        Math.random() * (ARENA_W - ARENA_PLACEMENT_MARGIN * 2);
+      const cy = ARENA_PLACEMENT_MARGIN +
+        Math.random() * (ARENA_H - ARENA_PLACEMENT_MARGIN * 2);
+      const vertices = generatePolygonVertices(
+        cx,
+        cy,
+        ROCK_MIN_RADIUS,
+        ROCK_MAX_RADIUS,
+        sides,
+      );
+      const br = Math.max(
+        ...vertices.map((v) => Math.hypot(v.x - cx, v.y - cy)),
+      );
       if (!tooClose(cx, cy, br)) {
         rock = { id: `rock_${i}`, x: cx, y: cy, boundingRadius: br, vertices };
         placed.push({ x: cx, y: cy, r: br });
@@ -130,10 +156,20 @@ function generateArena(): { rocks: Rock[]; cacti: Cactus[] } {
       }
     }
     if (!rock) {
-      const cx = FALLBACK_ROCK_ORIGIN_X + (i % FALLBACK_ROCK_COLS) * FALLBACK_ROCK_COL_STEP;
-      const cy = FALLBACK_ROCK_ORIGIN_Y + Math.floor(i / FALLBACK_ROCK_COLS) * FALLBACK_ROCK_ROW_STEP;
-      const vertices = generatePolygonVertices(cx, cy, ROCK_MIN_RADIUS, FALLBACK_ROCK_MAX_RADIUS, FALLBACK_ROCK_SIDES);
-      const br = Math.max(...vertices.map(v => Math.hypot(v.x - cx, v.y - cy)));
+      const cx = FALLBACK_ROCK_ORIGIN_X +
+        (i % FALLBACK_ROCK_COLS) * FALLBACK_ROCK_COL_STEP;
+      const cy = FALLBACK_ROCK_ORIGIN_Y +
+        Math.floor(i / FALLBACK_ROCK_COLS) * FALLBACK_ROCK_ROW_STEP;
+      const vertices = generatePolygonVertices(
+        cx,
+        cy,
+        ROCK_MIN_RADIUS,
+        FALLBACK_ROCK_MAX_RADIUS,
+        FALLBACK_ROCK_SIDES,
+      );
+      const br = Math.max(
+        ...vertices.map((v) => Math.hypot(v.x - cx, v.y - cy)),
+      );
       rock = { id: `rock_${i}`, x: cx, y: cy, boundingRadius: br, vertices };
       placed.push({ x: cx, y: cy, r: br });
     }
@@ -143,18 +179,32 @@ function generateArena(): { rocks: Rock[]; cacti: Cactus[] } {
   for (let i = 0; i < CACTUS_COUNT; i++) {
     let cactus: Cactus | null = null;
     for (let t = 0; t < PLACEMENT_MAX_ATTEMPTS; t++) {
-      const x = ARENA_PLACEMENT_MARGIN + Math.random() * (ARENA_W - ARENA_PLACEMENT_MARGIN * 2);
-      const y = CACTUS_PLACEMENT_MARGIN_Y + Math.random() * (ARENA_H - ARENA_PLACEMENT_MARGIN * 2);
+      const x = ARENA_PLACEMENT_MARGIN +
+        Math.random() * (ARENA_W - ARENA_PLACEMENT_MARGIN * 2);
+      const y = CACTUS_PLACEMENT_MARGIN_Y +
+        Math.random() * (ARENA_H - ARENA_PLACEMENT_MARGIN * 2);
       if (!tooClose(x, y, CACTUS_PLACEMENT_RADIUS)) {
-        cactus = { id: `cactus_${i}`, x, y, segments: Array(CACTUS_SEGMENT_COUNT).fill(true) };
+        cactus = {
+          id: `cactus_${i}`,
+          x,
+          y,
+          segments: Array(CACTUS_SEGMENT_COUNT).fill(true),
+        };
         placed.push({ x, y, r: CACTUS_PLACEMENT_RADIUS });
         break;
       }
     }
     if (!cactus) {
-      const x = FALLBACK_CACTUS_ORIGIN_X + (i % FALLBACK_CACTUS_COLS) * FALLBACK_CACTUS_COL_STEP;
-      const y = FALLBACK_CACTUS_ORIGIN_Y + Math.floor(i / FALLBACK_CACTUS_COLS) * FALLBACK_CACTUS_ROW_STEP;
-      cactus = { id: `cactus_${i}`, x, y, segments: Array(CACTUS_SEGMENT_COUNT).fill(true) };
+      const x = FALLBACK_CACTUS_ORIGIN_X +
+        (i % FALLBACK_CACTUS_COLS) * FALLBACK_CACTUS_COL_STEP;
+      const y = FALLBACK_CACTUS_ORIGIN_Y +
+        Math.floor(i / FALLBACK_CACTUS_COLS) * FALLBACK_CACTUS_ROW_STEP;
+      cactus = {
+        id: `cactus_${i}`,
+        x,
+        y,
+        segments: Array(CACTUS_SEGMENT_COUNT).fill(true),
+      };
       placed.push({ x, y, r: CACTUS_PLACEMENT_RADIUS });
     }
     cacti.push(cactus);
@@ -164,17 +214,29 @@ function generateArena(): { rocks: Rock[]; cacti: Cactus[] } {
 }
 
 export function getRockData(room: GameRoom): RockData[] {
-  return room.rocks.map(r => ({ id: r.id, x: r.x, y: r.y, vertices: r.vertices }));
+  return room.rocks.map((r) => ({
+    id: r.id,
+    x: r.x,
+    y: r.y,
+    vertices: r.vertices,
+  }));
 }
 
 export function getCactiData(room: GameRoom): CactusData[] {
-  return room.cacti.map(c => ({ id: c.id, x: c.x, y: c.y, segments: [...c.segments] }));
+  return room.cacti.map((c) => ({
+    id: c.id,
+    x: c.x,
+    y: c.y,
+    segments: [...c.segments],
+  }));
 }
 
 export function createRoom(id: string, name: string, maxPlayers = 8): GameRoom {
   const { rocks, cacti } = generateArena();
   const room: GameRoom = {
-    id, name, maxPlayers,
+    id,
+    name,
+    maxPlayers,
     players: new Map(),
     sockets: new Map(),
     bullets: [],
@@ -204,12 +266,17 @@ export function listRooms(): GameInfo[] {
 
 function findSafeSpawnPosition(room: GameRoom): { x: number; y: number } {
   for (let attempt = 0; attempt < PLACEMENT_MAX_ATTEMPTS; attempt++) {
-    const x = ARENA_PLACEMENT_MARGIN + Math.random() * (ARENA_W - ARENA_PLACEMENT_MARGIN * 2);
-    const y = ARENA_PLACEMENT_MARGIN + Math.random() * (ARENA_H - ARENA_PLACEMENT_MARGIN * 2);
+    const x = ARENA_PLACEMENT_MARGIN +
+      Math.random() * (ARENA_W - ARENA_PLACEMENT_MARGIN * 2);
+    const y = ARENA_PLACEMENT_MARGIN +
+      Math.random() * (ARENA_H - ARENA_PLACEMENT_MARGIN * 2);
 
     let safe = true;
     for (const rock of room.rocks) {
-      if (Math.hypot(x - rock.x, y - rock.y) < rock.boundingRadius + PLAYER_RADIUS + OBJECT_MIN_SPACING) {
+      if (
+        Math.hypot(x - rock.x, y - rock.y) <
+          rock.boundingRadius + PLAYER_RADIUS + OBJECT_MIN_SPACING
+      ) {
         safe = false;
         break;
       }
@@ -217,7 +284,10 @@ function findSafeSpawnPosition(room: GameRoom): { x: number; y: number } {
     if (!safe) continue;
 
     for (const cactus of room.cacti) {
-      if (Math.hypot(x - cactus.x, y - cactus.y) < CACTUS_PLACEMENT_RADIUS + PLAYER_RADIUS + OBJECT_MIN_SPACING) {
+      if (
+        Math.hypot(x - cactus.x, y - cactus.y) <
+          CACTUS_PLACEMENT_RADIUS + PLAYER_RADIUS + OBJECT_MIN_SPACING
+      ) {
         safe = false;
         break;
       }
@@ -227,7 +297,12 @@ function findSafeSpawnPosition(room: GameRoom): { x: number; y: number } {
   return { x: PLAYER_RADIUS * 3, y: PLAYER_RADIUS * 3 };
 }
 
-export function joinRoom(room: GameRoom, playerId: string, playerName: string, socket: WebSocket) {
+export function joinRoom(
+  room: GameRoom,
+  playerId: string,
+  playerName: string,
+  socket: WebSocket,
+) {
   const player = createPlayer(playerId, playerName);
   const spawn = findSafeSpawnPosition(room);
   player.x = spawn.x;
@@ -242,7 +317,12 @@ export function leaveRoom(room: GameRoom, playerId: string) {
   if (room.players.size === 0) room.gameOver = false;
 }
 
-export function applyInput(room: GameRoom, playerId: string, dx: number, dy: number) {
+export function applyInput(
+  room: GameRoom,
+  playerId: string,
+  dx: number,
+  dy: number,
+) {
   const player = room.players.get(playerId);
   if (!player || !player.alive) return;
   player.dx = dx;
@@ -275,7 +355,8 @@ export function shoot(room: GameRoom, playerId: string) {
     ownerId: playerId,
     x: player.x + dir * ARM_LENGTH * Math.cos(player.armAngle),
     y: player.y - ARM_LENGTH * Math.sin(player.armAngle),
-    vx, vy,
+    vx,
+    vy,
     born: now,
     bounces: 0,
   });
@@ -299,7 +380,12 @@ function broadcast(room: GameRoom, msg: string) {
 }
 
 function closestPointOnSegment(
-  px: number, py: number, ax: number, ay: number, bx: number, by: number
+  px: number,
+  py: number,
+  ax: number,
+  ay: number,
+  bx: number,
+  by: number,
 ): { x: number; y: number } {
   const dx = bx - ax, dy = by - ay, len2 = dx * dx + dy * dy;
   if (len2 === 0) return { x: ax, y: ay };
@@ -308,9 +394,13 @@ function closestPointOnSegment(
 }
 
 function bulletPolygonNormal(
-  bx: number, by: number, rock: Rock
+  bx: number,
+  by: number,
+  rock: Rock,
 ): { nx: number; ny: number } | null {
-  if (Math.hypot(bx - rock.x, by - rock.y) > rock.boundingRadius + BULLET_RADIUS) return null;
+  if (
+    Math.hypot(bx - rock.x, by - rock.y) > rock.boundingRadius + BULLET_RADIUS
+  ) return null;
   const vertices = rock.vertices, n = vertices.length;
   let bestDist = Infinity, bestNx = 0, bestNy = 0;
   for (let i = 0; i < n; i++) {
@@ -321,20 +411,32 @@ function bulletPolygonNormal(
       bestDist = dist;
       const ex = b.x - a.x, ey = b.y - a.y, el = Math.hypot(ex, ey);
       let nx = -ey / el, ny = ex / el;
-      if (nx * (bx - rock.x) + ny * (by - rock.y) < 0) { nx = -nx; ny = -ny; }
-      bestNx = nx; bestNy = ny;
+      if (nx * (bx - rock.x) + ny * (by - rock.y) < 0) {
+        nx = -nx;
+        ny = -ny;
+      }
+      bestNx = nx;
+      bestNy = ny;
     }
   }
   return bestDist < Infinity ? { nx: bestNx, ny: bestNy } : null;
 }
 
-function reflect(vx: number, vy: number, nx: number, ny: number): [number, number] {
+function reflect(
+  vx: number,
+  vy: number,
+  nx: number,
+  ny: number,
+): [number, number] {
   const dot = vx * nx + vy * ny;
   return [vx - 2 * dot * nx, vy - 2 * dot * ny];
 }
 
 function resolvePlayerRockCollision(player: Player, rock: Rock): void {
-  if (Math.hypot(player.x - rock.x, player.y - rock.y) > rock.boundingRadius + PLAYER_RADIUS) return;
+  if (
+    Math.hypot(player.x - rock.x, player.y - rock.y) >
+      rock.boundingRadius + PLAYER_RADIUS
+  ) return;
 
   const vertices = rock.vertices;
   const n = vertices.length;
@@ -390,18 +492,36 @@ function tick(room: GameRoom) {
   for (const player of room.players.values()) {
     if (!player.alive) continue;
 
-    player.vx = player.dx !== 0 ? player.vx + (player.dx * MAX_SPEED - player.vx) * ACCELERATION : player.vx * FRICTION;
-    player.vy = player.dy !== 0 ? player.vy + (player.dy * MAX_SPEED - player.vy) * ACCELERATION : player.vy * FRICTION;
+    player.vx = player.dx !== 0
+      ? player.vx + (player.dx * MAX_SPEED - player.vx) * ACCELERATION
+      : player.vx * FRICTION;
+    player.vy = player.dy !== 0
+      ? player.vy + (player.dy * MAX_SPEED - player.vy) * ACCELERATION
+      : player.vy * FRICTION;
     if (Math.abs(player.vx) < 0.05) player.vx = 0;
     if (Math.abs(player.vy) < 0.05) player.vy = 0;
 
-    player.x = Math.max(PLAYER_RADIUS, Math.min(ARENA_W - PLAYER_RADIUS, player.x + player.vx));
-    player.y = Math.max(PLAYER_RADIUS, Math.min(ARENA_H - PLAYER_RADIUS, player.y + player.vy));
+    player.x = Math.max(
+      PLAYER_RADIUS,
+      Math.min(ARENA_W - PLAYER_RADIUS, player.x + player.vx),
+    );
+    player.y = Math.max(
+      PLAYER_RADIUS,
+      Math.min(ARENA_H - PLAYER_RADIUS, player.y + player.vy),
+    );
 
     for (const rock of room.rocks) resolvePlayerRockCollision(player, rock);
-    for (const cactus of room.cacti) resolvePlayerCactusCollision(player, cactus);
-    player.x = Math.max(PLAYER_RADIUS, Math.min(ARENA_W - PLAYER_RADIUS, player.x));
-    player.y = Math.max(PLAYER_RADIUS, Math.min(ARENA_H - PLAYER_RADIUS, player.y));
+    for (const cactus of room.cacti) {
+      resolvePlayerCactusCollision(player, cactus);
+    }
+    player.x = Math.max(
+      PLAYER_RADIUS,
+      Math.min(ARENA_W - PLAYER_RADIUS, player.x),
+    );
+    player.y = Math.max(
+      PLAYER_RADIUS,
+      Math.min(ARENA_H - PLAYER_RADIUS, player.y),
+    );
 
     // Complete reload
     if (player.reloading && now - player.reloadStart >= RELOAD_TIME) {
@@ -417,7 +537,9 @@ function tick(room: GameRoom) {
     bullet.x += bullet.vx;
     bullet.y += bullet.vy;
 
-    if (bullet.x < 0 || bullet.x > ARENA_W || bullet.y < 0 || bullet.y > ARENA_H) continue;
+    if (
+      bullet.x < 0 || bullet.x > ARENA_W || bullet.y < 0 || bullet.y > ARENA_H
+    ) continue;
 
     let alive = true;
 
@@ -438,8 +560,12 @@ function tick(room: GameRoom) {
       outer: for (const cactus of room.cacti) {
         for (let i = 0; i < cactus.segments.length; i++) {
           if (!cactus.segments[i]) continue;
-          const sx = cactus.x - CACTUS_HALF_WIDTH, sy = cactus.y + i * CACTUS_SEGMENT_STRIDE;
-          if (bullet.x >= sx && bullet.x <= sx + CACTUS_SEGMENT_WIDTH && bullet.y >= sy && bullet.y <= sy + CACTUS_SEGMENT_HEIGHT) {
+          const sx = cactus.x - CACTUS_HALF_WIDTH,
+            sy = cactus.y + i * CACTUS_SEGMENT_STRIDE;
+          if (
+            bullet.x >= sx && bullet.x <= sx + CACTUS_SEGMENT_WIDTH &&
+            bullet.y >= sy && bullet.y <= sy + CACTUS_SEGMENT_HEIGHT
+          ) {
             cactus.segments[i] = false;
             alive = false;
             break outer;
@@ -453,7 +579,10 @@ function tick(room: GameRoom) {
       for (const player of room.players.values()) {
         if (!player.alive) continue;
         if (player.id === bullet.ownerId && now - bullet.born < 200) continue;
-        if (Math.hypot(bullet.x - player.x, bullet.y - player.y) < PLAYER_RADIUS + BULLET_RADIUS) {
+        if (
+          Math.hypot(bullet.x - player.x, bullet.y - player.y) <
+            PLAYER_RADIUS + BULLET_RADIUS
+        ) {
           player.health = Math.max(0, player.health - 20);
           if (player.health <= 0) {
             player.alive = false;
@@ -476,8 +605,8 @@ function tick(room: GameRoom) {
   // Win condition: 1 alive, 1+ dead
   if (!room.gameOver) {
     const allPlayers = [...room.players.values()];
-    const alivePlayers = allPlayers.filter(p => p.alive);
-    const deadPlayers = allPlayers.filter(p => !p.alive);
+    const alivePlayers = allPlayers.filter((p) => p.alive);
+    const deadPlayers = allPlayers.filter((p) => !p.alive);
     if (alivePlayers.length === 1 && deadPlayers.length >= 1) {
       room.gameOver = true;
       const winnerName = alivePlayers[0].name;
@@ -488,7 +617,20 @@ function tick(room: GameRoom) {
   }
 
   const players: PlayerSnapshot[] = [...room.players.values()].map(toSnapshot);
-  const bullets: BulletSnapshot[] = room.bullets.map(b => ({ id: b.id, x: b.x, y: b.y, bounces: b.bounces }));
-  const cacti: CactusData[] = room.cacti.map(c => ({ id: c.id, x: c.x, y: c.y, segments: [...c.segments] }));
-  broadcast(room, JSON.stringify({ type: "game_state", players, bullets, cacti }));
+  const bullets: BulletSnapshot[] = room.bullets.map((b) => ({
+    id: b.id,
+    x: b.x,
+    y: b.y,
+    bounces: b.bounces,
+  }));
+  const cacti: CactusData[] = room.cacti.map((c) => ({
+    id: c.id,
+    x: c.x,
+    y: c.y,
+    segments: [...c.segments],
+  }));
+  broadcast(
+    room,
+    JSON.stringify({ type: "game_state", players, bullets, cacti }),
+  );
 }

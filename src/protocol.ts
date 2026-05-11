@@ -11,7 +11,12 @@ export type ServerMessage =
   | { type: "lobby_state"; games: GameInfo[]; lobbyCount: number }
   | { type: "game_joined"; playerId: string; gameId: string }
   | { type: "arena"; rocks: RockData[]; cacti: CactusData[] }
-  | { type: "game_state"; players: PlayerSnapshot[]; bullets: BulletSnapshot[]; cacti: CactusData[] }
+  | {
+    type: "game_state";
+    players: PlayerSnapshot[];
+    bullets: BulletSnapshot[];
+    cacti: CactusData[];
+  }
   | { type: "game_over"; winnerName: string }
   | { type: "error"; message: string };
 

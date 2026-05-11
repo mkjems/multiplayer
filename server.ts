@@ -1,4 +1,16 @@
-import { createRoom, getRoom, joinRoom, leaveRoom, applyInput, listRooms, setArmAngle, shoot, reloadPlayer, getRockData, getCactiData } from "./src/game.ts";
+import {
+  applyInput,
+  createRoom,
+  getCactiData,
+  getRockData,
+  getRoom,
+  joinRoom,
+  leaveRoom,
+  listRooms,
+  reloadPlayer,
+  setArmAngle,
+  shoot,
+} from "./src/game.ts";
 import type { ClientMessage } from "./src/protocol.ts";
 
 // Seed some default rooms
@@ -8,7 +20,11 @@ createRoom("race", "Speed Race", 2);
 const lobbyClients = new Set<WebSocket>();
 
 export function broadcastLobby() {
-  const msg = JSON.stringify({ type: "lobby_state", games: listRooms(), lobbyCount: lobbyClients.size });
+  const msg = JSON.stringify({
+    type: "lobby_state",
+    games: listRooms(),
+    lobbyCount: lobbyClients.size,
+  });
   for (const ws of lobbyClients) {
     try {
       if (ws.readyState === WebSocket.OPEN) ws.send(msg);
@@ -21,7 +37,13 @@ export function broadcastLobby() {
 function sendLobbyState(ws: WebSocket) {
   try {
     if (ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ type: "lobby_state", games: listRooms(), lobbyCount: lobbyClients.size }));
+      ws.send(
+        JSON.stringify({
+          type: "lobby_state",
+          games: listRooms(),
+          lobbyCount: lobbyClients.size,
+        }),
+      );
     }
   } catch { /* ignore */ }
 }
@@ -63,8 +85,16 @@ function handleGameSocket(ws: WebSocket, roomId: string) {
     if (msg.type === "join_game") {
       playerId = crypto.randomUUID();
       joinRoom(room, playerId, msg.playerName, ws);
-      ws.send(JSON.stringify({ type: "game_joined", playerId, gameId: roomId }));
-      ws.send(JSON.stringify({ type: "arena", rocks: getRockData(room), cacti: getCactiData(room) }));
+      ws.send(
+        JSON.stringify({ type: "game_joined", playerId, gameId: roomId }),
+      );
+      ws.send(
+        JSON.stringify({
+          type: "arena",
+          rocks: getRockData(room),
+          cacti: getCactiData(room),
+        }),
+      );
       broadcastLobby();
     } else if (msg.type === "move" && playerId) {
       applyInput(room, playerId, msg.dx, msg.dy);
@@ -81,7 +111,7 @@ function handleGameSocket(ws: WebSocket, roomId: string) {
     }
   };
 
-  ws.onerror = () => { /* ignore */ };
+  ws.onerror = () => {/* ignore */};
 
   ws.onclose = () => {
     if (playerId) {
@@ -108,7 +138,9 @@ async function serveFile(path: string): Promise<Response> {
   }
 }
 
-function tryUpgrade(req: Request): { socket: WebSocket; response: Response } | null {
+function tryUpgrade(
+  req: Request,
+): { socket: WebSocket; response: Response } | null {
   if (req.headers.get("upgrade")?.toLowerCase() !== "websocket") return null;
   try {
     return Deno.upgradeWebSocket(req);
@@ -122,7 +154,9 @@ Deno.serve((req) => {
 
   if (url.pathname === "/ws/lobby") {
     const upgrade = tryUpgrade(req);
-    if (!upgrade) return new Response("WebSocket upgrade required", { status: 426 });
+    if (!upgrade) {
+      return new Response("WebSocket upgrade required", { status: 426 });
+    }
     handleLobbySocket(upgrade.socket);
     return upgrade.response;
   }
@@ -130,13 +164,17 @@ Deno.serve((req) => {
   const gameMatch = url.pathname.match(/^\/ws\/game\/(.+)$/);
   if (gameMatch) {
     const upgrade = tryUpgrade(req);
-    if (!upgrade) return new Response("WebSocket upgrade required", { status: 426 });
+    if (!upgrade) {
+      return new Response("WebSocket upgrade required", { status: 426 });
+    }
     handleGameSocket(upgrade.socket, gameMatch[1]);
     return upgrade.response;
   }
 
   let filePath = `public${url.pathname}`;
-  if (url.pathname === "/" || url.pathname === "") filePath = "public/index.html";
+  if (url.pathname === "/" || url.pathname === "") {
+    filePath = "public/index.html";
+  }
 
   return serveFile(filePath);
 });
