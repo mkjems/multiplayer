@@ -1,4 +1,4 @@
-const Sounds = (() => {
+export function createSounds() {
   let audioCtx = null;
   let muted = false;
 
@@ -219,4 +219,4 @@ const Sounds = (() => {
     playDeath,
     playReload,
   };
-})();
+}

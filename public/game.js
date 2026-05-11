@@ -1,3 +1,5 @@
+import { createSounds } from "./sounds.js";
+
 // Color palette — canvas/JS colors (CSS equivalents live in game.html :root)
 const COLOR_GROUND = "#232121";
 const COLOR_ROCK_FILL = "#4a4a5a";
@@ -40,6 +42,8 @@ const TRAIL_MAX_POSITIONS = 8; // positions per bullet (at 20 Hz ≈ 400 ms of h
 const playerName = sessionStorage.getItem("playerName");
 const gameId = sessionStorage.getItem("gameId");
 if (!playerName || !gameId) globalThis.location.href = "/";
+
+const sounds = createSounds();
 
 document.getElementById("game-title").textContent =
   gameId.charAt(0).toUpperCase() + gameId.slice(1);
@@ -100,15 +104,15 @@ ws.onmessage = (e) => {
     for (const p of msg.players) {
       if (!p.alive && !deathTimes.has(p.id)) {
         deathTimes.set(p.id, now);
-        Sounds.playDeath();
+        sounds.playDeath();
       }
       const prev = previousHealth.get(p.id) ?? p.health;
       if (p.health < prev) {
         hitTimes.set(p.id, now);
         if (p.id === myId) {
           triggerShake();
-          Sounds.playHit(true);
-        } else Sounds.playHit(false);
+          sounds.playHit(true);
+        } else sounds.playHit(false);
       }
       previousHealth.set(p.id, p.health);
     }
@@ -116,7 +120,7 @@ ws.onmessage = (e) => {
     bullets = msg.bullets;
     for (const b of msg.bullets) {
       const prev = previousBounces.get(b.id) ?? 0;
-      if (b.bounces > prev) Sounds.playRicochet();
+      if (b.bounces > prev) sounds.playRicochet();
       previousBounces.set(b.id, b.bounces);
     }
     for (const id of previousBounces.keys()) {
@@ -141,7 +145,7 @@ ws.onmessage = (e) => {
       if (prev) {
         for (let i = 0; i < cactus.segments.length; i++) {
           if (prev[i] && !cactus.segments[i]) {
-            Sounds.playCactusHit();
+            sounds.playCactusHit();
             break;
           }
         }
@@ -197,21 +201,21 @@ document.addEventListener("keydown", (e) => {
       ws.send(JSON.stringify({ type: "shoot" }));
     }
     const me = players.find((p) => p.id === myId);
-    if (me && me.ammo <= 0) Sounds.playReload();
-    else Sounds.playShoot();
+    if (me && me.ammo <= 0) sounds.playReload();
+    else sounds.playShoot();
   }
   if (k === "r") {
     if (ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ type: "reload" }));
     }
-    Sounds.playReload();
+    sounds.playReload();
   }
 });
 document.addEventListener("keyup", (e) => keys.delete(e.key.toLowerCase()));
 
 const muteBtn = document.getElementById("mute-btn");
 muteBtn.addEventListener("click", () => {
-  muteBtn.textContent = Sounds.toggleMute() ? "🔇" : "🔊";
+  muteBtn.textContent = sounds.toggleMute() ? "🔇" : "🔊";
 });
 
 let lastMove = { dx: 0, dy: 0 };
