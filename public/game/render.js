@@ -2,13 +2,14 @@
 // Rendering
 // ═════════════════════════════════════════════════════════════════════════════
 
+import { lerpColor } from "./utils.js";
+
 /**
  * Factory function to create renderer.
  *
  * @param {HTMLCanvasElement} canvas - Canvas element
  * @param {object} gameState - Game state object
  * @param {object} effects - Effects manager
- * @param {object} sounds - Sound manager
  * @param {object} constants - Game constants
  * @returns {object} Renderer with render() and drawDisconnected() methods
  */
@@ -16,20 +17,6 @@ export function createRenderer(canvas, gameState, effects, constants) {
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     throw new Error("Canvas 2D context is not available");
-  }
-
-  // Helper: interpolate between two colors
-  function lerpColor(c1, c2, t) {
-    const r1 = parseInt(c1.slice(1, 3), 16);
-    const g1 = parseInt(c1.slice(3, 5), 16);
-    const b1 = parseInt(c1.slice(5, 7), 16);
-    const r2 = parseInt(c2.slice(1, 3), 16);
-    const g2 = parseInt(c2.slice(3, 5), 16);
-    const b2 = parseInt(c2.slice(5, 7), 16);
-    const r = Math.round(r1 + (r2 - r1) * t);
-    const g = Math.round(g1 + (g2 - g1) * t);
-    const b = Math.round(b1 + (b2 - b1) * t);
-    return `rgb(${r},${g},${b})`;
   }
 
   // Draw a rock
@@ -51,15 +38,21 @@ export function createRenderer(canvas, gameState, effects, constants) {
 
   // Draw a cactus
   function drawCactus(cactus) {
+    const {
+      cactusHalfWidth,
+      cactusSegmentStride,
+      cactusSegmentWidth,
+      cactusSegmentHeight,
+    } = gameState.arenaConfig;
     for (let i = 0; i < cactus.segments.length; i++) {
       if (!cactus.segments[i]) continue;
-      const sx = cactus.x - constants.CACTUS_HALF_WIDTH;
-      const sy = cactus.y + i * constants.CACTUS_SEGMENT_STRIDE;
+      const sx = cactus.x - cactusHalfWidth;
+      const sy = cactus.y + i * cactusSegmentStride;
       ctx.fillStyle = constants.COLOR_CACTUS_FILL;
-      ctx.fillRect(sx, sy, constants.CACTUS_SEGMENT_WIDTH, constants.CACTUS_SEGMENT_HEIGHT);
+      ctx.fillRect(sx, sy, cactusSegmentWidth, cactusSegmentHeight);
       ctx.strokeStyle = constants.COLOR_CACTUS_STROKE;
       ctx.lineWidth = 1;
-      ctx.strokeRect(sx, sy, constants.CACTUS_SEGMENT_WIDTH, constants.CACTUS_SEGMENT_HEIGHT);
+      ctx.strokeRect(sx, sy, cactusSegmentWidth, cactusSegmentHeight);
     }
   }
 
@@ -87,6 +80,7 @@ export function createRenderer(canvas, gameState, effects, constants) {
     const angle = isMe ? gameState.localArmAngle : p.armAngle;
     const facing = isMe ? gameState.localFacing : p.facing;
     const dir = facing === "right" ? 1 : -1;
+    const { armLength } = gameState.arenaConfig;
 
     if (isMe) {
       ctx.save();
@@ -119,8 +113,8 @@ export function createRenderer(canvas, gameState, effects, constants) {
     ctx.beginPath();
     ctx.moveTo(p.x, p.y);
     ctx.lineTo(
-      p.x + dir * constants.ARM_LENGTH * Math.cos(angle),
-      p.y - constants.ARM_LENGTH * Math.sin(angle),
+      p.x + dir * armLength * Math.cos(angle),
+      p.y - armLength * Math.sin(angle),
     );
     ctx.strokeStyle = p.color;
     ctx.lineWidth = 5;

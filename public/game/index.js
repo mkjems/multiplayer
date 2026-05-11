@@ -9,6 +9,7 @@ import { createEffects } from "./effects.js";
 import { createNetworkManager } from "./network.js";
 import { setupInputHandler } from "./input.js";
 import { createRenderer } from "./render.js";
+import { requireCanvas, requireElement } from "./utils.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Initialize Game
@@ -17,20 +18,6 @@ import { createRenderer } from "./render.js";
 const playerName = sessionStorage.getItem("playerName");
 const gameId = sessionStorage.getItem("gameId");
 if (!playerName || !gameId) globalThis.location.href = "/";
-
-function requireElement(id) {
-  const el = document.getElementById(id);
-  if (!el) throw new Error(`Missing required element: #${id}`);
-  return el;
-}
-
-function requireCanvas(id) {
-  const el = requireElement(id);
-  if (!(el instanceof HTMLCanvasElement)) {
-    throw new Error(`Expected #${id} to be a canvas element`);
-  }
-  return el;
-}
 
 // Update page title
 requireElement("game-title").textContent =
@@ -57,6 +44,7 @@ function handleGameJoined(msg) {
 function handleArena(msg) {
   gameState.rocks = msg.rocks;
   gameState.cacti = msg.cacti;
+  gameState.arenaConfig = { ...msg.config };
 }
 
 function handleGameState(msg) {

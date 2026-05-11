@@ -1,5 +1,6 @@
 import { createPlayer, type Player, toSnapshot } from "./player.ts";
 import type {
+  ArenaConfig,
   BulletSnapshot,
   CactusData,
   GameInfo,
@@ -229,6 +230,17 @@ export function getCactiData(room: GameRoom): CactusData[] {
     y: c.y,
     segments: [...c.segments],
   }));
+}
+
+export function getArenaConfig(): ArenaConfig {
+  return {
+    armMax: ARM_MAX,
+    armLength: ARM_LENGTH,
+    cactusHalfWidth: CACTUS_HALF_WIDTH,
+    cactusSegmentStride: CACTUS_SEGMENT_STRIDE,
+    cactusSegmentWidth: CACTUS_SEGMENT_WIDTH,
+    cactusSegmentHeight: CACTUS_SEGMENT_HEIGHT,
+  };
 }
 
 export function createRoom(id: string, name: string, maxPlayers = 8): GameRoom {

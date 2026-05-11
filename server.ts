@@ -1,5 +1,6 @@
 import {
   applyInput,
+  getArenaConfig,
   createRoom,
   getCactiData,
   getRockData,
@@ -93,6 +94,7 @@ function handleGameSocket(ws: WebSocket, roomId: string) {
           type: "arena",
           rocks: getRockData(room),
           cacti: getCactiData(room),
+          config: getArenaConfig(),
         }),
       );
       broadcastLobby();

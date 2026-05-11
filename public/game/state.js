@@ -2,6 +2,15 @@
 // Game State Management
 // ═════════════════════════════════════════════════════════════════════════════
 
+import {
+  DEFAULT_ARM_LENGTH,
+  DEFAULT_ARM_MAX,
+  DEFAULT_CACTUS_HALF_WIDTH,
+  DEFAULT_CACTUS_SEGMENT_HEIGHT,
+  DEFAULT_CACTUS_SEGMENT_STRIDE,
+  DEFAULT_CACTUS_SEGMENT_WIDTH,
+} from "./constants.js";
+
 /**
  * Factory function to create game state object.
  * Encapsulates all mutable game data and provides methods to update it.
@@ -20,6 +29,16 @@ export function createGameState() {
     localArmAngle: 0,
     localFacing: "right",
 
+    // Server-authoritative arena config (defaults used until arena message arrives)
+    arenaConfig: {
+      armMax: DEFAULT_ARM_MAX,
+      armLength: DEFAULT_ARM_LENGTH,
+      cactusHalfWidth: DEFAULT_CACTUS_HALF_WIDTH,
+      cactusSegmentStride: DEFAULT_CACTUS_SEGMENT_STRIDE,
+      cactusSegmentWidth: DEFAULT_CACTUS_SEGMENT_WIDTH,
+      cactusSegmentHeight: DEFAULT_CACTUS_SEGMENT_HEIGHT,
+    },
+
     // Tracking for visual effects and state changes
     deathTimes: new Map(), // playerId → timestamp when alive went false
     hitTimes: new Map(), // playerId → timestamp of last hit
@@ -37,6 +56,7 @@ export function createGameState() {
       } else if (msg.type === "arena") {
         this.rocks = msg.rocks;
         this.cacti = msg.cacti;
+        if (msg.config) this.arenaConfig = { ...msg.config };
       }
     },
 
@@ -55,6 +75,14 @@ export function createGameState() {
       this.gameOverAt = null;
       this.localArmAngle = 0;
       this.localFacing = "right";
+      this.arenaConfig = {
+        armMax: DEFAULT_ARM_MAX,
+        armLength: DEFAULT_ARM_LENGTH,
+        cactusHalfWidth: DEFAULT_CACTUS_HALF_WIDTH,
+        cactusSegmentStride: DEFAULT_CACTUS_SEGMENT_STRIDE,
+        cactusSegmentWidth: DEFAULT_CACTUS_SEGMENT_WIDTH,
+        cactusSegmentHeight: DEFAULT_CACTUS_SEGMENT_HEIGHT,
+      };
       this.deathTimes.clear();
       this.hitTimes.clear();
       this.previousHealth.clear();

@@ -71,17 +71,18 @@ export function setupInputHandler(network, sounds, gameState, constants) {
     else if (dx < 0) gameState.localFacing = "left";
 
     // Handle arm angle adjustment (A/Z keys)
+    const { armMax } = gameState.arenaConfig;
     let angleChanged = false;
     if (keys.has("a")) {
       gameState.localArmAngle = Math.min(
-        constants.ARM_MAX,
+        armMax,
         gameState.localArmAngle + constants.ARM_STEP,
       );
       angleChanged = true;
     }
     if (keys.has("z")) {
       gameState.localArmAngle = Math.max(
-        -constants.ARM_MAX,
+        -armMax,
         gameState.localArmAngle - constants.ARM_STEP,
       );
       angleChanged = true;

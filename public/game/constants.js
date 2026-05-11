@@ -29,15 +29,15 @@ export const COLOR_DISCONNECT_TEXT = "#888"; // matches --color-text-secondary
 export const COLOR_HIT_FLASH = "#ffffff";
 export const COLOR_VIGNETTE = "220,50,50";
 
-// Cactus segment geometry — must match server constants in src/game.ts
-export const CACTUS_HALF_WIDTH = 8;
-export const CACTUS_SEGMENT_STRIDE = 14;
-export const CACTUS_SEGMENT_WIDTH = 16;
-export const CACTUS_SEGMENT_HEIGHT = 12;
+// Gameplay geometry defaults. Server-provided arena config should override these.
+export const DEFAULT_CACTUS_HALF_WIDTH = 8;
+export const DEFAULT_CACTUS_SEGMENT_STRIDE = 14;
+export const DEFAULT_CACTUS_SEGMENT_WIDTH = 16;
+export const DEFAULT_CACTUS_SEGMENT_HEIGHT = 14;
 
-// Arm and weapon
-export const ARM_LENGTH = 28; // must match src/game.ts
-export const ARM_MAX = Math.PI / 3;
+// Arm and weapon defaults. Server-provided arena config should override these.
+export const DEFAULT_ARM_LENGTH = 20;
+export const DEFAULT_ARM_MAX = Math.PI / 3;
 export const ARM_STEP = (2 * Math.PI) / 180; // 2° per frame
 
 // Animation and visual effect timings (milliseconds)

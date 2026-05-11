@@ -2,6 +2,8 @@
 // Network Management
 // ═════════════════════════════════════════════════════════════════════════════
 
+import { safeParseJson } from "./utils.js";
+
 /**
  * Factory function to create network manager.
  * Handles WebSocket connection and message routing.
@@ -29,7 +31,8 @@ export function createNetworkManager(
   };
 
   ws.onmessage = (e) => {
-    const msg = JSON.parse(e.data);
+    const msg = safeParseJson(e.data);
+    if (!msg) return;
     onStateUpdate(msg);
     if (msg.type === "game_over") {
       onGameOver(msg);

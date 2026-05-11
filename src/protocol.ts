@@ -10,7 +10,12 @@ export type ClientMessage =
 export type ServerMessage =
   | { type: "lobby_state"; games: GameInfo[]; lobbyCount: number }
   | { type: "game_joined"; playerId: string; gameId: string }
-  | { type: "arena"; rocks: RockData[]; cacti: CactusData[] }
+  | {
+    type: "arena";
+    rocks: RockData[];
+    cacti: CactusData[];
+    config: ArenaConfig;
+  }
   | {
     type: "game_state";
     players: PlayerSnapshot[];
@@ -62,4 +67,13 @@ export interface CactusData {
   x: number;
   y: number;
   segments: boolean[]; // true = alive, index 0 = top, 5 segments
+}
+
+export interface ArenaConfig {
+  armMax: number;
+  armLength: number;
+  cactusHalfWidth: number;
+  cactusSegmentStride: number;
+  cactusSegmentWidth: number;
+  cactusSegmentHeight: number;
 }
