@@ -1,14 +1,14 @@
 {
   "tasks": {
     "build:client": "deno run -A npm:typescript/tsc -p client/tsconfig.json",
-    "build:client:clean": "rm -f public/*.js public/game/*.js",
+    "client:clean": "rm -f public/*.js public/game/*.js",
     "watch:client": "deno run -A npm:typescript/tsc -p client/tsconfig.json --watch --preserveWatchOutput",
     "typecheck:client": "deno run -A npm:typescript/tsc -p client/tsconfig.json --noEmit",
     "start": "deno task build:client && deno run --allow-net --allow-read server.ts",
-    "dev": "deno task build:client && watch:client && deno run --allow-net --allow-read --watch server.ts",
-    "fmt": "deno fmt src/ && deno fmt server.ts && deno fmt client/ && deno fmt public/",
-    "lint": "deno lint src/ && deno lint server.ts && deno lint client/ && deno lint public/",
-    "check": "deno check src/ && deno check server.ts && deno check public/ && deno task typecheck:client"
+    "dev": "deno task build:client && (deno task watch:client & deno run --allow-net --allow-read --watch server.ts)",
+    "fmt": "deno fmt src/ && deno fmt server.ts && deno fmt client/",
+    "lint": "deno lint src/ && deno lint server.ts && deno lint client/",
+    "check": "deno check src/ && deno check server.ts && deno task typecheck:client"
   },
   "deploy": {
     "org": "mkjems",
