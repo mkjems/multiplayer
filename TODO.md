@@ -2,9 +2,6 @@
 
 
 
-## Sprint 17
-- We should encourage the mobile phone users to rotate to landscape orientation. We should find a way to take up be full screen even on iPhones, and somehow avoid the browser tabs and Url input field.
-
 ## Sprint 18
 - Its a little hard to find the other players. Can we make a semi transparent minimap in the top right corner showing the micro version of the arena. With a bright green dot for the current player and less bright green for the other players. This way the player will know in witch direction to go.  
 

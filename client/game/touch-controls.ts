@@ -160,6 +160,49 @@ export function setupTouchControls(
   document.addEventListener("touchend", onTouchEnd);
   document.addEventListener("touchcancel", onTouchEnd);
 
+  // ── Rotate-to-landscape prompt ─────────────────────────────────────────────
+  const rotatePrompt = document.createElement("div");
+  rotatePrompt.id = "touch-rotate-prompt";
+  rotatePrompt.innerHTML = `
+    <svg class="rotate-phone-svg" viewBox="0 0 140 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="6" y="4" width="32" height="54" rx="5" stroke="rgba(255,255,255,0.85)" stroke-width="3"/>
+      <rect x="14" y="50" width="16" height="3" rx="1.5" fill="rgba(255,255,255,0.6)"/>
+      <path d="M 44 32 Q 60 8 86 10 Q 112 12 126 34" stroke="rgba(255,255,255,0.75)" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <path d="M 120 42 L 128 33 L 134 43" stroke="rgba(255,255,255,0.75)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <rect x="88" y="56" width="46" height="28" rx="5" stroke="rgba(255,255,255,0.85)" stroke-width="3"/>
+      <rect x="129" y="64" width="3" height="12" rx="1.5" fill="rgba(255,255,255,0.6)"/>
+    </svg>
+    <p>Rotate your device for the best experience</p>
+  `;
+  document.body.appendChild(rotatePrompt);
+
+  function onOrientationChange(): void {
+    const isPortrait = window.innerHeight > window.innerWidth;
+    rotatePrompt.classList.toggle("visible", isPortrait);
+  }
+  window.addEventListener("resize", onOrientationChange);
+  onOrientationChange();
+
+  // ── Add-to-Home-Screen tip ─────────────────────────────────────────────────
+  const isStandalone = (navigator as unknown as { standalone?: boolean })
+    .standalone === true;
+  const tipDismissed = sessionStorage.getItem("homescreenTipDismissed");
+  if (!isStandalone && !tipDismissed) {
+    const homescreenTip = document.createElement("div");
+    homescreenTip.id = "touch-homescreen-tip";
+    homescreenTip.innerHTML = `
+      <span>Add to Home Screen for full-screen play</span>
+      <button id="touch-homescreen-dismiss" aria-label="Dismiss">✕</button>
+    `;
+    document.body.appendChild(homescreenTip);
+    document
+      .getElementById("touch-homescreen-dismiss")
+      ?.addEventListener("click", () => {
+        sessionStorage.setItem("homescreenTipDismissed", "1");
+        homescreenTip.remove();
+      });
+  }
+
   return function dispose(): void {
     joystickBase.removeEventListener("touchstart", onJoystickStart);
     sliderTrack.removeEventListener("touchstart", onSliderStart);
@@ -168,6 +211,8 @@ export function setupTouchControls(
     document.removeEventListener("touchmove", onTouchMove);
     document.removeEventListener("touchend", onTouchEnd);
     document.removeEventListener("touchcancel", onTouchEnd);
+    window.removeEventListener("resize", onOrientationChange);
     overlay.remove();
+    rotatePrompt.remove();
   };
 }
