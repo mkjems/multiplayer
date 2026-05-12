@@ -234,6 +234,8 @@ export function getCactiData(room: GameRoom): CactusData[] {
 
 export function getArenaConfig(): ArenaConfig {
   return {
+    arenaWidth: ARENA_W,
+    arenaHeight: ARENA_H,
     armMax: ARM_MAX,
     armLength: ARM_LENGTH,
     cactusHalfWidth: CACTUS_HALF_WIDTH,

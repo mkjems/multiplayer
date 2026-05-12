@@ -37,6 +37,14 @@ const overlay = requireElement("overlay");
 const winnerText = requireElement("winner-text");
 const countdownText = requireElement("countdown-text");
 
+function resizeCanvas(): void {
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = window.innerWidth * dpr;
+  canvas.height = window.innerHeight * dpr;
+}
+resizeCanvas();
+globalThis.addEventListener("resize", resizeCanvas);
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Network Message Handlers
 // ─────────────────────────────────────────────────────────────────────────────

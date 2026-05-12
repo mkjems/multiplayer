@@ -1,10 +1,5 @@
 # TODO
 
-## Sprint 12 — Fullscreen Canvas
-- Make the canvas fill the viewport (100vw, 100vh): remove the nav bar and hint text from game.html, set canvas dimensions dynamically on load and on window resize
-- Keep HUD (ammo, kill counter) in the viewport corners — confirm they remain correctly positioned when canvas is fullscreen
-- Center the existing 1000×650 world inside the now-larger canvas (letterbox) so the game looks correct before the camera system is added
-
 ## Sprint 13 — World Expansion + Camera System with Dead Zone
 - Expand the world: increase ARENA_W / ARENA_H in server/game.ts (e.g. 3000×2000), adjust spawn margin and object placement, broadcast world dimensions to clients
 - Add camera state to the client: cameraX, cameraY, and dead-zone size constants (e.g. 40% of viewport per axis)

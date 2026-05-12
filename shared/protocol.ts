@@ -71,6 +71,8 @@ export interface CactusData {
 }
 
 export interface ArenaConfig {
+  arenaWidth: number;
+  arenaHeight: number;
   armMax: number;
   armLength: number;
   cactusHalfWidth: number;

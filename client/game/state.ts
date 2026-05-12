@@ -9,6 +9,8 @@ import {
   DEFAULT_CACTUS_SEGMENT_HEIGHT,
   DEFAULT_CACTUS_SEGMENT_STRIDE,
   DEFAULT_CACTUS_SEGMENT_WIDTH,
+  DEFAULT_WORLD_HEIGHT,
+  DEFAULT_WORLD_WIDTH,
 } from "./constants.js";
 import type {
   ArenaConfig,
@@ -60,6 +62,8 @@ export function createGameState(): GameState {
 
     // Server-authoritative arena config (defaults used until arena message arrives)
     arenaConfig: {
+      arenaWidth: DEFAULT_WORLD_WIDTH,
+      arenaHeight: DEFAULT_WORLD_HEIGHT,
       armMax: DEFAULT_ARM_MAX,
       armLength: DEFAULT_ARM_LENGTH,
       cactusHalfWidth: DEFAULT_CACTUS_HALF_WIDTH,
@@ -105,6 +109,8 @@ export function createGameState(): GameState {
       this.localArmAngle = 0;
       this.localFacing = "right";
       this.arenaConfig = {
+        arenaWidth: DEFAULT_WORLD_WIDTH,
+        arenaHeight: DEFAULT_WORLD_HEIGHT,
         armMax: DEFAULT_ARM_MAX,
         armLength: DEFAULT_ARM_LENGTH,
         cactusHalfWidth: DEFAULT_CACTUS_HALF_WIDTH,

@@ -213,7 +213,7 @@ export function createRenderer(
     const me = gameState.getLocalPlayer();
     if (!me || !me.alive) return;
 
-    const size = 8, gap = 4, px = 14, py = canvas.height - 20;
+    const size = 8, gap = 4, px = 14, py = window.innerHeight - 20;
     ctx.font = "bold 10px system-ui";
     ctx.textAlign = "left";
 
@@ -241,10 +241,10 @@ export function createRenderer(
     ctx.textAlign = "right";
     ctx.fillStyle = constants.COLOR_HUD_LABEL;
     ctx.font = "bold 10px system-ui";
-    ctx.fillText("KILLS", canvas.width - 14, py - 2);
+    ctx.fillText("KILLS", window.innerWidth - 14, py - 2);
     ctx.fillStyle = me.kills > 0 ? constants.COLOR_KILLS_ACTIVE : constants.COLOR_KILLS_ZERO;
     ctx.font = "bold 18px system-ui";
-    ctx.fillText(String(me.kills), canvas.width - 14, py + 10);
+    ctx.fillText(String(me.kills), window.innerWidth - 14, py + 10);
   }
 
   // Draw vignette effect
@@ -253,22 +253,25 @@ export function createRenderer(
     if (alpha <= 0) return;
 
     const gradient = ctx.createRadialGradient(
-      canvas.width / 2,
-      canvas.height / 2,
-      canvas.height * 0.25,
-      canvas.width / 2,
-      canvas.height / 2,
-      canvas.height * 0.85,
+      window.innerWidth / 2,
+      window.innerHeight / 2,
+      window.innerHeight * 0.25,
+      window.innerWidth / 2,
+      window.innerHeight / 2,
+      window.innerHeight * 0.85,
     );
     gradient.addColorStop(0, `rgba(${constants.COLOR_VIGNETTE},0)`);
     gradient.addColorStop(1, `rgba(${constants.COLOR_VIGNETTE},${alpha})`);
     ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
   }
 
   return {
     render(inputProcessor: InputProcessor): void {
       inputProcessor.processInput();
+
+      const dpr = window.devicePixelRatio || 1;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       ctx.save();
       const shake = effects.getShakeOffset();
@@ -277,13 +280,19 @@ export function createRenderer(
       }
 
       ctx.fillStyle = constants.COLOR_GROUND;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
+      const worldOffsetX = (window.innerWidth - gameState.arenaConfig.arenaWidth) / 2;
+      const worldOffsetY = (window.innerHeight - gameState.arenaConfig.arenaHeight) / 2;
+
+      ctx.save();
+      ctx.translate(worldOffsetX, worldOffsetY);
       for (const rock of gameState.rocks) drawRock(rock);
       for (const cactus of gameState.cacti) drawCactus(cactus);
       for (const b of gameState.bullets) drawBulletTrail(b);
       for (const b of gameState.bullets) drawBullet(b);
       for (const p of gameState.players) drawPlayer(p);
+      ctx.restore();
 
       drawHUD();
       ctx.restore();
@@ -295,14 +304,14 @@ export function createRenderer(
 
     drawDisconnected(): void {
       ctx.fillStyle = constants.COLOR_DISCONNECT_BG;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
       ctx.fillStyle = constants.COLOR_DISCONNECT_TEXT;
       ctx.font = "16px system-ui";
       ctx.textAlign = "center";
       ctx.fillText(
         "Disconnected — go back to lobby",
-        canvas.width / 2,
-        canvas.height / 2,
+        window.innerWidth / 2,
+        window.innerHeight / 2,
       );
     },
   };

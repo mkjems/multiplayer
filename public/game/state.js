@@ -1,7 +1,7 @@
 // ═════════════════════════════════════════════════════════════════════════════
 // Game State Management
 // ═════════════════════════════════════════════════════════════════════════════
-import { DEFAULT_ARM_LENGTH, DEFAULT_ARM_MAX, DEFAULT_CACTUS_HALF_WIDTH, DEFAULT_CACTUS_SEGMENT_HEIGHT, DEFAULT_CACTUS_SEGMENT_STRIDE, DEFAULT_CACTUS_SEGMENT_WIDTH, } from "./constants.js";
+import { DEFAULT_ARM_LENGTH, DEFAULT_ARM_MAX, DEFAULT_CACTUS_HALF_WIDTH, DEFAULT_CACTUS_SEGMENT_HEIGHT, DEFAULT_CACTUS_SEGMENT_STRIDE, DEFAULT_CACTUS_SEGMENT_WIDTH, DEFAULT_WORLD_HEIGHT, DEFAULT_WORLD_WIDTH, } from "./constants.js";
 /**
  * Factory function to create game state object.
  * Encapsulates all mutable game data and provides methods to update it.
@@ -20,6 +20,8 @@ export function createGameState() {
         localFacing: "right",
         // Server-authoritative arena config (defaults used until arena message arrives)
         arenaConfig: {
+            arenaWidth: DEFAULT_WORLD_WIDTH,
+            arenaHeight: DEFAULT_WORLD_HEIGHT,
             armMax: DEFAULT_ARM_MAX,
             armLength: DEFAULT_ARM_LENGTH,
             cactusHalfWidth: DEFAULT_CACTUS_HALF_WIDTH,
@@ -63,6 +65,8 @@ export function createGameState() {
             this.localArmAngle = 0;
             this.localFacing = "right";
             this.arenaConfig = {
+                arenaWidth: DEFAULT_WORLD_WIDTH,
+                arenaHeight: DEFAULT_WORLD_HEIGHT,
                 armMax: DEFAULT_ARM_MAX,
                 armLength: DEFAULT_ARM_LENGTH,
                 cactusHalfWidth: DEFAULT_CACTUS_HALF_WIDTH,
