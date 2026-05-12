@@ -28,12 +28,12 @@ export function createGameState() {
             cactusSegmentHeight: DEFAULT_CACTUS_SEGMENT_HEIGHT,
         },
         // Tracking for visual effects and state changes
-        deathTimes: new Map(), // playerId → timestamp when alive went false
-        hitTimes: new Map(), // playerId → timestamp of last hit
-        previousHealth: new Map(), // playerId → last known health
-        previousBounces: new Map(), // bulletId → last known bounce count
-        bulletTrails: new Map(), // bulletId → [{x, y}, …] (oldest first)
-        previousCactiSegments: new Map(), // cactusId → segments boolean[]
+        deathTimes: new Map(),
+        hitTimes: new Map(),
+        previousHealth: new Map(),
+        previousBounces: new Map(),
+        bulletTrails: new Map(),
+        previousCactiSegments: new Map(),
         // Apply server state update to game state
         updateFromServerMessage(msg) {
             if (msg.type === "game_state") {

@@ -9,6 +9,18 @@ import type {
   PlayerSnapshot,
   RockData,
 } from "../../shared/protocol.ts";
+import type { GameState } from "./state.js";
+import type { Effects } from "./effects.js";
+import type * as ConstantsModule from "./constants.js";
+
+interface InputProcessor {
+  processInput(): void;
+}
+
+export interface Renderer {
+  render(inputProcessor: InputProcessor): void;
+  drawDisconnected(): void;
+}
 
 /**
  * Factory function to create renderer.
@@ -19,14 +31,19 @@ import type {
  * @param {object} constants - Game constants
  * @returns {object} Renderer with render() and drawDisconnected() methods
  */
-export function createRenderer(canvas, gameState, effects, constants) {
+export function createRenderer(
+  canvas: HTMLCanvasElement,
+  gameState: GameState,
+  effects: Effects,
+  constants: typeof ConstantsModule,
+): Renderer {
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     throw new Error("Canvas 2D context is not available");
   }
 
   // Draw a rock
-  function drawRock(rock: RockData) {
+  function drawRock(rock: RockData): void {
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(rock.vertices[0].x, rock.vertices[0].y);
@@ -43,7 +60,7 @@ export function createRenderer(canvas, gameState, effects, constants) {
   }
 
   // Draw a cactus
-  function drawCactus(cactus: CactusData) {
+  function drawCactus(cactus: CactusData): void {
     const {
       cactusHalfWidth,
       cactusSegmentStride,
@@ -63,7 +80,7 @@ export function createRenderer(canvas, gameState, effects, constants) {
   }
 
   // Draw a player
-  function drawPlayer(p: PlayerSnapshot) {
+  function drawPlayer(p: PlayerSnapshot): void {
     if (!p.alive) {
       const deathTime = gameState.deathTimes.get(p.id) ?? Date.now();
       const t = Math.min(1, (Date.now() - deathTime) / 1500);
@@ -151,7 +168,7 @@ export function createRenderer(canvas, gameState, effects, constants) {
   }
 
   // Draw bullet trail
-  function drawBulletTrail(b: BulletSnapshot) {
+  function drawBulletTrail(b: BulletSnapshot): void {
     const trail = gameState.bulletTrails.get(b.id);
     if (!trail || trail.length < 2) return;
 
@@ -180,7 +197,7 @@ export function createRenderer(canvas, gameState, effects, constants) {
   }
 
   // Draw a bullet
-  function drawBullet(b: BulletSnapshot) {
+  function drawBullet(b: BulletSnapshot): void {
     ctx.beginPath();
     ctx.arc(b.x, b.y, 3, 0, Math.PI * 2);
     ctx.fillStyle = constants.COLOR_BULLET_FILL;
@@ -191,7 +208,7 @@ export function createRenderer(canvas, gameState, effects, constants) {
   }
 
   // Draw HUD (ammo, kills)
-  function drawHUD() {
+  function drawHUD(): void {
     const me = gameState.getLocalPlayer();
     if (!me || !me.alive) return;
 
@@ -230,7 +247,7 @@ export function createRenderer(canvas, gameState, effects, constants) {
   }
 
   // Draw vignette effect
-  function drawVignette() {
+  function drawVignette(): void {
     const alpha = effects.getVignetteAlpha();
     if (alpha <= 0) return;
 
@@ -249,7 +266,7 @@ export function createRenderer(canvas, gameState, effects, constants) {
   }
 
   return {
-    render(inputProcessor) {
+    render(inputProcessor: InputProcessor): void {
       inputProcessor.processInput();
 
       ctx.save();
@@ -275,7 +292,7 @@ export function createRenderer(canvas, gameState, effects, constants) {
       requestAnimationFrame(() => this.render(inputProcessor));
     },
 
-    drawDisconnected() {
+    drawDisconnected(): void {
       ctx.fillStyle = constants.COLOR_DISCONNECT_BG;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = constants.COLOR_DISCONNECT_TEXT;

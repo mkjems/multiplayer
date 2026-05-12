@@ -3,6 +3,14 @@
 // ═════════════════════════════════════════════════════════════════════════════
 
 import type { ClientMessage } from "../../shared/protocol.ts";
+import type { GameState } from "./state.js";
+import type { Sounds } from "../sounds.js";
+import type * as ConstantsModule from "./constants.js";
+
+export interface InputHandler {
+  processInput(): void;
+  dispose(): void;
+}
 
 /**
  * Sets up keyboard input handlers and sends player commands to server.
@@ -14,10 +22,10 @@ import type { ClientMessage } from "../../shared/protocol.ts";
  */
 export function setupInputHandler(
   network: { send: (msg: ClientMessage) => void },
-  sounds,
-  gameState,
-  constants,
-) {
+  sounds: Sounds,
+  gameState: GameState,
+  constants: typeof ConstantsModule,
+): InputHandler {
   const keys = new Set();
   let lastMove = { dx: 0, dy: 0 };
   let lastAngleSent = 0;
@@ -27,7 +35,7 @@ export function setupInputHandler(
   }
 
   // Handle key presses
-  const onKeyDown = (e) => {
+  const onKeyDown = (e: KeyboardEvent): void => {
     const k = e.key.toLowerCase();
     keys.add(k);
 
@@ -49,12 +57,12 @@ export function setupInputHandler(
     }
   };
 
-  const onKeyUp = (e) => {
+  const onKeyUp = (e: KeyboardEvent): void => {
     keys.delete(e.key.toLowerCase());
   };
 
   // Mute button
-  const onMuteClick = () => {
+  const onMuteClick = (): void => {
     muteBtn.textContent = sounds.toggleMute() ? "🔇" : "🔊";
   };
 
@@ -63,7 +71,7 @@ export function setupInputHandler(
   muteBtn.addEventListener("click", onMuteClick);
 
   // Called once per frame to process input and send to server
-  function processInput() {
+  function processInput(): void {
     const dx = (keys.has("arrowright") ? 1 : 0) - (keys.has("arrowleft") ? 1 : 0);
     const dy = (keys.has("arrowdown") ? 1 : 0) - (keys.has("arrowup") ? 1 : 0);
 
@@ -102,7 +110,7 @@ export function setupInputHandler(
     }
   }
 
-  function dispose() {
+  function dispose(): void {
     keys.clear();
     document.removeEventListener("keydown", onKeyDown);
     document.removeEventListener("keyup", onKeyUp);

@@ -1,14 +1,25 @@
-export function createSounds() {
-  let audioCtx = null;
+export interface Sounds {
+  isMuted(): boolean;
+  toggleMute(): boolean;
+  playShoot(): void;
+  playCactusHit(): void;
+  playRicochet(): void;
+  playHit(isLocalPlayer: boolean): void;
+  playDeath(): void;
+  playReload(): void;
+}
+
+export function createSounds(): Sounds {
+  let audioCtx: AudioContext | null = null;
   let muted = false;
 
-  function getCtx() {
+  function getCtx(): AudioContext {
     if (!audioCtx) audioCtx = new AudioContext();
     if (audioCtx.state === "suspended") audioCtx.resume();
     return audioCtx;
   }
 
-  function makeNoise(durationSeconds) {
+  function makeNoise(durationSeconds: number): AudioBuffer {
     const ctx = getCtx();
     const sampleCount = Math.ceil(ctx.sampleRate * durationSeconds);
     const buffer = ctx.createBuffer(1, sampleCount, ctx.sampleRate);
@@ -97,7 +108,7 @@ export function createSounds() {
     osc.stop(t + 0.5);
   }
 
-  function playHit(isLocalPlayer) {
+  function playHit(isLocalPlayer: boolean): void {
     if (muted) return;
     const ctx = getCtx();
     const t = ctx.currentTime;
@@ -179,7 +190,7 @@ export function createSounds() {
     const ctx = getCtx();
     const t = ctx.currentTime;
 
-    function makeClick(startTime, filterFreq, gainValue) {
+    function makeClick(startTime: number, filterFreq: number, gainValue: number): void {
       const source = ctx.createBufferSource();
       source.buffer = makeNoise(0.012);
       const highpass = ctx.createBiquadFilter();
@@ -199,11 +210,11 @@ export function createSounds() {
     makeClick(t + 0.09, 3600, 0.45);
   }
 
-  function isMuted() {
+  function isMuted(): boolean {
     return muted;
   }
 
-  function toggleMute() {
+  function toggleMute(): boolean {
     muted = !muted;
     if (muted && audioCtx) audioCtx.suspend();
     return muted;

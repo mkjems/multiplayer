@@ -1,12 +1,12 @@
 // Shared helpers used across game client modules.
 
-export function requireElement(id) {
+export function requireElement(id: string): HTMLElement {
   const element = document.getElementById(id);
   if (!element) throw new Error(`Missing required element: #${id}`);
   return element;
 }
 
-export function requireCanvas(id) {
+export function requireCanvas(id: string): HTMLCanvasElement {
   const element = requireElement(id);
   if (!(element instanceof HTMLCanvasElement)) {
     throw new Error(`Expected #${id} to be a canvas element`);
@@ -14,7 +14,7 @@ export function requireCanvas(id) {
   return element;
 }
 
-export function safeParseJson(payload) {
+export function safeParseJson(payload: string): unknown {
   try {
     return JSON.parse(payload);
   } catch {
@@ -22,7 +22,7 @@ export function safeParseJson(payload) {
   }
 }
 
-export function lerpColor(c1, c2, t) {
+export function lerpColor(c1: string, c2: string, t: number): string {
   const r1 = parseInt(c1.slice(1, 3), 16);
   const g1 = parseInt(c1.slice(3, 5), 16);
   const b1 = parseInt(c1.slice(5, 7), 16);

@@ -2,24 +2,35 @@
 // Visual Effects
 // ═════════════════════════════════════════════════════════════════════════════
 
+import type * as ConstantsModule from "./constants.js";
+
+export interface Effects {
+  shakeUntil: number;
+  vignetteUntil: number;
+  trigger(): void;
+  getShakeOffset(): { x: number; y: number };
+  getVignetteAlpha(): number;
+  reset(): void;
+}
+
 /**
  * Factory function to create visual effects manager.
  * Handles screen shake and vignette animations.
  */
-export function createEffects(constants) {
+export function createEffects(constants: typeof ConstantsModule): Effects {
   return {
     shakeUntil: 0,
     vignetteUntil: 0,
 
     // Trigger shake and vignette effects
-    trigger() {
+    trigger(): void {
       const now = Date.now();
       this.shakeUntil = now + constants.SHAKE_DURATION;
       this.vignetteUntil = now + constants.VIGNETTE_DURATION;
     },
 
     // Get current frame shake offset
-    getShakeOffset() {
+    getShakeOffset(): { x: number; y: number } {
       const now = Date.now();
       if (now >= this.shakeUntil) {
         return { x: 0, y: 0 };
@@ -33,7 +44,7 @@ export function createEffects(constants) {
     },
 
     // Get current vignette alpha
-    getVignetteAlpha() {
+    getVignetteAlpha(): number {
       const now = Date.now();
       if (now >= this.vignetteUntil) {
         return 0;
@@ -43,7 +54,7 @@ export function createEffects(constants) {
     },
 
     // Reset effects state
-    reset() {
+    reset(): void {
       this.shakeUntil = 0;
       this.vignetteUntil = 0;
     },

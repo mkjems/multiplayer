@@ -5,6 +5,12 @@
 import { safeParseJson } from "./utils.js";
 import type { ClientMessage, ServerMessage } from "../../shared/protocol.ts";
 
+export interface NetworkManager {
+  connection: WebSocket;
+  send(msg: ClientMessage): void;
+  close(): void;
+}
+
 /**
  * Factory function to create network manager.
  * Handles WebSocket connection and message routing.
@@ -22,7 +28,7 @@ export function createNetworkManager(
   onStateUpdate: (msg: ServerMessage) => void,
   onGameOver: (msg: Extract<ServerMessage, { type: "game_over" }>) => void,
   onDisconnect: () => void,
-) {
+): NetworkManager {
   const protocol = location.protocol === "https:" ? "wss" : "ws";
   const ws = new WebSocket(`${protocol}://${location.host}/ws/game/${gameId}`);
   let isClosedByClient = false;

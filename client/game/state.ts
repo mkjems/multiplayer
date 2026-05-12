@@ -19,18 +19,39 @@ import type {
   ServerMessage,
 } from "../../shared/protocol.ts";
 
+export interface GameState {
+  myId: string | null;
+  players: PlayerSnapshot[];
+  bullets: BulletSnapshot[];
+  rocks: RockData[];
+  cacti: CactusData[];
+  gameOverAt: number | null;
+  localArmAngle: number;
+  localFacing: "left" | "right";
+  arenaConfig: ArenaConfig;
+  deathTimes: Map<string, number>;
+  hitTimes: Map<string, number>;
+  previousHealth: Map<string, number>;
+  previousBounces: Map<string, number>;
+  bulletTrails: Map<string, { x: number; y: number }[]>;
+  previousCactiSegments: Map<string, boolean[]>;
+  updateFromServerMessage(msg: ServerMessage): void;
+  getLocalPlayer(): PlayerSnapshot | undefined;
+  reset(): void;
+}
+
 /**
  * Factory function to create game state object.
  * Encapsulates all mutable game data and provides methods to update it.
  */
-export function createGameState() {
+export function createGameState(): GameState {
   return {
     // Player and entity data
-    myId: null as string | null,
-    players: [] as PlayerSnapshot[],
-    bullets: [] as BulletSnapshot[],
-    rocks: [] as RockData[],
-    cacti: [] as CactusData[],
+    myId: null,
+    players: [],
+    bullets: [],
+    rocks: [],
+    cacti: [],
     gameOverAt: null,
 
     // Local input state
@@ -45,18 +66,18 @@ export function createGameState() {
       cactusSegmentStride: DEFAULT_CACTUS_SEGMENT_STRIDE,
       cactusSegmentWidth: DEFAULT_CACTUS_SEGMENT_WIDTH,
       cactusSegmentHeight: DEFAULT_CACTUS_SEGMENT_HEIGHT,
-    } as ArenaConfig,
+    },
 
     // Tracking for visual effects and state changes
-    deathTimes: new Map(), // playerId → timestamp when alive went false
-    hitTimes: new Map(), // playerId → timestamp of last hit
-    previousHealth: new Map(), // playerId → last known health
-    previousBounces: new Map(), // bulletId → last known bounce count
-    bulletTrails: new Map(), // bulletId → [{x, y}, …] (oldest first)
-    previousCactiSegments: new Map(), // cactusId → segments boolean[]
+    deathTimes: new Map<string, number>(),
+    hitTimes: new Map<string, number>(),
+    previousHealth: new Map<string, number>(),
+    previousBounces: new Map<string, number>(),
+    bulletTrails: new Map<string, { x: number; y: number }[]>(),
+    previousCactiSegments: new Map<string, boolean[]>(),
 
     // Apply server state update to game state
-    updateFromServerMessage(msg: ServerMessage) {
+    updateFromServerMessage(msg: ServerMessage): void {
       if (msg.type === "game_state") {
         this.players = msg.players;
         this.bullets = msg.bullets;
@@ -69,12 +90,12 @@ export function createGameState() {
     },
 
     // Get current player
-    getLocalPlayer() {
+    getLocalPlayer(): PlayerSnapshot | undefined {
       return this.players.find((p) => p.id === this.myId);
     },
 
     // Reset state for new game
-    reset() {
+    reset(): void {
       this.myId = null;
       this.players = [];
       this.bullets = [];

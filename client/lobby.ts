@@ -49,7 +49,7 @@ ws.onclose = () => {
     '<div class="loading">Lost connection to lobby. Refresh to reconnect.</div>';
 };
 
-function renderGames(games: GameInfo[]) {
+function renderGames(games: GameInfo[]): void {
   const container = document.getElementById("games");
   if (!container) {
     throw new Error("Missing required element: #games");
