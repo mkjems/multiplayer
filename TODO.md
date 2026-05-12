@@ -1,7 +1,6 @@
 # TODO
 
-## Sprint 15 
-- Bullet to rock collision detection is not always reliable. Bullets sometimes fly through Rocks 
+
 
 ## Sprint 16
 - support phone play with A virtual D-pad (4 arrows) in the bottom-left and a fire button bottom-right would cover 90% of gameplay. Arm angle could be a swipe/drag on the right side. It's doable but would be a meaningful sprint on its own.

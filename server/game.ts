@@ -413,33 +413,50 @@ function closestPointOnSegment(
   return { x: ax + t * dx, y: ay + t * dy };
 }
 
-function bulletPolygonNormal(
-  bx: number,
-  by: number,
+function segmentIntersectT(
+  p1x: number, p1y: number, p2x: number, p2y: number,
+  ax: number, ay: number, bx: number, by: number,
+): number | null {
+  const dx = p2x - p1x, dy = p2y - p1y;
+  const ex = bx - ax, ey = by - ay;
+  const denom = dx * ey - dy * ex;
+  if (Math.abs(denom) < 1e-10) return null;
+  const t = ((ax - p1x) * ey - (ay - p1y) * ex) / denom;
+  const s = ((ax - p1x) * dy - (ay - p1y) * dx) / denom;
+  if (t < 0 || t > 1 || s < 0 || s > 1) return null;
+  return t;
+}
+
+function sweepBulletRock(
+  prevX: number, prevY: number,
+  newX: number, newY: number,
   rock: Rock,
-): { nx: number; ny: number } | null {
-  if (
-    Math.hypot(bx - rock.x, by - rock.y) > rock.boundingRadius + BULLET_RADIUS
-  ) return null;
-  const vertices = rock.vertices, n = vertices.length;
-  let bestDist = Infinity, bestNx = 0, bestNy = 0;
-  for (let i = 0; i < n; i++) {
-    const a = vertices[i], b = vertices[(i + 1) % n];
-    const cp = closestPointOnSegment(bx, by, a.x, a.y, b.x, b.y);
-    const dist = Math.hypot(bx - cp.x, by - cp.y);
-    if (dist < BULLET_RADIUS && dist < bestDist) {
-      bestDist = dist;
+): { t: number; nx: number; ny: number } | null {
+  const pathDx = newX - prevX, pathDy = newY - prevY;
+  const lenSq = pathDx * pathDx + pathDy * pathDy;
+  const tClamped = lenSq < 1e-10 ? 0 :
+    Math.max(0, Math.min(1, ((rock.x - prevX) * pathDx + (rock.y - prevY) * pathDy) / lenSq));
+  const closestDist = Math.hypot(
+    rock.x - (prevX + tClamped * pathDx),
+    rock.y - (prevY + tClamped * pathDy),
+  );
+  if (closestDist > rock.boundingRadius + BULLET_RADIUS) return null;
+
+  let earliest: { t: number; nx: number; ny: number } | null = null;
+  const vertices = rock.vertices;
+  for (let i = 0; i < vertices.length; i++) {
+    const a = vertices[i], b = vertices[(i + 1) % vertices.length];
+    const t = segmentIntersectT(prevX, prevY, newX, newY, a.x, a.y, b.x, b.y);
+    if (t !== null && (earliest === null || t < earliest.t)) {
       const ex = b.x - a.x, ey = b.y - a.y, el = Math.hypot(ex, ey);
       let nx = -ey / el, ny = ex / el;
-      if (nx * (bx - rock.x) + ny * (by - rock.y) < 0) {
-        nx = -nx;
-        ny = -ny;
-      }
-      bestNx = nx;
-      bestNy = ny;
+      // Orient normal toward bullet's incoming direction, not the polygon center
+      // (centroid-based orientation is unreliable for non-convex polygons)
+      if (nx * (prevX - a.x) + ny * (prevY - a.y) < 0) { nx = -nx; ny = -ny; }
+      earliest = { t, nx, ny };
     }
   }
-  return bestDist < Infinity ? { nx: bestNx, ny: bestNy } : null;
+  return earliest;
 }
 
 function reflect(
@@ -585,6 +602,8 @@ function tick(room: GameRoom) {
   const surviving: Bullet[] = [];
 
   for (const bullet of room.bullets) {
+    const prevX = bullet.x;
+    const prevY = bullet.y;
     bullet.x += bullet.vx;
     bullet.y += bullet.vy;
 
@@ -594,16 +613,19 @@ function tick(room: GameRoom) {
 
     let alive = true;
 
-    // Rock ricochet
+    // Rock ricochet — sweep-based to prevent bullet tunneling through thin edges
+    let earliestHit: { t: number; nx: number; ny: number } | null = null;
     for (const rock of room.rocks) {
-      const hit = bulletPolygonNormal(bullet.x, bullet.y, rock);
-      if (hit) {
-        [bullet.vx, bullet.vy] = reflect(bullet.vx, bullet.vy, hit.nx, hit.ny);
-        bullet.x += hit.nx * (BULLET_RADIUS + 2);
-        bullet.y += hit.ny * (BULLET_RADIUS + 2);
-        bullet.bounces++;
-        break;
+      const hit = sweepBulletRock(prevX, prevY, bullet.x, bullet.y, rock);
+      if (hit && (earliestHit === null || hit.t < earliestHit.t)) {
+        earliestHit = hit;
       }
+    }
+    if (earliestHit !== null) {
+      bullet.x = prevX + earliestHit.t * (bullet.x - prevX) + earliestHit.nx * (BULLET_RADIUS + 2);
+      bullet.y = prevY + earliestHit.t * (bullet.y - prevY) + earliestHit.ny * (BULLET_RADIUS + 2);
+      [bullet.vx, bullet.vy] = reflect(bullet.vx, bullet.vy, earliestHit.nx, earliestHit.ny);
+      bullet.bounces++;
     }
 
     // Cactus hit
