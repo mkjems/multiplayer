@@ -1,13 +1,5 @@
 # TODO
 
-## Sprint 10 — TypeScript: Type Annotations
-- Add parameter and return types to all functions in `game/state.ts`
-- Add parameter and return types to all functions in `game/network.ts`
-- Add parameter and return types to all functions in `game/render.ts` (drawRock, drawPlayer, drawBullet, etc.)
-- Add parameter and return types to all functions in `game/input.ts`
-- Add parameter and return types to utility functions in `game/utils.ts` and `sounds.ts`
-- Add types to `lobby.ts` (`renderGames`, `joinGame`, `escHtml`)
-
 ## Sprint 11 — TypeScript: Enable Strict Mode
 - Set `"strict": true` in `client/tsconfig.json`
 - Fix all `noImplicitAny` errors surfaced across client files
@@ -22,7 +14,7 @@
 - When a game is finished inside a room. The room should be regenerated. 
 - When new players join the should be placed as far away for the other players as possible but 30px from the edge  
 - Gun should also be part of collision geometry. Mussel should not poke through rock/cacti.
-- Bullet to rock collision detection is not always reliable.
+- Bullet to rock collision detection is not always reliable. Bullets fly through Rocks 
 - Cacti should have one or two arms and variation in height
 - Rocks should be larger
 - Players should not be able to move through other players (collision detection)
@@ -37,5 +29,6 @@
 - support phone play with A virtual D-pad (4 arrows) in the bottom-left and a fire button bottom-right would cover 90% of gameplay. Arm angle could be a swipe/drag on the right side. It's doable but would be a meaningful sprint on its own.
 - Use real artwork for character animation. vector or sprites
 - Use real sounds for effects 
+- Make overlay where user can read about the controls of the game.
 
 
