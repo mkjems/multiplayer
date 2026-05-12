@@ -11,8 +11,8 @@ import {
   reloadPlayer,
   setArmAngle,
   shoot,
-} from "./server/game.ts";
-import type { ClientMessage } from "./server/protocol.ts";
+} from "./game.ts";
+import type { ClientMessage } from "./protocol.ts";
 
 // Seed some default rooms
 createRoom("dots", "Dot Arena", 3);
