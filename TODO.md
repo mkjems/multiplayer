@@ -1,11 +1,12 @@
 # TODO
 
 
-
 ## Sprint 16
-- support phone play with A virtual D-pad (4 arrows) in the bottom-left and a fire button bottom-right would cover 90% of gameplay. Arm angle could be a swipe/drag on the right side. It's doable but would be a meaningful sprint on its own.
+- support phone play with A virtual D-pad (4 arrows) in the bottom-left and a fire button bottom-right would cover 90% of gameplay. Arm angle could be a swipe/drag on the right side.
 
 ## Sprint 17
+- Its a little hard to find the other players. Can we make a semi transparent minimap in the top right corner showing the micro version of the arena. With a bright green dot for the current player and less bright green for the other players. This way the player will know in witch direction to go.  
+
 
 ## Backlog
 - Cacti should have one or two arms and variation in height
