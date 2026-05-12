@@ -3,6 +3,7 @@
 ## Sprint 19
 
 ## Backlog
+- when all players are dead everyone should return to the lobby. 
 - In game, Ammo should be in top left corner.
 - In game, The semi transparent bar at the top should. be fully transparent.
 - When phone detected on landing page. Show suggestion to add page to home screen. 
