@@ -54,6 +54,10 @@ export const TRAIL_MAX_POSITIONS = 8; // positions per bullet (at 20 Hz ≈ 400 
 // Camera dead zone: fraction of viewport in which the player can move without scrolling
 export const CAMERA_DEAD_ZONE_FRACTION = 0.4;
 
+// HUD layout
+export const HUD_AMMO_TOP = 22;
+export const HUD_KILLS_BOTTOM_OFFSET = 20;
+
 // Minimap
 export const MINIMAP_WIDTH_DESKTOP = 150;
 export const MINIMAP_WIDTH_MOBILE = 90;

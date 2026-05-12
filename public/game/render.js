@@ -217,19 +217,21 @@ export function createRenderer(canvas, gameState, effects, constants) {
         const me = gameState.getLocalPlayer();
         if (!me || !me.alive)
             return;
-        const size = 8, gap = 4, px = 14, py = window.innerHeight - 20;
+        const size = 8, gap = 4, px = 14;
+        const ammoY = constants.HUD_AMMO_TOP;
+        const killsY = window.innerHeight - constants.HUD_KILLS_BOTTOM_OFFSET;
         ctx.font = "bold 10px system-ui";
         ctx.textAlign = "left";
         if (me.reloading) {
             ctx.fillStyle = constants.COLOR_RELOAD_TEXT;
-            ctx.fillText("RELOADING…", px, py + 8);
+            ctx.fillText("RELOADING…", px, ammoY + 8);
         }
         else {
             ctx.fillStyle = constants.COLOR_HUD_LABEL;
-            ctx.fillText("AMMO", px, py - 2);
+            ctx.fillText("AMMO", px, ammoY - 2);
             for (let i = 0; i < 6; i++) {
                 ctx.beginPath();
-                ctx.arc(px + i * (size + gap) + size / 2, py + size / 2, size / 2, 0, Math.PI * 2);
+                ctx.arc(px + i * (size + gap) + size / 2, ammoY + size / 2, size / 2, 0, Math.PI * 2);
                 ctx.fillStyle = i < me.ammo ? constants.COLOR_AMMO_FULL : constants.COLOR_AMMO_EMPTY;
                 ctx.fill();
             }
@@ -238,10 +240,10 @@ export function createRenderer(canvas, gameState, effects, constants) {
         ctx.textAlign = "right";
         ctx.fillStyle = constants.COLOR_HUD_LABEL;
         ctx.font = "bold 10px system-ui";
-        ctx.fillText("KILLS", window.innerWidth - 14, py - 2);
+        ctx.fillText("KILLS", window.innerWidth - 14, killsY - 2);
         ctx.fillStyle = me.kills > 0 ? constants.COLOR_KILLS_ACTIVE : constants.COLOR_KILLS_ZERO;
         ctx.font = "bold 18px system-ui";
-        ctx.fillText(String(me.kills), window.innerWidth - 14, py + 10);
+        ctx.fillText(String(me.kills), window.innerWidth - 14, killsY + 10);
     }
     // Draw vignette effect
     function drawVignette() {
