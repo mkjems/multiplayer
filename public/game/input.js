@@ -20,14 +20,15 @@ export function setupInputHandler(network, sounds, gameState, constants) {
         const k = e.key.toLowerCase();
         keys.add(k);
         if (k === "x") {
-            // Shoot
-            network.send({ type: "shoot" });
             const me = gameState.getLocalPlayer();
-            if (me && me.ammo <= 0) {
-                sounds.playReload();
-            }
-            else {
-                sounds.playShoot();
+            if (me && me.alive) {
+                network.send({ type: "shoot" });
+                if (me.ammo <= 0) {
+                    sounds.playReload();
+                }
+                else {
+                    sounds.playShoot();
+                }
             }
         }
         if (k === "r") {

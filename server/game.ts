@@ -328,7 +328,13 @@ export function joinRoom(
 export function leaveRoom(room: GameRoom, playerId: string) {
   room.players.delete(playerId);
   room.sockets.delete(playerId);
-  if (room.players.size === 0) room.gameOver = false;
+  if (room.players.size === 0) {
+    room.gameOver = false;
+    const { rocks, cacti } = generateArena();
+    room.rocks = rocks;
+    room.cacti = cacti;
+    room.bullets = [];
+  }
 }
 
 export function applyInput(
@@ -499,6 +505,25 @@ function resolvePlayerCactusCollision(player: Player, cactus: Cactus): void {
   }
 }
 
+function resolvePlayerPlayerCollision(playerA: Player, playerB: Player): void {
+  const dx = playerA.x - playerB.x;
+  const dy = playerA.y - playerB.y;
+  const dist = Math.hypot(dx, dy);
+  const minDist = PLAYER_RADIUS * 2;
+  if (dist >= minDist) return;
+  const overlap = (minDist - dist) / 2;
+  if (dist > 0) {
+    const nx = dx / dist, ny = dy / dist;
+    playerA.x += nx * overlap;
+    playerA.y += ny * overlap;
+    playerB.x -= nx * overlap;
+    playerB.y -= ny * overlap;
+  } else {
+    playerA.x += overlap;
+    playerB.x -= overlap;
+  }
+}
+
 function tick(room: GameRoom) {
   const now = Date.now();
 
@@ -542,6 +567,18 @@ function tick(room: GameRoom) {
       player.ammo = 6;
       player.reloading = false;
     }
+  }
+
+  // Player-player collision (pair-wise, both pushed equally)
+  const alivePlayers = [...room.players.values()].filter((p) => p.alive);
+  for (let i = 0; i < alivePlayers.length; i++) {
+    for (let j = i + 1; j < alivePlayers.length; j++) {
+      resolvePlayerPlayerCollision(alivePlayers[i], alivePlayers[j]);
+    }
+  }
+  for (const player of alivePlayers) {
+    player.x = Math.max(PLAYER_RADIUS, Math.min(ARENA_W - PLAYER_RADIUS, player.x));
+    player.y = Math.max(PLAYER_RADIUS, Math.min(ARENA_H - PLAYER_RADIUS, player.y));
   }
 
   // Bullet physics

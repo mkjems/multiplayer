@@ -54,6 +54,7 @@ function handleLobbySocket(ws: WebSocket) {
 
   sendLobbyState(ws);
   ws.onopen = () => sendLobbyState(ws);
+  broadcastLobby();
 
   ws.onmessage = (e) => {
     try {
@@ -62,8 +63,8 @@ function handleLobbySocket(ws: WebSocket) {
     } catch { /* ignore */ }
   };
 
-  ws.onerror = () => lobbyClients.delete(ws);
-  ws.onclose = () => lobbyClients.delete(ws);
+  ws.onerror = () => { lobbyClients.delete(ws); broadcastLobby(); };
+  ws.onclose = () => { lobbyClients.delete(ws); broadcastLobby(); };
 }
 
 function handleGameSocket(ws: WebSocket, roomId: string) {

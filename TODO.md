@@ -1,7 +1,7 @@
 # TODO
 
 ## Sprint 14
-- Dead players should not be able to shoot.
+- Dead players should not be able to shoot.(There is no bullet, but we hear the sound)
 - Players should not be able to move through other players (collision detection)
 - The number of people in the lobby does not get updated when new people arrive
 - When a game is finished inside a room. The room should be regenerated. 
@@ -20,7 +20,7 @@
 - Rocks should be larger
 - When new players join the should be placed as far away for the other players as possible but 30px from the edge  
 
-## Ideas / Maybes
+## Ideas / Maybes 
 - Migrate client build from `tsc` to Vite for faster dev builds, HMR, and better bundling
 - Lobby shows game type icons
 - Use real artwork for character animation. vector or sprites
