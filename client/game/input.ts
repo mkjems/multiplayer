@@ -6,6 +6,7 @@ import type { ClientMessage } from "../../shared/protocol.ts";
 import type { GameState } from "./state.js";
 import type { Sounds } from "../sounds.js";
 import type * as ConstantsModule from "./constants.js";
+import { requireElement } from "./utils.js";
 
 export interface InputHandler {
   processInput(): void;
@@ -29,10 +30,7 @@ export function setupInputHandler(
   const keys = new Set();
   let lastMove = { dx: 0, dy: 0 };
   let lastAngleSent = 0;
-  const muteBtn = document.getElementById("mute-btn");
-  if (!muteBtn) {
-    throw new Error("Missing required element: #mute-btn");
-  }
+  const muteBtn = requireElement("mute-btn");
 
   // Handle key presses
   const onKeyDown = (e: KeyboardEvent): void => {

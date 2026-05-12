@@ -18,7 +18,10 @@ import type { ServerMessage } from "../../shared/protocol.ts";
 
 const playerName = sessionStorage.getItem("playerName");
 const gameId = sessionStorage.getItem("gameId");
-if (!playerName || !gameId) globalThis.location.href = "/";
+if (!playerName || !gameId) {
+  globalThis.location.href = "/";
+  throw new Error("Missing session data");
+}
 
 // Update page title
 requireElement("game-title").textContent =

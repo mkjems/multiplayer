@@ -1,16 +1,9 @@
 # TODO
 
-## Sprint 11 — TypeScript: Enable Strict Mode
-- Set `"strict": true` in `client/tsconfig.json`
-- Fix all `noImplicitAny` errors surfaced across client files
-- Fix `strictNullChecks` issues (nullable values like `gameState.myId`)
-- Verify clean build with `deno task client:clean && deno task build:client` and `deno task typecheck:client`
-
 
 ## Backlog
 - Dead players should not be able to shoot.
 - The number of people in the lobby does not get updated when new people arrive
-- Should we have a walking sound?
 - When a game is finished inside a room. The room should be regenerated. 
 - When new players join the should be placed as far away for the other players as possible but 30px from the edge  
 - Gun should also be part of collision geometry. Mussel should not poke through rock/cacti.
@@ -30,5 +23,6 @@
 - Use real artwork for character animation. vector or sprites
 - Use real sounds for effects 
 - Make overlay where user can read about the controls of the game.
+- Should we have a walking sound?
 
 

@@ -37,10 +37,11 @@ export function createRenderer(
   effects: Effects,
   constants: typeof ConstantsModule,
 ): Renderer {
-  const ctx = canvas.getContext("2d");
-  if (!ctx) {
+  const ctxOrNull = canvas.getContext("2d");
+  if (!ctxOrNull) {
     throw new Error("Canvas 2D context is not available");
   }
+  const ctx = ctxOrNull;
 
   // Draw a rock
   function drawRock(rock: RockData): void {

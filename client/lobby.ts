@@ -83,9 +83,9 @@ function renderGames(games: GameInfo[]): void {
   }).join("");
 
   container.querySelectorAll<HTMLElement>(".game-card:not(.full)").forEach((card) => {
-    card.addEventListener("click", () => joinGame(card.dataset.id));
+    card.addEventListener("click", () => joinGame(card.dataset.id!));
     card.addEventListener("keydown", (e: KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " ") joinGame(card.dataset.id);
+      if (e.key === "Enter" || e.key === " ") joinGame(card.dataset.id!);
     });
   });
 }

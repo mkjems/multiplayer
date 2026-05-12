@@ -14,8 +14,10 @@ import { requireCanvas, requireElement } from "./utils.js";
 // ─────────────────────────────────────────────────────────────────────────────
 const playerName = sessionStorage.getItem("playerName");
 const gameId = sessionStorage.getItem("gameId");
-if (!playerName || !gameId)
+if (!playerName || !gameId) {
     globalThis.location.href = "/";
+    throw new Error("Missing session data");
+}
 // Update page title
 requireElement("game-title").textContent =
     gameId.charAt(0).toUpperCase() + gameId.slice(1);

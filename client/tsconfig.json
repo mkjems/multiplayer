@@ -6,7 +6,7 @@
     "rootDir": ".",
     "outDir": "../public",
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
-    "strict": false,
+    "strict": true,
     "noEmitOnError": true,
     "sourceMap": false,
     "skipLibCheck": true,

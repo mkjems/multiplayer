@@ -12,10 +12,11 @@ import { lerpColor } from "./utils.js";
  * @returns {object} Renderer with render() and drawDisconnected() methods
  */
 export function createRenderer(canvas, gameState, effects, constants) {
-    const ctx = canvas.getContext("2d");
-    if (!ctx) {
+    const ctxOrNull = canvas.getContext("2d");
+    if (!ctxOrNull) {
         throw new Error("Canvas 2D context is not available");
     }
+    const ctx = ctxOrNull;
     // Draw a rock
     function drawRock(rock) {
         ctx.save();

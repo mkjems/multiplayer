@@ -1,6 +1,7 @@
 // ═════════════════════════════════════════════════════════════════════════════
 // Input Handling
 // ═════════════════════════════════════════════════════════════════════════════
+import { requireElement } from "./utils.js";
 /**
  * Sets up keyboard input handlers and sends player commands to server.
  *
@@ -13,10 +14,7 @@ export function setupInputHandler(network, sounds, gameState, constants) {
     const keys = new Set();
     let lastMove = { dx: 0, dy: 0 };
     let lastAngleSent = 0;
-    const muteBtn = document.getElementById("mute-btn");
-    if (!muteBtn) {
-        throw new Error("Missing required element: #mute-btn");
-    }
+    const muteBtn = requireElement("mute-btn");
     // Handle key presses
     const onKeyDown = (e) => {
         const k = e.key.toLowerCase();
