@@ -53,3 +53,19 @@ export const TRAIL_MAX_POSITIONS = 8; // positions per bullet (at 20 Hz ≈ 400 
 
 // Camera dead zone: fraction of viewport in which the player can move without scrolling
 export const CAMERA_DEAD_ZONE_FRACTION = 0.4;
+
+// Minimap
+export const MINIMAP_WIDTH_DESKTOP = 150;
+export const MINIMAP_WIDTH_MOBILE = 90;
+export const MINIMAP_MOBILE_BREAKPOINT = 768;
+export const MINIMAP_MARGIN = 12;
+export const MINIMAP_NAVBAR_HEIGHT = 44;
+export const MINIMAP_BACKGROUND_OPACITY = 0.55;
+export const MINIMAP_BORDER_RADIUS = 4;
+export const MINIMAP_LOCAL_DOT_RADIUS = 3.5;
+export const MINIMAP_OTHER_DOT_RADIUS = 2.5;
+export const COLOR_MINIMAP_BG = "#0f0f1a";
+export const COLOR_MINIMAP_BORDER = "#555555";
+export const COLOR_MINIMAP_LOCAL_PLAYER = "#e0e0e0";
+export const COLOR_MINIMAP_OTHER_PLAYER_ALIVE = "#888888";
+export const COLOR_MINIMAP_OTHER_PLAYER_DEAD = "#3a3a3a";
