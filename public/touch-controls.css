@@ -1,0 +1,131 @@
+/* Touch controls overlay — only rendered on touch devices */
+
+:root {
+  --touch-control-bg: rgba(255, 255, 255, 0.10);
+  --touch-control-border: rgba(255, 255, 255, 0.28);
+  --touch-thumb-bg: rgba(255, 255, 255, 0.55);
+  --touch-thumb-border: rgba(255, 255, 255, 0.80);
+  --touch-fire-bg: rgba(210, 45, 45, 0.55);
+  --touch-fire-border: rgba(255, 100, 100, 0.75);
+  --touch-reload-bg: rgba(50, 130, 215, 0.45);
+  --touch-reload-border: rgba(100, 180, 255, 0.65);
+  --touch-safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+#touch-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+/* ── Left joystick ──────────────────────────────────────────────────────── */
+
+.touch-joystick-base {
+  position: absolute;
+  bottom: calc(36px + var(--touch-safe-bottom));
+  left: 28px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: var(--touch-control-bg);
+  border: 2px solid var(--touch-control-border);
+  pointer-events: all;
+  touch-action: none;
+}
+
+.touch-joystick-thumb {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--touch-thumb-bg);
+  border: 2px solid var(--touch-thumb-border);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* ── Arm angle slider ───────────────────────────────────────────────────── */
+
+.touch-slider-container {
+  position: absolute;
+  bottom: calc(30px + var(--touch-safe-bottom));
+  right: 130px;
+  pointer-events: none;
+}
+
+.touch-slider-track {
+  width: 44px;
+  height: 170px;
+  border-radius: 22px;
+  background: var(--touch-control-bg);
+  border: 2px solid var(--touch-control-border);
+  position: relative;
+  pointer-events: all;
+  touch-action: none;
+}
+
+.touch-slider-thumb {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--touch-thumb-bg);
+  border: 2px solid var(--touch-thumb-border);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* ── Fire button ────────────────────────────────────────────────────────── */
+
+.touch-fire-btn {
+  position: absolute;
+  bottom: calc(70px + var(--touch-safe-bottom));
+  right: 24px;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: var(--touch-fire-bg);
+  border: 2px solid var(--touch-fire-border);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  pointer-events: all;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.touch-fire-btn:active {
+  background: rgba(255, 70, 70, 0.70);
+}
+
+/* ── Reload button ──────────────────────────────────────────────────────── */
+
+.touch-reload-btn {
+  position: absolute;
+  bottom: calc(170px + var(--touch-safe-bottom));
+  right: 42px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--touch-reload-bg);
+  border: 2px solid var(--touch-reload-border);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  pointer-events: all;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.touch-reload-btn:active {
+  background: rgba(80, 160, 255, 0.65);
+}

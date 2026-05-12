@@ -8,6 +8,7 @@ import { createGameState } from "./state.js";
 import { createEffects } from "./effects.js";
 import { createNetworkManager } from "./network.js";
 import { setupInputHandler } from "./input.js";
+import { setupTouchControls } from "./touch-controls.js";
 import { createRenderer } from "./render.js";
 import { requireCanvas, requireElement } from "./utils.js";
 import type { ServerMessage } from "../../shared/protocol.ts";
@@ -180,6 +181,11 @@ const network = createNetworkManager(
 
 const inputHandler = setupInputHandler(network, sounds, gameState, CONSTANTS);
 
+const touchControlsDispose =
+  navigator.maxTouchPoints > 0
+    ? setupTouchControls(inputHandler, gameState)
+    : null;
+
 const renderer = createRenderer(canvas, gameState, effects, CONSTANTS);
 let hasCleanedUp = false;
 
@@ -187,6 +193,7 @@ function cleanupSession() {
   if (hasCleanedUp) return;
   hasCleanedUp = true;
   inputHandler.dispose();
+  touchControlsDispose?.();
   network.close();
 }
 
