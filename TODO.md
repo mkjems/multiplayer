@@ -35,6 +35,7 @@
 
 
 ## Ideas / Maybes
+- Migrate client build from `tsc` to Vite for faster dev builds, HMR, and better bundling
 - Lobby shows game type icons
 - The game canvas should fill the users display, There should be nothing above or beneath the canvas
 - the game should be a 2D world-space game where the player stays centered and the camera moves across the map.

@@ -1,71 +1,44 @@
+# Coding Standards
 
-Coding standards
-================
+- No hardcoded colors or magic values — use descriptively named variables
+- No abbreviations in variable names
+- TypeScript for all client and server code; all functions must be typed
+- Scripts in HTML files belong in separate files
+- Deno tasks must cover all steps needed to develop and run the project
+- Do not touch TODO.md unless the human asks
 
-Colors should not be hardcoded - create a variable with a descriptive name. 
-If functions rely on hardcoded internal values it is better to create a variable in the function with a descriptive name.
-Larger scripts in html files are better to keep in separate files
-Try to avoid abbreviations in the variable names you have control over. 
+# Architecture
 
-Agent Human collaboration
-=========================
+- **Server**: Deno + TypeScript, entry point `server/main.ts`, source in `server/`
+- **Client**: TypeScript compiled with `tsc` from `client/` to `public/`
+- **Deployment**: Deno Deploy
+- Server holds source of truth for all games, broadcasts at 20 Hz
+- Clients run their own animations at 60 Hz
 
-Agent should not touch the TODO.md unless I give permission
+# Game Overview
 
+Pixel art retro cowboy shooting game. Players join rooms via a lobby and fight in a 2D arena with rocks and cacti.
 
+**3 pages:** Landing (enter name) → Lobby (choose room) → Game
 
-THIS IS HOW THE GAME SHOULD BEHAVE
-==================================
+**World & camera:** The arena is larger than the viewport. The camera uses a central dead zone — the player moves freely within a centered rectangle without scrolling; the camera only moves when the player reaches the rectangle's edge.
 
-A game engine on the server side hosts many simultaneous games.
+**Controls (keyboard):** Arrow keys to move, A/Z to aim arm (±60° from horizontal), X to fire, R to reload.
 
-Client connections are upgraded to websockets.
+**Players:** Represented as a colored dot with name below. The arm is a line extending left or right (never up/down) — direction follows last horizontal movement. Bullets originate from the muzzle.
 
-When a client connects to the server you are asked for your name if you do not have one saved in session storage.
+**Bullets:** 6 per player. Ricochets off rocks. Removes a piece of cactus on hit. Reload takes 2 seconds (press R).
 
-You then enter the lobby where you can see the ongoing games and how many are playing in each.
+**Health:** Starts at 100%. Hits reduce health. At 0% the player dies — dot fades to grey, smaller size, dramatic sound. Dead players cannot move or shoot.
 
-You click a game to enter that room
+**Win condition:** When one player remains alive (with at least one dead), the game ends. After a winner celebration, all players return to the lobby.
 
-The game itself is a pixel art retro cowboy shooting game.
+**Spawn:** Players start in an empty area (no rocks, cacti, or opponents nearby).
 
-There is a lot of open space on the playing arena bit also some rocks and cactus that the players can hide behind.
+**Collision:** Players cannot move through rocks, cacti, or other players.
 
-Players can not move through cacti or rocks.
+# Platform
 
-Payers will start on a empty lot where there are no rock or cacti or opponent.
-
-The players move around using the arrow keys and can also control the angle of the arm (keys a and z) from plus 60 degrees up to minus 60 degrees down.
-
-The players are represented using a round dot. The name appears under the player.
-
-The rocks are represented by a solid grey shape made up of multiple (3-7) straight sides of varying length.  
-
-The angle of the arm pointing out to the side is just a line going from the center of the dot and extending a bit so you can see it.
-
-The arm should always point to the left or to the right side. Never above or below. 
-When the player is moving right, the arm is to the right.
-When the player is moving left the arm is to the left.
-Up and down movement does not change the arm.
-
-When pressing 'x' the gun is fired and a bullet is created that flies through the air. when it hits a rock it ricochets of and continues flying
-The bullets should originate from the mussel of the 'gun' 
-
-When a bullet hits a cactus a piece of the cactus is removed where the bullet hit.  
-
-Each player has 6 bullets.
-
-When gun in out of bullets you can reload by pressing r, takes 2 seconds.
-
-Players health decrease when hit by a bullet. (starts at 100%)
-
-When player health reaches 0 or below, player dies. 
-
-When a player dies the colored dot fade slowly to gray and a dramatic dying sound is heard. 
-
-A dead player is represented by smaller grey dot. A dead player can not move or shoot. 
-
-If there is only one alive player in a room, and at least one or more dead players, then the game is over. After a small celebration of the winner, everybody in the room is returned to the lobby. They are now all free to join a room to play again.
-
-
-
+- Desktop: keyboard controls
+- Mobile: virtual joystick (future sprint)
+- Canvas fills the full screen; all UI overlays the canvas

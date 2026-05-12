@@ -25,23 +25,6 @@ Open [http://localhost:8000](http://localhost:8000) in your browser (try two tab
 
 ---
 
-## Project structure
-
-```
-├── server.ts           # HTTP server + WebSocket upgrade handler
-├── deno.json           # Deno config and tasks
-├── src/
-│   ├── protocol.ts     # TypeScript message types (client ↔ server)
-│   ├── player.ts       # Player model and color assignment
-│   └── game.ts         # Game rooms, authoritative state, tick loop
-└── public/
-    ├── index.html      # Landing page — enter your name
-    ├── lobby.html      # Game selection — live player counts
-    └── game.html       # Canvas game client (arrow keys)
-```
-
----
-
 ## How it works
 
 1. **Landing page** — player enters a name, stored in `sessionStorage`
@@ -61,13 +44,4 @@ Client                        Server
 
 ---
 
-## Adding a new game
-
-1. Register a room in `server.ts`:
-   ```ts
-   createRoom("myGame", "My Game", 6);
-   ```
-2. The room appears in the lobby automatically.
-3. Customise game logic in `src/game.ts` — `tick()` is where physics/rules live.
-4. Update `public/game.html` to render your game-specific state.
 
