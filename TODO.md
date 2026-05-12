@@ -41,5 +41,7 @@
 - the game should be a 2D world-space game where the player stays centered and the camera moves across the map.
 - Implement a 2D camera system with a central dead zone.
 - support phone play with A virtual D-pad (4 arrows) in the bottom-left and a fire button bottom-right would cover 90% of gameplay. Arm angle could be a swipe/drag on the right side. It's doable but would be a meaningful sprint on its own.
+- Use real artwork for character animation. vector or sprites
+- Use real sounds for effects 
 
 
