@@ -1,10 +1,11 @@
 # TODO
 
-## Sprint 18
-- Its a little hard to find the other players. Can we make a semi transparent minimap in the top right corner of the game screen showing the micro version of the arena. With a bright grey dot for the current player and less bright grey dot for the other players. This way the player will know in witch direction to go hunting.
+## Sprint 19
 
 ## Backlog
-- When phone detected. Show suggestion to add page to home screen. 
+- In game, Ammo should be in top left corner.
+- In game, The semi transparent bar at the top should. be fully transparent.
+- When phone detected on landing page. Show suggestion to add page to home screen. 
 - Cacti should have one or two arms and variation in height
 - Gun should also be part of collision geometry. Mussel should not poke through rock/cacti.
 - Rocks should be larger
