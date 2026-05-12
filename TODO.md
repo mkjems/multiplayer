@@ -1,11 +1,5 @@
 # TODO
 
-## Sprint 14
-- Dead players should not be able to shoot.(There is no bullet, but we hear the sound)
-- Players should not be able to move through other players (collision detection)
-- The number of people in the lobby does not get updated when new people arrive
-- When a game is finished inside a room. The room should be regenerated. 
-
 ## Sprint 15 
 - Bullet to rock collision detection is not always reliable. Bullets sometimes fly through Rocks 
 
