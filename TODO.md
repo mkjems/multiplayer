@@ -1,7 +1,5 @@
 # TODO
 
-
-
 ## Sprint 18
 - Its a little hard to find the other players. Can we make a semi transparent minimap in the top right corner showing the micro version of the arena. With a bright green dot for the current player and less bright green for the other players. This way the player will know in witch direction to go.  
 
