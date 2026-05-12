@@ -8,7 +8,7 @@ import type {
   RockData,
 } from "../shared/protocol.ts";
 
-const MAX_SPEED = 4;
+const MAX_SPEED = 6;
 const ACCELERATION = 0.35;
 const FRICTION = 0.75;
 const BULLET_SPEED = 12;
@@ -17,39 +17,39 @@ const PLAYER_RADIUS = 16;
 const BULLET_RADIUS = 4;
 const SHOOT_COOL_DOWN = 400;
 const RELOAD_TIME = 2000;
-const ARENA_W = 1000;
-const ARENA_H = 650;
+const ARENA_W = 3000;
+const ARENA_H = 2000;
 const ARM_MAX = Math.PI / 3;
 const ARM_LENGTH = 20;
 
 // Arena generation — rock placement
-const ROCK_COUNT = 6;
+const ROCK_COUNT = 15;
 const ROCK_MIN_SIDES = 6;
 const ROCK_EXTRA_SIDES = 5;
 const ROCK_MIN_RADIUS = 20;
 const ROCK_MAX_RADIUS = 85;
-const FALLBACK_ROCK_COLS = 3;
-const FALLBACK_ROCK_ORIGIN_X = 120;
-const FALLBACK_ROCK_COL_STEP = 230;
-const FALLBACK_ROCK_ORIGIN_Y = 150;
-const FALLBACK_ROCK_ROW_STEP = 200;
+const FALLBACK_ROCK_COLS = 5;
+const FALLBACK_ROCK_ORIGIN_X = 200;
+const FALLBACK_ROCK_COL_STEP = 600;
+const FALLBACK_ROCK_ORIGIN_Y = 300;
+const FALLBACK_ROCK_ROW_STEP = 700;
 const FALLBACK_ROCK_MAX_RADIUS = 35;
 const FALLBACK_ROCK_SIDES = 5;
 
 // Arena generation — cactus placement
-const CACTUS_COUNT = 4;
+const CACTUS_COUNT = 10;
 const CACTUS_PLACEMENT_RADIUS = 18;
 const CACTUS_PLACEMENT_MARGIN_Y = 60;
-const FALLBACK_CACTUS_COLS = 2;
-const FALLBACK_CACTUS_ORIGIN_X = 200;
-const FALLBACK_CACTUS_COL_STEP = 380;
-const FALLBACK_CACTUS_ORIGIN_Y = 180;
-const FALLBACK_CACTUS_ROW_STEP = 140;
+const FALLBACK_CACTUS_COLS = 5;
+const FALLBACK_CACTUS_ORIGIN_X = 300;
+const FALLBACK_CACTUS_COL_STEP = 500;
+const FALLBACK_CACTUS_ORIGIN_Y = 400;
+const FALLBACK_CACTUS_ROW_STEP = 800;
 
 // Arena generation — shared
 const PLACEMENT_MAX_ATTEMPTS = 60;
 const OBJECT_MIN_SPACING = 40;
-const ARENA_PLACEMENT_MARGIN = 80;
+const ARENA_PLACEMENT_MARGIN = 120;
 
 // Cactus segment geometry (used for collision and rendering)
 export const CACTUS_SEGMENT_COUNT = 5;

@@ -1,12 +1,5 @@
 # TODO
 
-## Sprint 13 — World Expansion + Camera System with Dead Zone
-- Expand the world: increase ARENA_W / ARENA_H in server/game.ts (e.g. 3000×2000), adjust spawn margin and object placement, broadcast world dimensions to clients
-- Add camera state to the client: cameraX, cameraY, and dead-zone size constants (e.g. 40% of viewport per axis)
-- Implement dead-zone camera logic: move camera only when the local player exits the centered dead-zone rectangle; clamp camera so it never reveals outside the world
-- Apply camera transform to all draw calls: wrap world-space drawing in ctx.save() / ctx.translate(-cameraX, -cameraY) / ctx.restore(); draw HUD outside this transform
-- Verify screen-shake effect still works: ensure the shake translate is applied inside the camera transform, not outside it
-
 ## Sprint 14
 
 ## Backlog

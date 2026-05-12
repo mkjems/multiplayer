@@ -43,6 +43,10 @@ export function createRenderer(
   }
   const ctx = ctxOrNull;
 
+  let cameraX = 0;
+  let cameraY = 0;
+  let cameraInitialized = false;
+
   // Draw a rock
   function drawRock(rock: RockData): void {
     ctx.save();
@@ -273,6 +277,46 @@ export function createRenderer(
       const dpr = window.devicePixelRatio || 1;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const worldWidth = gameState.arenaConfig.arenaWidth;
+      const worldHeight = gameState.arenaConfig.arenaHeight;
+
+      // Initialize camera centered on local player on first appearance
+      if (!cameraInitialized) {
+        const localPlayer = gameState.getLocalPlayer();
+        if (localPlayer) {
+          cameraX = localPlayer.x - viewportWidth / 2;
+          cameraY = localPlayer.y - viewportHeight / 2;
+          cameraX = Math.max(0, Math.min(worldWidth - viewportWidth, cameraX));
+          cameraY = Math.max(0, Math.min(worldHeight - viewportHeight, cameraY));
+          cameraInitialized = true;
+        }
+      }
+
+      // Dead-zone camera: only scroll when the local player exits the centered rectangle
+      const localPlayer = gameState.getLocalPlayer();
+      if (localPlayer && localPlayer.alive) {
+        const deadZoneWidth = viewportWidth * constants.CAMERA_DEAD_ZONE_FRACTION;
+        const deadZoneHeight = viewportHeight * constants.CAMERA_DEAD_ZONE_FRACTION;
+        const deadZoneLeft = (viewportWidth - deadZoneWidth) / 2;
+        const deadZoneRight = deadZoneLeft + deadZoneWidth;
+        const deadZoneTop = (viewportHeight - deadZoneHeight) / 2;
+        const deadZoneBottom = deadZoneTop + deadZoneHeight;
+
+        const screenX = localPlayer.x - cameraX;
+        const screenY = localPlayer.y - cameraY;
+
+        if (screenX < deadZoneLeft) cameraX = localPlayer.x - deadZoneLeft;
+        if (screenX > deadZoneRight) cameraX = localPlayer.x - deadZoneRight;
+        if (screenY < deadZoneTop) cameraY = localPlayer.y - deadZoneTop;
+        if (screenY > deadZoneBottom) cameraY = localPlayer.y - deadZoneBottom;
+
+        cameraX = Math.max(0, Math.min(worldWidth - viewportWidth, cameraX));
+        cameraY = Math.max(0, Math.min(worldHeight - viewportHeight, cameraY));
+      }
+
+      // Screen shake is applied outside camera transform so the whole viewport shakes
       ctx.save();
       const shake = effects.getShakeOffset();
       if (shake.x !== 0 || shake.y !== 0) {
@@ -280,13 +324,11 @@ export function createRenderer(
       }
 
       ctx.fillStyle = constants.COLOR_GROUND;
-      ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+      ctx.fillRect(0, 0, viewportWidth, viewportHeight);
 
-      const worldOffsetX = (window.innerWidth - gameState.arenaConfig.arenaWidth) / 2;
-      const worldOffsetY = (window.innerHeight - gameState.arenaConfig.arenaHeight) / 2;
-
+      // Camera transform: shift world coordinates to screen space
       ctx.save();
-      ctx.translate(worldOffsetX, worldOffsetY);
+      ctx.translate(-cameraX, -cameraY);
       for (const rock of gameState.rocks) drawRock(rock);
       for (const cactus of gameState.cacti) drawCactus(cactus);
       for (const b of gameState.bullets) drawBulletTrail(b);

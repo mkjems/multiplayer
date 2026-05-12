@@ -30,8 +30,8 @@ export const COLOR_HIT_FLASH = "#ffffff";
 export const COLOR_VIGNETTE = "220,50,50";
 
 // Gameplay geometry defaults. Server-provided arena config should override these.
-export const DEFAULT_WORLD_WIDTH = 1000;
-export const DEFAULT_WORLD_HEIGHT = 650;
+export const DEFAULT_WORLD_WIDTH = 3000;
+export const DEFAULT_WORLD_HEIGHT = 2000;
 export const DEFAULT_CACTUS_HALF_WIDTH = 8;
 export const DEFAULT_CACTUS_SEGMENT_STRIDE = 14;
 export const DEFAULT_CACTUS_SEGMENT_WIDTH = 16;
@@ -50,3 +50,6 @@ export const VIGNETTE_DURATION = 600;
 
 // Bullet trail
 export const TRAIL_MAX_POSITIONS = 8; // positions per bullet (at 20 Hz ≈ 400 ms of history)
+
+// Camera dead zone: fraction of viewport in which the player can move without scrolling
+export const CAMERA_DEAD_ZONE_FRACTION = 0.4;
