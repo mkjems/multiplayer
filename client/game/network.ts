@@ -3,6 +3,7 @@
 // ═════════════════════════════════════════════════════════════════════════════
 
 import { safeParseJson } from "./utils.js";
+import type { ClientMessage, ServerMessage } from "../../shared/protocol.ts";
 
 /**
  * Factory function to create network manager.
@@ -16,11 +17,11 @@ import { safeParseJson } from "./utils.js";
  * @returns {object} Network manager with send() and close() methods
  */
 export function createNetworkManager(
-  gameId,
-  playerName,
-  onStateUpdate,
-  onGameOver,
-  onDisconnect,
+  gameId: string,
+  playerName: string,
+  onStateUpdate: (msg: ServerMessage) => void,
+  onGameOver: (msg: Extract<ServerMessage, { type: "game_over" }>) => void,
+  onDisconnect: () => void,
 ) {
   const protocol = location.protocol === "https:" ? "wss" : "ws";
   const ws = new WebSocket(`${protocol}://${location.host}/ws/game/${gameId}`);
@@ -31,7 +32,7 @@ export function createNetworkManager(
   };
 
   ws.onmessage = (e) => {
-    const msg = safeParseJson(e.data);
+    const msg = safeParseJson(e.data) as ServerMessage | null;
     if (!msg) return;
     onStateUpdate(msg);
     if (msg.type === "game_over") {
@@ -46,7 +47,7 @@ export function createNetworkManager(
   return {
     connection: ws,
 
-    send(msg) {
+    send(msg: ClientMessage) {
       if (ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify(msg));
       }

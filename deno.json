@@ -1,9 +1,9 @@
 {
   "tasks": {
-    "build:client": "deno run -A npm:typescript/tsc -p client/tsconfig.json",
-    "client:clean": "rm -f public/*.js public/game/*.js",
-    "watch:client": "deno run -A npm:typescript/tsc -p client/tsconfig.json --watch --preserveWatchOutput",
-    "typecheck:client": "deno run -A npm:typescript/tsc -p client/tsconfig.json --noEmit",
+    "build:client": "deno run -A npm:typescript/tsc --build client/tsconfig.json",
+    "client:clean": "rm -rf public/*.js public/game/*.js dist/ shared/*.tsbuildinfo client/*.tsbuildinfo",
+    "watch:client": "deno run -A npm:typescript/tsc --build client/tsconfig.json --watch --preserveWatchOutput",
+    "typecheck:client": "deno run -A npm:typescript/tsc --build client/tsconfig.json --dry",
     "start": "deno task build:client && deno run --allow-net --allow-read server/main.ts",
     "dev": "deno task build:client && (deno task watch:client & deno run --allow-net --allow-read --watch server/main.ts)",
     "fmt": "deno fmt server/ && deno fmt client/",

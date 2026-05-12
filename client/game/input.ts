@@ -2,6 +2,8 @@
 // Input Handling
 // ═════════════════════════════════════════════════════════════════════════════
 
+import type { ClientMessage } from "../../shared/protocol.ts";
+
 /**
  * Sets up keyboard input handlers and sends player commands to server.
  *
@@ -10,7 +12,12 @@
  * @param {object} gameState - Game state object
  * @param {object} constants - Game constants
  */
-export function setupInputHandler(network, sounds, gameState, constants) {
+export function setupInputHandler(
+  network: { send: (msg: ClientMessage) => void },
+  sounds,
+  gameState,
+  constants,
+) {
   const keys = new Set();
   let lastMove = { dx: 0, dy: 0 };
   let lastAngleSent = 0;

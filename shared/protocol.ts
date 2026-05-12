@@ -5,7 +5,8 @@ export type ClientMessage =
   | { type: "move"; dx: number; dy: number }
   | { type: "arm_angle"; angle: number }
   | { type: "shoot" }
-  | { type: "reload" };
+  | { type: "reload" }
+  | { type: "ping" };
 
 export type ServerMessage =
   | { type: "lobby_state"; games: GameInfo[]; lobbyCount: number }

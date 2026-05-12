@@ -12,7 +12,7 @@ import {
   setArmAngle,
   shoot,
 } from "./game.ts";
-import type { ClientMessage } from "./protocol.ts";
+import type { ClientMessage } from "../shared/protocol.ts";
 
 // Seed some default rooms
 createRoom("dots", "Dot Arena", 3);

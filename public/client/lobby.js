@@ -1,3 +1,4 @@
+"use strict";
 const playerName = sessionStorage.getItem("playerName");
 if (!playerName) {
     globalThis.location.href = "/";
@@ -21,7 +22,7 @@ ws.onmessage = (e) => {
         if (!countEl || !numberEl) {
             throw new Error("Missing required lobby count elements");
         }
-        numberEl.textContent = String(msg.lobbyCount);
+        numberEl.textContent = msg.lobbyCount;
         countEl.style.display = "";
     }
 };
@@ -82,4 +83,3 @@ function joinGame(gameId) {
 function escHtml(str) {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
-export {};

@@ -10,6 +10,14 @@ import {
   DEFAULT_CACTUS_SEGMENT_STRIDE,
   DEFAULT_CACTUS_SEGMENT_WIDTH,
 } from "./constants.js";
+import type {
+  ArenaConfig,
+  BulletSnapshot,
+  CactusData,
+  PlayerSnapshot,
+  RockData,
+  ServerMessage,
+} from "../../shared/protocol.ts";
 
 /**
  * Factory function to create game state object.
@@ -18,11 +26,11 @@ import {
 export function createGameState() {
   return {
     // Player and entity data
-    myId: null,
-    players: [],
-    bullets: [],
-    rocks: [],
-    cacti: [],
+    myId: null as string | null,
+    players: [] as PlayerSnapshot[],
+    bullets: [] as BulletSnapshot[],
+    rocks: [] as RockData[],
+    cacti: [] as CactusData[],
     gameOverAt: null,
 
     // Local input state
@@ -37,7 +45,7 @@ export function createGameState() {
       cactusSegmentStride: DEFAULT_CACTUS_SEGMENT_STRIDE,
       cactusSegmentWidth: DEFAULT_CACTUS_SEGMENT_WIDTH,
       cactusSegmentHeight: DEFAULT_CACTUS_SEGMENT_HEIGHT,
-    },
+    } as ArenaConfig,
 
     // Tracking for visual effects and state changes
     deathTimes: new Map(), // playerId → timestamp when alive went false
@@ -48,7 +56,7 @@ export function createGameState() {
     previousCactiSegments: new Map(), // cactusId → segments boolean[]
 
     // Apply server state update to game state
-    updateFromServerMessage(msg) {
+    updateFromServerMessage(msg: ServerMessage) {
       if (msg.type === "game_state") {
         this.players = msg.players;
         this.bullets = msg.bullets;

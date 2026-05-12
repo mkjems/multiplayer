@@ -1,3 +1,5 @@
+import type { ClientMessage, GameInfo, ServerMessage } from "../shared/protocol.ts";
+
 const playerName = sessionStorage.getItem("playerName");
 if (!playerName) {
   globalThis.location.href = "/";
@@ -13,11 +15,11 @@ const protocol = location.protocol === "https:" ? "wss" : "ws";
 const ws = new WebSocket(`${protocol}://${location.host}/ws/lobby`);
 
 ws.onopen = () => {
-  ws.send(JSON.stringify({ type: "join_lobby" }));
+  ws.send(JSON.stringify({ type: "join_lobby" } satisfies ClientMessage));
 };
 
 ws.onmessage = (e) => {
-  const msg = JSON.parse(e.data);
+  const msg = JSON.parse(e.data) as ServerMessage;
   if (msg.type === "lobby_state") {
     renderGames(msg.games);
     const countEl = document.getElementById("lobby-count");
@@ -25,7 +27,7 @@ ws.onmessage = (e) => {
     if (!countEl || !numberEl) {
       throw new Error("Missing required lobby count elements");
     }
-    numberEl.textContent = msg.lobbyCount;
+    numberEl.textContent = String(msg.lobbyCount);
     countEl.style.display = "";
   }
 };
@@ -33,7 +35,7 @@ ws.onmessage = (e) => {
 // Keep connection alive on Deploy (edge isolates drop idle WS connections)
 const heartbeat = setInterval(() => {
   if (ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ type: "ping" }));
+    ws.send(JSON.stringify({ type: "ping" } satisfies ClientMessage));
   }
 }, 15000);
 
@@ -47,7 +49,7 @@ ws.onclose = () => {
     '<div class="loading">Lost connection to lobby. Refresh to reconnect.</div>';
 };
 
-function renderGames(games) {
+function renderGames(games: GameInfo[]) {
   const container = document.getElementById("games");
   if (!container) {
     throw new Error("Missing required element: #games");
@@ -88,11 +90,11 @@ function renderGames(games) {
   });
 }
 
-function joinGame(gameId) {
+function joinGame(gameId: string) {
   sessionStorage.setItem("gameId", gameId);
   globalThis.location.href = `/game.html`;
 }
 
-function escHtml(str) {
+function escHtml(str: string): string {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }

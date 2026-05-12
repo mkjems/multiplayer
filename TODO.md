@@ -1,11 +1,5 @@
 # TODO
 
-## Sprint 9 — TypeScript: Shared Protocol Types
-- Import and use types from `server/protocol.ts` in client files (currently none are imported)
-- Type the parsed WebSocket messages in `game/network.ts` and `lobby.ts` against `ServerMessage` / `ClientMessage`
-- Type the message handlers in `game/index.ts` (`handleGameJoined`, `handleArena`, etc.)
-- Remove any type definitions in client files that duplicate what `server/protocol.ts` already defines
-
 ## Sprint 10 — TypeScript: Type Annotations
 - Add parameter and return types to all functions in `game/state.ts`
 - Add parameter and return types to all functions in `game/network.ts`

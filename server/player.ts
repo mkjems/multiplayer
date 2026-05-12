@@ -1,4 +1,4 @@
-import type { PlayerSnapshot } from "./protocol.ts";
+import type { PlayerSnapshot } from "../shared/protocol.ts";
 
 const COLORS = [
   "#e74c3c",

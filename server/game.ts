@@ -6,7 +6,7 @@ import type {
   GameInfo,
   PlayerSnapshot,
   RockData,
-} from "./protocol.ts";
+} from "../shared/protocol.ts";
 
 const MAX_SPEED = 4;
 const ACCELERATION = 0.35;

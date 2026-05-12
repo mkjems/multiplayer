@@ -3,6 +3,12 @@
 // ═════════════════════════════════════════════════════════════════════════════
 
 import { lerpColor } from "./utils.js";
+import type {
+  BulletSnapshot,
+  CactusData,
+  PlayerSnapshot,
+  RockData,
+} from "../../shared/protocol.ts";
 
 /**
  * Factory function to create renderer.
@@ -20,7 +26,7 @@ export function createRenderer(canvas, gameState, effects, constants) {
   }
 
   // Draw a rock
-  function drawRock(rock) {
+  function drawRock(rock: RockData) {
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(rock.vertices[0].x, rock.vertices[0].y);
@@ -37,7 +43,7 @@ export function createRenderer(canvas, gameState, effects, constants) {
   }
 
   // Draw a cactus
-  function drawCactus(cactus) {
+  function drawCactus(cactus: CactusData) {
     const {
       cactusHalfWidth,
       cactusSegmentStride,
@@ -57,7 +63,7 @@ export function createRenderer(canvas, gameState, effects, constants) {
   }
 
   // Draw a player
-  function drawPlayer(p) {
+  function drawPlayer(p: PlayerSnapshot) {
     if (!p.alive) {
       const deathTime = gameState.deathTimes.get(p.id) ?? Date.now();
       const t = Math.min(1, (Date.now() - deathTime) / 1500);
@@ -145,7 +151,7 @@ export function createRenderer(canvas, gameState, effects, constants) {
   }
 
   // Draw bullet trail
-  function drawBulletTrail(b) {
+  function drawBulletTrail(b: BulletSnapshot) {
     const trail = gameState.bulletTrails.get(b.id);
     if (!trail || trail.length < 2) return;
 
@@ -174,7 +180,7 @@ export function createRenderer(canvas, gameState, effects, constants) {
   }
 
   // Draw a bullet
-  function drawBullet(b) {
+  function drawBullet(b: BulletSnapshot) {
     ctx.beginPath();
     ctx.arc(b.x, b.y, 3, 0, Math.PI * 2);
     ctx.fillStyle = constants.COLOR_BULLET_FILL;
