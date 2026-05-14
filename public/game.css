@@ -31,8 +31,6 @@ nav {
   align-items: center;
   gap: 16px;
   padding: 10px 20px;
-  background: transparent;
-  backdrop-filter: blur(4px);
 }
 nav .game-title {
   font-weight: 600;
