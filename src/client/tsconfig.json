@@ -10,7 +10,8 @@
     "noEmitOnError": true,
     "sourceMap": false,
     "skipLibCheck": true,
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
+    "rewriteRelativeImportExtensions": true
   },
   "references": [{ "path": "../shared" }],
   "include": ["./**/*.ts"]

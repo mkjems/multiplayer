@@ -2,7 +2,7 @@
 // Rendering
 // ═════════════════════════════════════════════════════════════════════════════
 
-import { lerpColor } from "./utils";
+import { lerpColor } from "./utils.ts";
 import type {
   BulletSnapshot,
   CactusData,

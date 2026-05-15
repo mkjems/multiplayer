@@ -2,15 +2,15 @@
 // Game Entry Point
 // ═════════════════════════════════════════════════════════════════════════════
 
-import { createSounds } from "../sounds";
-import * as CONSTANTS from "./constants";
-import { createGameState } from "./state";
-import { createEffects } from "./effects";
-import { createNetworkManager } from "./network";
-import { setupInputHandler } from "./input";
-import { setupTouchControls } from "./touch-controls";
-import { createRenderer } from "./render";
-import { requireCanvas, requireElement } from "./utils";
+import { createSounds } from "../sounds.ts";
+import * as CONSTANTS from "./constants.ts";
+import { createGameState } from "./state.ts";
+import { createEffects } from "./effects.ts";
+import { createNetworkManager } from "./network.ts";
+import { setupInputHandler } from "./input.ts";
+import { setupTouchControls } from "./touch-controls.ts";
+import { createRenderer } from "./render.ts";
+import { requireCanvas, requireElement } from "./utils.ts";
 import type { ServerMessage } from "../../shared/protocol";
 
 // ─────────────────────────────────────────────────────────────────────────────
