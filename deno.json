@@ -1,14 +1,15 @@
 {
+  "exclude": ["src/client", "src/shared", "public"],
   "tasks": {
-    "build:client": "rm -rf public && mkdir -p public && deno run -A npm:typescript/tsc --project src/shared/tsconfig.json && deno run -A npm:typescript/tsc --project src/client/tsconfig.json --outDir public && cp src/client/*.html public/ 2>/dev/null || true && cp src/client/*.css public/ 2>/dev/null || true && cp src/client/*.json public/ 2>/dev/null || true && cp -r src/client/assets public/ 2>/dev/null || true",
-    "client:clean": "rm -rf public",
-    "watch:client": "deno run -A npm:typescript/tsc --project src/client/tsconfig.json --watch --preserveWatchOutput",
-    "typecheck:client": "deno run -A npm:typescript/tsc --project src/client/tsconfig.json --noEmit",
-    "start": "deno task build:client && deno run --allow-net --allow-read src/server/main.ts",
-    "dev": "deno task build:client && (deno task watch:client & deno run --allow-net --allow-read --watch src/server/main.ts)",
+    "build": "rm -rf public && mkdir -p public && deno run -A npm:typescript/tsc --project src/shared/tsconfig.json && deno run -A npm:typescript/tsc --project src/client/tsconfig.json --outDir public && cp src/client/*.html public/ 2>/dev/null || true && cp src/client/*.css public/ 2>/dev/null || true && cp src/client/*.json public/ 2>/dev/null || true && cp -r src/client/assets public/ 2>/dev/null || true",
+    "build:clean": "rm -rf public",
+    "client:watch": "deno run -A npm:typescript/tsc --project src/client/tsconfig.json --watch --preserveWatchOutput",
+    "client:typecheck": "deno run -A npm:typescript/tsc --project src/client/tsconfig.json --noEmit",
+    "start": "deno task build && deno run --allow-net --allow-read src/server/main.ts",
+    "dev": "deno task build && (deno task client:watch & deno run --allow-net --allow-read --watch src/server/main.ts)",
     "fmt": "deno fmt src/",
-    "lint": "deno lint --exclude src/server src/",
-    "check": "deno check src/server/main.ts && deno task typecheck:client"
+    "lint": "deno lint src/server",
+    "check": "deno check src/server/main.ts && deno task client:typecheck"
   },
   "lint": {
     "exclude": ["src/client"]
