@@ -52,7 +52,7 @@ export const VIGNETTE_DURATION = 600;
 export const TRAIL_MAX_POSITIONS = 8; // positions per bullet (at 20 Hz ≈ 400 ms of history)
 
 // Camera dead zone: fraction of viewport in which the player can move without scrolling
-export const CAMERA_DEAD_ZONE_FRACTION = 0.1;
+export const CAMERA_DEAD_ZONE_FRACTION = 0;
 
 // Minimap
 export const MINIMAP_WIDTH_DESKTOP = 150;
