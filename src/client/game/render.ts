@@ -2,16 +2,16 @@
 // Rendering
 // ═════════════════════════════════════════════════════════════════════════════
 
-import { lerpColor } from "./utils.ts";
+import { lerpColor } from "./utils";
 import type {
   BulletSnapshot,
   CactusData,
   PlayerSnapshot,
   RockData,
-} from "../../shared/protocol.ts";
-import type { GameState } from "./state.ts";
-import type { Effects } from "./effects.ts";
-import type * as ConstantsModule from "./constants.ts";
+} from "../../shared/protocol";
+import type { GameState } from "./state";
+import type { Effects } from "./effects";
+import type * as ConstantsModule from "./constants";
 
 interface InputProcessor {
   processInput(): void;

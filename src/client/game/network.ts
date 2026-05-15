@@ -2,8 +2,8 @@
 // Network Management
 // ═════════════════════════════════════════════════════════════════════════════
 
-import { safeParseJson } from "./utils.ts";
-import type { ClientMessage, ServerMessage } from "../../shared/protocol.ts";
+import { safeParseJson } from "./utils";
+import type { ClientMessage, ServerMessage } from "../../shared/protocol";
 
 export interface NetworkManager {
   connection: WebSocket;

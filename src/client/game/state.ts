@@ -11,7 +11,7 @@ import {
   DEFAULT_CACTUS_SEGMENT_WIDTH,
   DEFAULT_WORLD_HEIGHT,
   DEFAULT_WORLD_WIDTH,
-} from "./constants.ts";
+} from "./constants";
 import type {
   ArenaConfig,
   BulletSnapshot,
@@ -19,7 +19,7 @@ import type {
   PlayerSnapshot,
   RockData,
   ServerMessage,
-} from "../../shared/protocol.ts";
+} from "../../shared/protocol";
 
 export interface GameState {
   myId: string | null;

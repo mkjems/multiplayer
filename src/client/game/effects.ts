@@ -2,7 +2,7 @@
 // Visual Effects
 // ═════════════════════════════════════════════════════════════════════════════
 
-import type * as ConstantsModule from "./constants.ts";
+import type * as ConstantsModule from "./constants";
 
 export interface Effects {
   shakeUntil: number;

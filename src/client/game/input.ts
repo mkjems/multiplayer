@@ -2,11 +2,11 @@
 // Input Handling
 // ═════════════════════════════════════════════════════════════════════════════
 
-import type { ClientMessage } from "../../shared/protocol.ts";
-import type { GameState } from "./state.ts";
-import type { Sounds } from "../sounds.ts";
-import type * as ConstantsModule from "./constants.ts";
-import { requireElement } from "./utils.ts";
+import type { ClientMessage } from "../../shared/protocol";
+import type { GameState } from "./state";
+import type { Sounds } from "../sounds";
+import type * as ConstantsModule from "./constants";
+import { requireElement } from "./utils";
 
 export interface InputHandler {
   processInput(): void;

@@ -2,7 +2,7 @@ import type {
   ClientMessage,
   GameInfo,
   ServerMessage,
-} from "../shared/protocol.ts";
+} from "../shared/protocol";
 
 const playerName = sessionStorage.getItem("playerName");
 if (!playerName) {
