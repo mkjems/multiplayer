@@ -2,17 +2,24 @@
 
 ## Sprint 19
 
-## Backlog
-- when all players are dead everyone should return to the lobby. 
-- In game, Ammo should be in top left corner.
-- In game, The semi transparent bar at the top should. be fully transparent.
-- When phone detected on landing page. Show suggestion to add page to home screen. 
-- Cacti should have one or two arms and variation in height
-- Gun should also be part of collision geometry. Mussel should not poke through rock/cacti.
-- Rocks should be larger
-- When new players join the should be placed as far away for the other players as possible but 30px from the edge 
+## Sprint 20
 
-## Ideas / Maybes 
+## Sprint 21
+
+## Backlog
+- Do not commit the result of build process to git  
+- Add a background image of wild west texture to arena
+- Find a way to use ntfy to send Martin a message when someone enters a name in the landing page https://ntfy.sh/mkjems-multiplayer-visit' method: 'POST', body: ` 😀 New multiplayer visitor: ${name}`
+- When all players are dead everyone should return to the lobby. (If a sole player shoot him or her self)
+- Bug, In game. if the phone goes black screen (sleep) and wakes up again the server connection is not restored Player can not move
+- In game, Ammo should be in top left corner. can be part of HUD does not have to be canvas 
+- When phone detected on landing page. Show suggestion to add page to home screen for better full screen experience. 
+- Gun should also be part of collision geometry. Mussel should not poke through rock/cacti.
+- In game. For some reason the sound for the first shot is lagging way more than the following shots
+- When new players join the should be placed as far away for the other players as possible but 30px from the edge 
+- Cacti should have one or two arms and variation in height
+
+## Ideas / Maybes  
 - Migrate client build from `tsc` to Vite for faster dev builds, HMR, and better bundling
 - Lobby shows game type icons
 - Use real artwork for character animation. vector or sprites

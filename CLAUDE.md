@@ -14,6 +14,7 @@
 - **Deployment**: Deno Deploy
 - Server holds source of truth for all games, broadcasts at 20 Hz
 - Clients run their own animations at 60 Hz
+- Do not commit the result of build process to git
 
 # Game Overview
 
