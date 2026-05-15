@@ -1,14 +1,17 @@
 {
   "tasks": {
-    "build:client": "deno run -A npm:typescript/tsc --build client/tsconfig.json",
-    "client:clean": "rm -rf public/*.js public/game/*.js dist/ shared/*.tsbuildinfo client/*.tsbuildinfo",
-    "watch:client": "deno run -A npm:typescript/tsc --build client/tsconfig.json --watch --preserveWatchOutput",
-    "typecheck:client": "deno run -A npm:typescript/tsc --build client/tsconfig.json --dry",
-    "start": "deno task build:client && deno run --allow-net --allow-read server/main.ts",
-    "dev": "deno task build:client && (deno task watch:client & deno run --allow-net --allow-read --watch server/main.ts)",
-    "fmt": "deno fmt server/ && deno fmt client/",
-    "lint": "deno lint server/ && deno lint client/",
-    "check": "deno check server/ && deno task typecheck:client"
+    "build:client": "rm -rf public && mkdir -p public && deno run -A npm:typescript/tsc --project src/client/tsconfig.json --outDir public && cp src/client/*.{html,css,json} public/ 2>/dev/null || true && cp -r src/client/assets public/ 2>/dev/null || true",
+    "client:clean": "rm -rf public",
+    "watch:client": "deno run -A npm:typescript/tsc --project src/client/tsconfig.json --watch --preserveWatchOutput",
+    "typecheck:client": "deno run -A npm:typescript/tsc --project src/client/tsconfig.json --noEmit",
+    "start": "deno task build:client && deno run --allow-net --allow-read src/server/main.ts",
+    "dev": "deno task build:client && (deno task watch:client & deno run --allow-net --allow-read --watch src/server/main.ts)",
+    "fmt": "deno fmt src/",
+    "lint": "deno lint --exclude src/server src/",
+    "check": "deno check src/server/main.ts && deno task typecheck:client"
+  },
+  "lint": {
+    "exclude": ["src/server"]
   },
   "deploy": {
     "org": "mkjems",

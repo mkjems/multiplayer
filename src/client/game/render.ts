@@ -2,16 +2,16 @@
 // Rendering
 // ═════════════════════════════════════════════════════════════════════════════
 
-import { lerpColor } from "./utils.js";
+import { lerpColor } from "./utils.ts";
 import type {
   BulletSnapshot,
   CactusData,
   PlayerSnapshot,
   RockData,
 } from "../../shared/protocol.ts";
-import type { GameState } from "./state.js";
-import type { Effects } from "./effects.js";
-import type * as ConstantsModule from "./constants.js";
+import type { GameState } from "./state.ts";
+import type { Effects } from "./effects.ts";
+import type * as ConstantsModule from "./constants.ts";
 
 interface InputProcessor {
   processInput(): void;
@@ -233,14 +233,26 @@ export function createRenderer(
     ctx.globalAlpha = constants.MINIMAP_BACKGROUND_OPACITY;
     ctx.fillStyle = constants.COLOR_MINIMAP_BG;
     ctx.beginPath();
-    ctx.roundRect(minimapX, minimapY, minimapWidth, minimapHeight, constants.MINIMAP_BORDER_RADIUS);
+    ctx.roundRect(
+      minimapX,
+      minimapY,
+      minimapWidth,
+      minimapHeight,
+      constants.MINIMAP_BORDER_RADIUS,
+    );
     ctx.fill();
 
     ctx.globalAlpha = 1;
     ctx.strokeStyle = constants.COLOR_MINIMAP_BORDER;
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(minimapX, minimapY, minimapWidth, minimapHeight, constants.MINIMAP_BORDER_RADIUS);
+    ctx.roundRect(
+      minimapX,
+      minimapY,
+      minimapWidth,
+      minimapHeight,
+      constants.MINIMAP_BORDER_RADIUS,
+    );
     ctx.stroke();
 
     for (const player of gameState.players) {
@@ -291,7 +303,9 @@ export function createRenderer(
           0,
           Math.PI * 2,
         );
-        ctx.fillStyle = i < me.ammo ? constants.COLOR_AMMO_FULL : constants.COLOR_AMMO_EMPTY;
+        ctx.fillStyle = i < me.ammo
+          ? constants.COLOR_AMMO_FULL
+          : constants.COLOR_AMMO_EMPTY;
         ctx.fill();
       }
     }
@@ -301,7 +315,9 @@ export function createRenderer(
     ctx.fillStyle = constants.COLOR_HUD_LABEL;
     ctx.font = "bold 10px system-ui";
     ctx.fillText("KILLS", window.innerWidth - 14, py - 2);
-    ctx.fillStyle = me.kills > 0 ? constants.COLOR_KILLS_ACTIVE : constants.COLOR_KILLS_ZERO;
+    ctx.fillStyle = me.kills > 0
+      ? constants.COLOR_KILLS_ACTIVE
+      : constants.COLOR_KILLS_ZERO;
     ctx.font = "bold 18px system-ui";
     ctx.fillText(String(me.kills), window.innerWidth - 14, py + 10);
   }
@@ -344,7 +360,10 @@ export function createRenderer(
           cameraX = localPlayer.x - viewportWidth / 2;
           cameraY = localPlayer.y - viewportHeight / 2;
           cameraX = Math.max(0, Math.min(worldWidth - viewportWidth, cameraX));
-          cameraY = Math.max(0, Math.min(worldHeight - viewportHeight, cameraY));
+          cameraY = Math.max(
+            0,
+            Math.min(worldHeight - viewportHeight, cameraY),
+          );
           cameraInitialized = true;
         }
       }
@@ -352,8 +371,10 @@ export function createRenderer(
       // Dead-zone camera: only scroll when the local player exits the centered rectangle
       const localPlayer = gameState.getLocalPlayer();
       if (localPlayer && localPlayer.alive) {
-        const deadZoneWidth = viewportWidth * constants.CAMERA_DEAD_ZONE_FRACTION;
-        const deadZoneHeight = viewportHeight * constants.CAMERA_DEAD_ZONE_FRACTION;
+        const deadZoneWidth = viewportWidth *
+          constants.CAMERA_DEAD_ZONE_FRACTION;
+        const deadZoneHeight = viewportHeight *
+          constants.CAMERA_DEAD_ZONE_FRACTION;
         const deadZoneLeft = (viewportWidth - deadZoneWidth) / 2;
         const deadZoneRight = deadZoneLeft + deadZoneWidth;
         const deadZoneTop = (viewportHeight - deadZoneHeight) / 2;

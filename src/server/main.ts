@@ -1,7 +1,7 @@
 import {
   applyInput,
-  getArenaConfig,
   createRoom,
+  getArenaConfig,
   getCactiData,
   getRockData,
   getRoom,
@@ -63,8 +63,14 @@ function handleLobbySocket(ws: WebSocket) {
     } catch { /* ignore */ }
   };
 
-  ws.onerror = () => { lobbyClients.delete(ws); broadcastLobby(); };
-  ws.onclose = () => { lobbyClients.delete(ws); broadcastLobby(); };
+  ws.onerror = () => {
+    lobbyClients.delete(ws);
+    broadcastLobby();
+  };
+  ws.onclose = () => {
+    lobbyClients.delete(ws);
+    broadcastLobby();
+  };
 }
 
 function handleGameSocket(ws: WebSocket, roomId: string) {

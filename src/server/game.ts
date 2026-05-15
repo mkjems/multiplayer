@@ -414,8 +414,14 @@ function closestPointOnSegment(
 }
 
 function segmentIntersectT(
-  p1x: number, p1y: number, p2x: number, p2y: number,
-  ax: number, ay: number, bx: number, by: number,
+  p1x: number,
+  p1y: number,
+  p2x: number,
+  p2y: number,
+  ax: number,
+  ay: number,
+  bx: number,
+  by: number,
 ): number | null {
   const dx = p2x - p1x, dy = p2y - p1y;
   const ex = bx - ax, ey = by - ay;
@@ -428,14 +434,21 @@ function segmentIntersectT(
 }
 
 function sweepBulletRock(
-  prevX: number, prevY: number,
-  newX: number, newY: number,
+  prevX: number,
+  prevY: number,
+  newX: number,
+  newY: number,
   rock: Rock,
 ): { t: number; nx: number; ny: number } | null {
   const pathDx = newX - prevX, pathDy = newY - prevY;
   const lenSq = pathDx * pathDx + pathDy * pathDy;
-  const tClamped = lenSq < 1e-10 ? 0 :
-    Math.max(0, Math.min(1, ((rock.x - prevX) * pathDx + (rock.y - prevY) * pathDy) / lenSq));
+  const tClamped = lenSq < 1e-10 ? 0 : Math.max(
+    0,
+    Math.min(
+      1,
+      ((rock.x - prevX) * pathDx + (rock.y - prevY) * pathDy) / lenSq,
+    ),
+  );
   const closestDist = Math.hypot(
     rock.x - (prevX + tClamped * pathDx),
     rock.y - (prevY + tClamped * pathDy),
@@ -452,7 +465,10 @@ function sweepBulletRock(
       let nx = -ey / el, ny = ex / el;
       // Orient normal toward bullet's incoming direction, not the polygon center
       // (centroid-based orientation is unreliable for non-convex polygons)
-      if (nx * (prevX - a.x) + ny * (prevY - a.y) < 0) { nx = -nx; ny = -ny; }
+      if (nx * (prevX - a.x) + ny * (prevY - a.y) < 0) {
+        nx = -nx;
+        ny = -ny;
+      }
       earliest = { t, nx, ny };
     }
   }
@@ -594,8 +610,14 @@ function tick(room: GameRoom) {
     }
   }
   for (const player of alivePlayers) {
-    player.x = Math.max(PLAYER_RADIUS, Math.min(ARENA_W - PLAYER_RADIUS, player.x));
-    player.y = Math.max(PLAYER_RADIUS, Math.min(ARENA_H - PLAYER_RADIUS, player.y));
+    player.x = Math.max(
+      PLAYER_RADIUS,
+      Math.min(ARENA_W - PLAYER_RADIUS, player.x),
+    );
+    player.y = Math.max(
+      PLAYER_RADIUS,
+      Math.min(ARENA_H - PLAYER_RADIUS, player.y),
+    );
   }
 
   // Bullet physics
@@ -622,9 +644,16 @@ function tick(room: GameRoom) {
       }
     }
     if (earliestHit !== null) {
-      bullet.x = prevX + earliestHit.t * (bullet.x - prevX) + earliestHit.nx * (BULLET_RADIUS + 2);
-      bullet.y = prevY + earliestHit.t * (bullet.y - prevY) + earliestHit.ny * (BULLET_RADIUS + 2);
-      [bullet.vx, bullet.vy] = reflect(bullet.vx, bullet.vy, earliestHit.nx, earliestHit.ny);
+      bullet.x = prevX + earliestHit.t * (bullet.x - prevX) +
+        earliestHit.nx * (BULLET_RADIUS + 2);
+      bullet.y = prevY + earliestHit.t * (bullet.y - prevY) +
+        earliestHit.ny * (BULLET_RADIUS + 2);
+      [bullet.vx, bullet.vy] = reflect(
+        bullet.vx,
+        bullet.vy,
+        earliestHit.nx,
+        earliestHit.ny,
+      );
       bullet.bounces++;
     }
 

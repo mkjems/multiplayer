@@ -3,10 +3,10 @@
 // ═════════════════════════════════════════════════════════════════════════════
 
 import type { ClientMessage } from "../../shared/protocol.ts";
-import type { GameState } from "./state.js";
-import type { Sounds } from "../sounds.js";
-import type * as ConstantsModule from "./constants.js";
-import { requireElement } from "./utils.js";
+import type { GameState } from "./state.ts";
+import type { Sounds } from "../sounds.ts";
+import type * as ConstantsModule from "./constants.ts";
+import { requireElement } from "./utils.ts";
 
 export interface InputHandler {
   processInput(): void;
@@ -78,10 +78,10 @@ export function setupInputHandler(
   // Called once per frame to process input and send to server
   function processInput(): void {
     if (!touchMoveActive) {
-      const dx =
-        (keys.has("arrowright") ? 1 : 0) - (keys.has("arrowleft") ? 1 : 0);
-      const dy =
-        (keys.has("arrowdown") ? 1 : 0) - (keys.has("arrowup") ? 1 : 0);
+      const dx = (keys.has("arrowright") ? 1 : 0) -
+        (keys.has("arrowleft") ? 1 : 0);
+      const dy = (keys.has("arrowdown") ? 1 : 0) -
+        (keys.has("arrowup") ? 1 : 0);
 
       if (dx !== lastMove.dx || dy !== lastMove.dy) {
         lastMove = { dx, dy };

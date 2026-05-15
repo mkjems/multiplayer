@@ -190,7 +190,11 @@ export function createSounds(): Sounds {
     const ctx = getCtx();
     const t = ctx.currentTime;
 
-    function makeClick(startTime: number, filterFreq: number, gainValue: number): void {
+    function makeClick(
+      startTime: number,
+      filterFreq: number,
+      gainValue: number,
+    ): void {
       const source = ctx.createBufferSource();
       source.buffer = makeNoise(0.012);
       const highpass = ctx.createBiquadFilter();

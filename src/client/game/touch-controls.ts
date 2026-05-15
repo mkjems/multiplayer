@@ -2,8 +2,8 @@
 // Touch Controls Overlay
 // ═════════════════════════════════════════════════════════════════════════════
 
-import type { InputHandler } from "./input.js";
-import type { GameState } from "./state.js";
+import type { InputHandler } from "./input.ts";
+import type { GameState } from "./state.ts";
 
 export function setupTouchControls(
   inputHandler: InputHandler,

@@ -2,15 +2,15 @@
 // Game Entry Point
 // ═════════════════════════════════════════════════════════════════════════════
 
-import { createSounds } from "../sounds.js";
-import * as CONSTANTS from "./constants.js";
-import { createGameState } from "./state.js";
-import { createEffects } from "./effects.js";
-import { createNetworkManager } from "./network.js";
-import { setupInputHandler } from "./input.js";
-import { setupTouchControls } from "./touch-controls.js";
-import { createRenderer } from "./render.js";
-import { requireCanvas, requireElement } from "./utils.js";
+import { createSounds } from "../sounds.ts";
+import * as CONSTANTS from "./constants.ts";
+import { createGameState } from "./state.ts";
+import { createEffects } from "./effects.ts";
+import { createNetworkManager } from "./network.ts";
+import { setupInputHandler } from "./input.ts";
+import { setupTouchControls } from "./touch-controls.ts";
+import { createRenderer } from "./render.ts";
+import { requireCanvas, requireElement } from "./utils.ts";
 import type { ServerMessage } from "../../shared/protocol.ts";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -25,8 +25,8 @@ if (!playerName || !gameId) {
 }
 
 // Update page title
-requireElement("game-title").textContent =
-  gameId.charAt(0).toUpperCase() + gameId.slice(1);
+requireElement("game-title").textContent = gameId.charAt(0).toUpperCase() +
+  gameId.slice(1);
 
 // Initialize systems
 const sounds = createSounds();
@@ -50,7 +50,9 @@ globalThis.addEventListener("resize", resizeCanvas);
 // Network Message Handlers
 // ─────────────────────────────────────────────────────────────────────────────
 
-function handleGameJoined(msg: Extract<ServerMessage, { type: "game_joined" }>) {
+function handleGameJoined(
+  msg: Extract<ServerMessage, { type: "game_joined" }>,
+) {
   gameState.myId = msg.playerId;
 }
 
@@ -90,7 +92,9 @@ function handleGameState(msg: Extract<ServerMessage, { type: "game_state" }>) {
     gameState.previousBounces.set(b.id, b.bounces);
   }
   for (const id of gameState.previousBounces.keys()) {
-    if (!msg.bullets.some((b) => b.id === id)) gameState.previousBounces.delete(id);
+    if (!msg.bullets.some((b) => b.id === id)) {
+      gameState.previousBounces.delete(id);
+    }
   }
 
   for (const b of msg.bullets) {
@@ -105,7 +109,9 @@ function handleGameState(msg: Extract<ServerMessage, { type: "game_state" }>) {
     }
   }
   for (const id of gameState.bulletTrails.keys()) {
-    if (!msg.bullets.some((b) => b.id === id)) gameState.bulletTrails.delete(id);
+    if (!msg.bullets.some((b) => b.id === id)) {
+      gameState.bulletTrails.delete(id);
+    }
   }
 
   for (const cactus of msg.cacti) {
@@ -181,10 +187,9 @@ const network = createNetworkManager(
 
 const inputHandler = setupInputHandler(network, sounds, gameState, CONSTANTS);
 
-const touchControlsDispose =
-  navigator.maxTouchPoints > 0
-    ? setupTouchControls(inputHandler, gameState)
-    : null;
+const touchControlsDispose = navigator.maxTouchPoints > 0
+  ? setupTouchControls(inputHandler, gameState)
+  : null;
 
 const renderer = createRenderer(canvas, gameState, effects, CONSTANTS);
 let hasCleanedUp = false;

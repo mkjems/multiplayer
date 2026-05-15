@@ -1,4 +1,8 @@
-import type { ClientMessage, GameInfo, ServerMessage } from "../shared/protocol.ts";
+import type {
+  ClientMessage,
+  GameInfo,
+  ServerMessage,
+} from "../shared/protocol.ts";
 
 const playerName = sessionStorage.getItem("playerName");
 if (!playerName) {
@@ -82,12 +86,14 @@ function renderGames(games: GameInfo[]): void {
     `;
   }).join("");
 
-  container.querySelectorAll<HTMLElement>(".game-card:not(.full)").forEach((card) => {
-    card.addEventListener("click", () => joinGame(card.dataset.id!));
-    card.addEventListener("keydown", (e: KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " ") joinGame(card.dataset.id!);
-    });
-  });
+  container.querySelectorAll<HTMLElement>(".game-card:not(.full)").forEach(
+    (card) => {
+      card.addEventListener("click", () => joinGame(card.dataset.id!));
+      card.addEventListener("keydown", (e: KeyboardEvent) => {
+        if (e.key === "Enter" || e.key === " ") joinGame(card.dataset.id!);
+      });
+    },
+  );
 }
 
 function joinGame(gameId: string) {

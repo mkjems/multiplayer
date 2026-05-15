@@ -11,7 +11,7 @@ import {
   DEFAULT_CACTUS_SEGMENT_WIDTH,
   DEFAULT_WORLD_HEIGHT,
   DEFAULT_WORLD_WIDTH,
-} from "./constants.js";
+} from "./constants.ts";
 import type {
   ArenaConfig,
   BulletSnapshot,
