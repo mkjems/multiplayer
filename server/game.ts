@@ -23,11 +23,11 @@ const ARM_MAX = Math.PI / 3;
 const ARM_LENGTH = 20;
 
 // Arena generation — rock placement
-const ROCK_COUNT = 15;
+const ROCK_COUNT = 35;
 const ROCK_MIN_SIDES = 6;
 const ROCK_EXTRA_SIDES = 5;
 const ROCK_MIN_RADIUS = 20;
-const ROCK_MAX_RADIUS = 85;
+const ROCK_MAX_RADIUS = 95;
 const FALLBACK_ROCK_COLS = 5;
 const FALLBACK_ROCK_ORIGIN_X = 200;
 const FALLBACK_ROCK_COL_STEP = 600;
@@ -37,7 +37,7 @@ const FALLBACK_ROCK_MAX_RADIUS = 35;
 const FALLBACK_ROCK_SIDES = 5;
 
 // Arena generation — cactus placement
-const CACTUS_COUNT = 10;
+const CACTUS_COUNT = 30;
 const CACTUS_PLACEMENT_RADIUS = 18;
 const CACTUS_PLACEMENT_MARGIN_Y = 60;
 const FALLBACK_CACTUS_COLS = 5;
