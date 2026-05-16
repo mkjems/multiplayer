@@ -132,16 +132,18 @@ export function createRenderer(
     }
 
     // Arm
-    ctx.beginPath();
-    ctx.moveTo(p.x, p.y);
-    ctx.lineTo(
-      p.x + dir * armLength * Math.cos(angle),
-      p.y - armLength * Math.sin(angle),
-    );
-    ctx.strokeStyle = p.color;
-    ctx.lineWidth = 5;
-    ctx.lineCap = "round";
-    ctx.stroke();
+    if (!p.reloading) {
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(
+        p.x + dir * armLength * Math.cos(angle),
+        p.y - armLength * Math.sin(angle),
+      );
+      ctx.strokeStyle = p.color;
+      ctx.lineWidth = 5;
+      ctx.lineCap = "round";
+      ctx.stroke();
+    }
 
     // Health bar
     const barW = 36, barH = 4, bx = p.x - 18, by = p.y - 26;
