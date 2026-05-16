@@ -8,7 +8,28 @@
 
 ## Backlog 
 - Add a background image of wild west texture to arena
-- Find a way to use ntfy to send Martin a message when someone enters a name in the landing page https://ntfy.sh/mkjems-multiplayer-visit' method: 'POST', body: ` 😀 New multiplayer visitor: ${name}`
+
+- I would like the client to send small post with the json {name: string} to a new api endpoint api/visitor when ever a user enters their name on the landing page.
+
+That endpoint should trigger the server to send a notification using ntfy to me. 
+
+The server should make a request to a ntfy secret topic like so:
+
+```
+// script.ts
+const TOPIC = Deno.env.get("NTFY_TOPIC");// secret topic name
+
+
+const res = await fetch(`https://ntfy.sh/{TOPIC}`, {
+  method: "POST",
+  body: `😀 New multiplayer visitor: ${name}`
+});
+
+if (res.ok) {
+  console.log("Notification sent to ntfy!");
+}
+```
+
 - When all players are dead everyone should return to the lobby. (If a sole player shoot him or her self)
 - Bug, In game. if the phone goes black screen (sleep) and wakes up again the server connection is not restored Player can not move
 - In game, Ammo should be in top left corner. can be part of HUD does not have to be canvas 
