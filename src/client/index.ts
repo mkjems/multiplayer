@@ -1,6 +1,9 @@
+import { initializeHomeScreenSuggestion } from "./home-screen-suggestion.ts";
+
 const input = document.getElementById("name");
 const btn = document.getElementById("enter");
 const form = document.getElementById("landing-form");
+
 if (!(input instanceof HTMLInputElement)) {
   throw new Error("Missing required input element: #name");
 }
@@ -17,6 +20,7 @@ const landingForm = form;
 let isSubmitting = false;
 
 nameInput.focus();
+initializeHomeScreenSuggestion();
 
 nameInput.addEventListener("input", () => {
   enterButton.disabled = isSubmitting || nameInput.value.trim().length === 0;

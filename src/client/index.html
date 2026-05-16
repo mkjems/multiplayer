@@ -23,6 +23,26 @@
       <h1>Multiplayer</h1>
       <p class="subtitle">Pick a name and jump into a game</p>
 
+      <aside
+        id="home-screen-suggestion"
+        class="home-screen-suggestion"
+        aria-live="polite"
+        hidden
+      >
+        <button
+          id="dismiss-home-screen-suggestion"
+          class="dismiss-suggestion"
+          type="button"
+          aria-label="Dismiss home screen suggestion"
+        >
+          x
+        </button>
+        <strong>Add Cowboys to your Home Screen</strong>
+        <p id="home-screen-instructions">
+          Launching from Home Screen gives you the best fullscreen experience.
+        </p>
+      </aside>
+
       <form id="landing-form">
         <label for="name">Your name</label>
         <input
