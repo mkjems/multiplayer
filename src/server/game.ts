@@ -8,9 +8,9 @@ import type {
   RockData,
 } from "../shared/protocol.ts";
 
-const MAX_SPEED = 16;
-const ACCELERATION = 0.18;
-const IDLE_DRAG = 0.95;
+const MAX_SPEED = 10;
+const ACCELERATION = 1;
+const IDLE_DRAG = 0;
 const STOP_SPEED = 0.05;
 const BULLET_SPEED = 22;
 const TICK_MS = 50;
@@ -18,8 +18,8 @@ const PLAYER_RADIUS = 16;
 const BULLET_RADIUS = 4;
 const SHOOT_COOL_DOWN = 400;
 const RELOAD_TIME = 2000;
-const ARENA_W = 3000;
-const ARENA_H = 2000;
+const ARENA_W = 2000;
+const ARENA_H = 1800;
 const ARM_MAX = Math.PI / 3;
 const ARM_LENGTH = 20;
 
