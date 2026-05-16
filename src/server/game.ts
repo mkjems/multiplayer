@@ -19,12 +19,15 @@ const BULLET_RADIUS = 4;
 const SHOOT_COOL_DOWN = 400;
 const RELOAD_TIME = 2000;
 const ARENA_W = 2000;
-const ARENA_H = 1800;
+const ARENA_H = 1500;
 const ARM_MAX = Math.PI / 3;
 const ARM_LENGTH = 20;
+const MAX_ENERGY = 100;
+const RATE_OF_ENERGY_LOSS_PR_DISTANCE = 0.12;
+const RATE_OF_ENERGY_REGAIN_PR_TIME = 18;
 
 // Arena generation — rock placement
-const ROCK_COUNT = 35;
+const ROCK_COUNT = 25;
 const ROCK_MIN_SIDES = 6;
 const ROCK_EXTRA_SIDES = 5;
 const ROCK_MIN_RADIUS = 20;
@@ -664,6 +667,12 @@ function applyIdleDrag(velocity: number): number {
 function updatePlayerVelocity(player: Player): void {
   const input = normalizeInput(player.dx, player.dy);
 
+  if (player.energy <= 0 && (input.x !== 0 || input.y !== 0)) {
+    player.vx = 0;
+    player.vy = 0;
+    return;
+  }
+
   player.vx = input.x !== 0
     ? approachVelocity(player.vx, input.x * MAX_SPEED)
     : applyIdleDrag(player.vx);
@@ -672,7 +681,9 @@ function updatePlayerVelocity(player: Player): void {
     : applyIdleDrag(player.vy);
 }
 
-function movePlayer(player: Player): void {
+function movePlayer(player: Player): number {
+  const previousX = player.x;
+  const previousY = player.y;
   const nextX = player.x + player.vx;
   const nextY = player.y + player.vy;
 
@@ -681,6 +692,28 @@ function movePlayer(player: Player): void {
 
   if (player.x !== nextX) player.vx = 0;
   if (player.y !== nextY) player.vy = 0;
+
+  return Math.hypot(player.x - previousX, player.y - previousY);
+}
+
+function updatePlayerEnergy(player: Player, movedDistance: number): void {
+  const input = normalizeInput(player.dx, player.dy);
+  const hasMovementInput = input.x !== 0 || input.y !== 0;
+
+  if (hasMovementInput && movedDistance > 0) {
+    player.energy = Math.max(
+      0,
+      player.energy - movedDistance * RATE_OF_ENERGY_LOSS_PR_DISTANCE,
+    );
+    return;
+  }
+
+  if (!hasMovementInput) {
+    player.energy = Math.min(
+      MAX_ENERGY,
+      player.energy + RATE_OF_ENERGY_REGAIN_PR_TIME * (TICK_MS / 1000),
+    );
+  }
 }
 
 function tick(room: GameRoom) {
@@ -691,7 +724,8 @@ function tick(room: GameRoom) {
     if (!player.alive) continue;
 
     updatePlayerVelocity(player);
-    movePlayer(player);
+    const movedDistance = movePlayer(player);
+    updatePlayerEnergy(player, movedDistance);
 
     for (const rock of room.rocks) resolvePlayerRockCollision(player, rock);
     for (const cactus of room.cacti) {

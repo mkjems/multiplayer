@@ -59,6 +59,7 @@ export interface PlayerSnapshot {
     y: number;
     color: string;
     health: number;
+    energy: number;
     ammo: number;
     armAngle: number;
     facing: "left" | "right";

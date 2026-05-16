@@ -24,6 +24,7 @@ export interface Player {
   vx: number;
   vy: number;
   health: number;
+  energy: number;
   ammo: number;
   armAngle: number;
   facing: "left" | "right";
@@ -46,6 +47,7 @@ export function createPlayer(id: string, name: string): Player {
     vx: 0,
     vy: 0,
     health: 100,
+    energy: 100,
     ammo: 6,
     armAngle: 0,
     facing: "right",
@@ -65,6 +67,7 @@ export function toSnapshot(player: Player): PlayerSnapshot {
     y: player.y,
     color: player.color,
     health: player.health,
+    energy: player.energy,
     ammo: player.ammo,
     armAngle: player.armAngle,
     facing: player.facing,

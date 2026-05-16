@@ -145,8 +145,14 @@ export function createRenderer(
       ctx.stroke();
     }
 
-    // Health bar
+    // Energy + health bars
     const barW = 36, barH = 4, bx = p.x - 18, by = p.y - 26;
+    const energyY = by - 6;
+    ctx.fillStyle = constants.COLOR_ENERGY_BG;
+    ctx.fillRect(bx, energyY, barW, barH);
+    ctx.fillStyle = constants.COLOR_ENERGY_FILL;
+    ctx.fillRect(bx, energyY, barW * (p.energy / 100), barH);
+
     ctx.fillStyle = constants.COLOR_HEALTH_BG;
     ctx.fillRect(bx, by, barW, barH);
     ctx.fillStyle = p.health > 60
