@@ -279,6 +279,7 @@ export function createRenderer(
     if (!me || !me.alive) return;
 
     const size = 8, gap = 4, px = 14, py = 24;
+    const killsX = px + 6 * (size + gap) + 18;
     ctx.font = "bold 10px system-ui";
     ctx.textAlign = "left";
 
@@ -304,16 +305,15 @@ export function createRenderer(
       }
     }
 
-    // Kill counter
-    ctx.textAlign = "right";
+    ctx.textAlign = "left";
     ctx.fillStyle = constants.COLOR_HUD_LABEL;
     ctx.font = "bold 10px system-ui";
-    ctx.fillText("KILLS", window.innerWidth - 14, py - 2);
+    ctx.fillText("KILLS", killsX, py - 2);
     ctx.fillStyle = me.kills > 0
       ? constants.COLOR_KILLS_ACTIVE
       : constants.COLOR_KILLS_ZERO;
     ctx.font = "bold 18px system-ui";
-    ctx.fillText(String(me.kills), window.innerWidth - 14, py + 10);
+    ctx.fillText(String(me.kills), killsX, py + 10);
   }
 
   // Draw vignette effect
