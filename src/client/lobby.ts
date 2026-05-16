@@ -1,7 +1,4 @@
-import type {
-  ClientMessage,
-  GameInfo,
-} from "../shared/protocol";
+import type { ClientMessage, GameInfo } from "../shared/protocol";
 import { parseServerMessage } from "./protocol-guards.ts";
 
 const playerName = sessionStorage.getItem("playerName");
@@ -14,6 +11,14 @@ if (!displayNameEl) {
   throw new Error("Missing required element: #display-name");
 }
 displayNameEl.textContent = playerName;
+
+const keyboardControlsEl = document.getElementById("keyboard-controls");
+if (!keyboardControlsEl) {
+  throw new Error("Missing required element: #keyboard-controls");
+}
+if (navigator.maxTouchPoints > 0) {
+  keyboardControlsEl.classList.add("hidden");
+}
 
 const protocol = location.protocol === "https:" ? "wss" : "ws";
 const ws = new WebSocket(`${protocol}://${location.host}/ws/lobby`);
