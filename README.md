@@ -18,10 +18,12 @@ deno task dev
 
 Open [http://localhost:8000](http://localhost:8000) in your browser (try two tabs to see multiplayer in action).
 
-| Task | Command |
-|------|---------|
-| Development (watch mode) | `deno task dev` |
-| Production | `deno task start` |
+| Task                     | Command                |
+| ------------------------ | ---------------------- |
+| Development (watch mode) | `deno task dev`        |
+| Client dev server        | `deno task client:dev` |
+| Production build         | `deno task build`      |
+| Production               | `deno task start`      |
 
 ---
 
@@ -43,5 +45,3 @@ Client                        Server
 ```
 
 ---
-
-

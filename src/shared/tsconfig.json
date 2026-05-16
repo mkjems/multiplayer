@@ -7,7 +7,7 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "rootDir": ".",
-    "outDir": "../dist/shared"
+    "outDir": "../../dist/shared"
   },
   "include": ["./**/*.ts"]
 }

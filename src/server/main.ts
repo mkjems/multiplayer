@@ -138,6 +138,11 @@ async function serveFile(path: string): Promise<Response> {
       html: "text/html",
       js: "application/javascript",
       css: "text/css",
+      json: "application/json",
+      map: "application/json",
+      png: "image/png",
+      ico: "image/x-icon",
+      svg: "image/svg+xml",
     };
     return new Response(file, {
       headers: { "Content-Type": types[ext ?? ""] ?? "text/plain" },

@@ -1,9 +1,10 @@
 {
   "exclude": ["src/client", "src/shared", "public"],
   "tasks": {
-    "build": "rm -rf public && mkdir -p public && deno run -A npm:typescript/tsc --project src/shared/tsconfig.json && deno run -A npm:typescript/tsc --project src/client/tsconfig.json --outDir public && cp src/client/*.html public/ 2>/dev/null || true && cp src/client/*.css public/ 2>/dev/null || true && cp src/client/*.json public/ 2>/dev/null || true && cp -r src/client/assets public/ 2>/dev/null || true",
+    "build": "deno task client:typecheck && deno run -A npm:vite build",
     "build:clean": "rm -rf public",
-    "client:watch": "deno run -A npm:typescript/tsc --project src/client/tsconfig.json --watch --preserveWatchOutput",
+    "client:dev": "deno run -A npm:vite --host 0.0.0.0",
+    "client:watch": "deno run -A npm:vite build --watch",
     "client:typecheck": "deno run -A npm:typescript/tsc --project src/client/tsconfig.json --noEmit",
     "start": "deno task build && deno run --allow-net --allow-read src/server/main.ts",
     "dev": "deno task build && (deno task client:watch & deno run --allow-net --allow-read --watch src/server/main.ts)",
@@ -19,7 +20,3 @@
     "app": "multiplayer"
   }
 }
-
-
-
-
