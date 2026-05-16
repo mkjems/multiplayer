@@ -16,7 +16,7 @@ nameInput.addEventListener("input", () => {
   enterButton.disabled = nameInput.value.trim().length === 0;
 });
 
-function submit() {
+function submit(): void {
   const name = nameInput.value.trim();
   if (!name) return;
   sessionStorage.setItem("playerName", name);

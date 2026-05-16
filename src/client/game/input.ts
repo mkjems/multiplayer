@@ -20,11 +20,6 @@ export interface InputHandler {
 
 /**
  * Sets up keyboard input handlers and sends player commands to server.
- *
- * @param {object} network - Network manager
- * @param {object} sounds - Sound manager
- * @param {object} gameState - Game state object
- * @param {object} constants - Game constants
  */
 export function setupInputHandler(
   network: { send: (msg: ClientMessage) => void },
@@ -32,7 +27,7 @@ export function setupInputHandler(
   gameState: GameState,
   constants: typeof ConstantsModule,
 ): InputHandler {
-  const keys = new Set();
+  const keys = new Set<string>();
   let lastMove = { dx: 0, dy: 0 };
   let lastAngleSent = 0;
   let touchMoveActive = false;

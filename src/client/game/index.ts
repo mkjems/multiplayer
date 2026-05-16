@@ -52,17 +52,19 @@ globalThis.addEventListener("resize", resizeCanvas);
 
 function handleGameJoined(
   msg: Extract<ServerMessage, { type: "game_joined" }>,
-) {
+): void {
   gameState.myId = msg.playerId;
 }
 
-function handleArena(msg: Extract<ServerMessage, { type: "arena" }>) {
+function handleArena(msg: Extract<ServerMessage, { type: "arena" }>): void {
   gameState.rocks = msg.rocks;
   gameState.cacti = msg.cacti;
   gameState.arenaConfig = { ...msg.config };
 }
 
-function handleGameState(msg: Extract<ServerMessage, { type: "game_state" }>) {
+function handleGameState(
+  msg: Extract<ServerMessage, { type: "game_state" }>,
+): void {
   const now = Date.now();
 
   for (const p of msg.players) {
@@ -136,7 +138,7 @@ function handleGameState(msg: Extract<ServerMessage, { type: "game_state" }>) {
   if (me) gameState.localFacing = me.facing;
 }
 
-function handleStateUpdate(msg: ServerMessage) {
+function handleStateUpdate(msg: ServerMessage): void {
   if (msg.type === "game_joined") {
     handleGameJoined(msg);
     return;
@@ -150,7 +152,9 @@ function handleStateUpdate(msg: ServerMessage) {
   }
 }
 
-function handleGameOver(msg: Extract<ServerMessage, { type: "game_over" }>) {
+function handleGameOver(
+  msg: Extract<ServerMessage, { type: "game_over" }>,
+): void {
   gameState.gameOverAt = Date.now();
   winnerText.textContent = `🏆 ${msg.winnerName} wins!`;
   overlay.classList.add("visible");
@@ -168,7 +172,7 @@ function handleGameOver(msg: Extract<ServerMessage, { type: "game_over" }>) {
   }, 1000);
 }
 
-function handleDisconnect() {
+function handleDisconnect(): void {
   if (gameState.gameOverAt) return; // Already handled
   renderer.drawDisconnected();
 }
@@ -194,7 +198,7 @@ const touchControlsDispose = navigator.maxTouchPoints > 0
 const renderer = createRenderer(canvas, gameState, effects, CONSTANTS);
 let hasCleanedUp = false;
 
-function cleanupSession() {
+function cleanupSession(): void {
   if (hasCleanedUp) return;
   hasCleanedUp = true;
   inputHandler.dispose();

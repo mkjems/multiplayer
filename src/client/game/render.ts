@@ -24,12 +24,6 @@ export interface Renderer {
 
 /**
  * Factory function to create renderer.
- *
- * @param {HTMLCanvasElement} canvas - Canvas element
- * @param {object} gameState - Game state object
- * @param {object} effects - Effects manager
- * @param {object} constants - Game constants
- * @returns {object} Renderer with render() and drawDisconnected() methods
  */
 export function createRenderer(
   canvas: HTMLCanvasElement,

@@ -1,8 +1,8 @@
 import type {
   ClientMessage,
   GameInfo,
-  ServerMessage,
 } from "../shared/protocol";
+import { parseServerMessage } from "./protocol-guards.ts";
 
 const playerName = sessionStorage.getItem("playerName");
 if (!playerName) {
@@ -23,7 +23,8 @@ ws.onopen = () => {
 };
 
 ws.onmessage = (e) => {
-  const msg = JSON.parse(e.data) as ServerMessage;
+  const msg = parseServerMessage(e.data);
+  if (!msg) return;
   if (msg.type === "lobby_state") {
     renderGames(msg.games);
     const countEl = document.getElementById("lobby-count");
@@ -96,7 +97,7 @@ function renderGames(games: GameInfo[]): void {
   );
 }
 
-function joinGame(gameId: string) {
+function joinGame(gameId: string): void {
   sessionStorage.setItem("gameId", gameId);
   globalThis.location.href = `/game.html`;
 }

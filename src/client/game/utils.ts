@@ -14,14 +14,6 @@ export function requireCanvas(id: string): HTMLCanvasElement {
   return element;
 }
 
-export function safeParseJson(payload: string): unknown {
-  try {
-    return JSON.parse(payload);
-  } catch {
-    return null;
-  }
-}
-
 export function lerpColor(c1: string, c2: string, t: number): string {
   const r1 = parseInt(c1.slice(1, 3), 16);
   const g1 = parseInt(c1.slice(3, 5), 16);

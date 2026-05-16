@@ -28,7 +28,7 @@ export function createSounds(): Sounds {
     return buffer;
   }
 
-  function playShoot() {
+  function playShoot(): void {
     if (muted) return;
     const ctx = getCtx();
     const t = ctx.currentTime;
@@ -60,7 +60,7 @@ export function createSounds(): Sounds {
     osc.stop(t + 0.12);
   }
 
-  function playCactusHit() {
+  function playCactusHit(): void {
     if (muted) return;
     const ctx = getCtx();
     const t = ctx.currentTime;
@@ -80,7 +80,7 @@ export function createSounds(): Sounds {
     noiseSource.start(t);
   }
 
-  function playRicochet() {
+  function playRicochet(): void {
     if (muted) return;
     const ctx = getCtx();
     const t = ctx.currentTime;
@@ -140,7 +140,7 @@ export function createSounds(): Sounds {
     noiseSource.start(t);
   }
 
-  function playDeath() {
+  function playDeath(): void {
     if (muted) return;
     const ctx = getCtx();
     const t = ctx.currentTime;
@@ -185,7 +185,7 @@ export function createSounds(): Sounds {
     keenOsc.stop(t + 1.4);
   }
 
-  function playReload() {
+  function playReload(): void {
     if (muted) return;
     const ctx = getCtx();
     const t = ctx.currentTime;

@@ -2,7 +2,7 @@
 // Network Management
 // ═════════════════════════════════════════════════════════════════════════════
 
-import { safeParseJson } from "./utils.ts";
+import { parseServerMessage } from "../protocol-guards.ts";
 import type { ClientMessage, ServerMessage } from "../../shared/protocol";
 
 export interface NetworkManager {
@@ -11,23 +11,22 @@ export interface NetworkManager {
   close(): void;
 }
 
+export type StateUpdateHandler = (msg: ServerMessage) => void;
+export type GameOverHandler = (
+  msg: Extract<ServerMessage, { type: "game_over" }>,
+) => void;
+export type DisconnectHandler = () => void;
+
 /**
  * Factory function to create network manager.
  * Handles WebSocket connection and message routing.
- *
- * @param {string} gameId - Game room ID
- * @param {string} playerName - Player name
- * @param {Function} onStateUpdate - Callback for game state updates
- * @param {Function} onGameOver - Callback for game over event
- * @param {Function} onDisconnect - Callback for connection lost (for rendering)
- * @returns {object} Network manager with send() and close() methods
  */
 export function createNetworkManager(
   gameId: string,
   playerName: string,
-  onStateUpdate: (msg: ServerMessage) => void,
-  onGameOver: (msg: Extract<ServerMessage, { type: "game_over" }>) => void,
-  onDisconnect: () => void,
+  onStateUpdate: StateUpdateHandler,
+  onGameOver: GameOverHandler,
+  onDisconnect: DisconnectHandler,
 ): NetworkManager {
   const protocol = location.protocol === "https:" ? "wss" : "ws";
   const ws = new WebSocket(`${protocol}://${location.host}/ws/game/${gameId}`);
@@ -38,7 +37,7 @@ export function createNetworkManager(
   };
 
   ws.onmessage = (e) => {
-    const msg = safeParseJson(e.data) as ServerMessage | null;
+    const msg = parseServerMessage(e.data);
     if (!msg) return;
     onStateUpdate(msg);
     if (msg.type === "game_over") {
