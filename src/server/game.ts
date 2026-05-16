@@ -90,6 +90,12 @@ interface Vector {
   y: number;
 }
 
+interface CactusSegmentHit {
+  cactus: Cactus;
+  segmentIndex: number;
+  t: number;
+}
+
 export interface GameRoom {
   id: string;
   name: string;
@@ -481,6 +487,83 @@ function sweepBulletRock(
   return earliest;
 }
 
+function segmentRectIntersectT(
+  fromX: number,
+  fromY: number,
+  toX: number,
+  toY: number,
+  rectX: number,
+  rectY: number,
+  rectWidth: number,
+  rectHeight: number,
+): number | null {
+  const dx = toX - fromX;
+  const dy = toY - fromY;
+  let tMin = 0;
+  let tMax = 1;
+
+  if (Math.abs(dx) < 1e-10) {
+    if (fromX < rectX || fromX > rectX + rectWidth) return null;
+  } else {
+    const invDx = 1 / dx;
+    let tx1 = (rectX - fromX) * invDx;
+    let tx2 = (rectX + rectWidth - fromX) * invDx;
+    if (tx1 > tx2) [tx1, tx2] = [tx2, tx1];
+    tMin = Math.max(tMin, tx1);
+    tMax = Math.min(tMax, tx2);
+    if (tMin > tMax) return null;
+  }
+
+  if (Math.abs(dy) < 1e-10) {
+    if (fromY < rectY || fromY > rectY + rectHeight) return null;
+  } else {
+    const invDy = 1 / dy;
+    let ty1 = (rectY - fromY) * invDy;
+    let ty2 = (rectY + rectHeight - fromY) * invDy;
+    if (ty1 > ty2) [ty1, ty2] = [ty2, ty1];
+    tMin = Math.max(tMin, ty1);
+    tMax = Math.min(tMax, ty2);
+    if (tMin > tMax) return null;
+  }
+
+  return tMin;
+}
+
+function sweepBulletCacti(
+  prevX: number,
+  prevY: number,
+  newX: number,
+  newY: number,
+  cacti: Cactus[],
+): CactusSegmentHit | null {
+  let earliestHit: CactusSegmentHit | null = null;
+
+  for (const cactus of cacti) {
+    for (let i = 0; i < cactus.segments.length; i++) {
+      if (!cactus.segments[i]) continue;
+
+      const segmentX = cactus.x - CACTUS_HALF_WIDTH;
+      const segmentY = cactus.y + i * CACTUS_SEGMENT_STRIDE;
+      const t = segmentRectIntersectT(
+        prevX,
+        prevY,
+        newX,
+        newY,
+        segmentX - BULLET_RADIUS,
+        segmentY - BULLET_RADIUS,
+        CACTUS_SEGMENT_WIDTH + BULLET_RADIUS * 2,
+        CACTUS_SEGMENT_HEIGHT + BULLET_RADIUS * 2,
+      );
+
+      if (t !== null && (earliestHit === null || t < earliestHit.t)) {
+        earliestHit = { cactus, segmentIndex: i, t };
+      }
+    }
+  }
+
+  return earliestHit;
+}
+
 function reflect(
   vx: number,
   vy: number,
@@ -687,20 +770,16 @@ function tick(room: GameRoom) {
 
     // Cactus hit
     if (alive) {
-      outer: for (const cactus of room.cacti) {
-        for (let i = 0; i < cactus.segments.length; i++) {
-          if (!cactus.segments[i]) continue;
-          const sx = cactus.x - CACTUS_HALF_WIDTH,
-            sy = cactus.y + i * CACTUS_SEGMENT_STRIDE;
-          if (
-            bullet.x >= sx && bullet.x <= sx + CACTUS_SEGMENT_WIDTH &&
-            bullet.y >= sy && bullet.y <= sy + CACTUS_SEGMENT_HEIGHT
-          ) {
-            cactus.segments[i] = false;
-            alive = false;
-            break outer;
-          }
-        }
+      const cactusHit = sweepBulletCacti(
+        prevX,
+        prevY,
+        bullet.x,
+        bullet.y,
+        room.cacti,
+      );
+      if (cactusHit !== null) {
+        cactusHit.cactus.segments[cactusHit.segmentIndex] = false;
+        alive = false;
       }
     }
 
