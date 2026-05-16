@@ -41,6 +41,7 @@ export const DEFAULT_CACTUS_SEGMENT_HEIGHT = 14;
 export const DEFAULT_ARM_LENGTH = 20;
 export const DEFAULT_ARM_MAX = Math.PI / 3;
 export const ARM_STEP = (2 * Math.PI) / 180; // 2° per frame
+export const SHOOT_COOL_DOWN_MS = 400;
 
 // Animation and visual effect timings (milliseconds)
 export const HIT_FLASH_DURATION = 300;

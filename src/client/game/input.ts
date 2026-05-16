@@ -30,8 +30,28 @@ export function setupInputHandler(
   const keys = new Set<string>();
   let lastMove = { dx: 0, dy: 0 };
   let lastAngleSent = 0;
+  let lastShootSent = 0;
   let touchMoveActive = false;
   const muteBtn = requireElement("mute-btn");
+
+  function tryShoot(): void {
+    const me = gameState.getLocalPlayer();
+    const now = Date.now();
+    if (
+      !me || !me.alive || me.reloading ||
+      now - lastShootSent < constants.SHOOT_COOL_DOWN_MS
+    ) {
+      return;
+    }
+
+    network.send({ type: "shoot" });
+    lastShootSent = now;
+    if (me.ammo <= 0) {
+      sounds.playReload();
+    } else {
+      sounds.playShoot();
+    }
+  }
 
   // Handle key presses
   const onKeyDown = (e: KeyboardEvent): void => {
@@ -39,15 +59,7 @@ export function setupInputHandler(
     keys.add(k);
 
     if (k === "x") {
-      const me = gameState.getLocalPlayer();
-      if (me && me.alive) {
-        network.send({ type: "shoot" });
-        if (me.ammo <= 0) {
-          sounds.playReload();
-        } else {
-          sounds.playShoot();
-        }
-      }
+      tryShoot();
     }
 
     if (k === "r") {
@@ -147,15 +159,7 @@ export function setupInputHandler(
   }
 
   function fireTouchShoot(): void {
-    const me = gameState.getLocalPlayer();
-    if (me && me.alive) {
-      network.send({ type: "shoot" });
-      if (me.ammo <= 0) {
-        sounds.playReload();
-      } else {
-        sounds.playShoot();
-      }
-    }
+    tryShoot();
   }
 
   function fireTouchReload(): void {
