@@ -8,10 +8,11 @@ import type {
   RockData,
 } from "../shared/protocol.ts";
 
-const MAX_SPEED = 6;
-const ACCELERATION = 0.35;
-const FRICTION = 0.75;
-const BULLET_SPEED = 12;
+const MAX_SPEED = 16;
+const ACCELERATION = 0.18;
+const IDLE_DRAG = 0.95;
+const STOP_SPEED = 0.05;
+const BULLET_SPEED = 22;
 const TICK_MS = 50;
 const PLAYER_RADIUS = 16;
 const BULLET_RADIUS = 4;
@@ -82,6 +83,11 @@ interface Cactus {
   x: number;
   y: number;
   segments: boolean[];
+}
+
+interface Vector {
+  x: number;
+  y: number;
 }
 
 export interface GameRoom {
@@ -557,6 +563,43 @@ function resolvePlayerPlayerCollision(playerA: Player, playerB: Player): void {
   }
 }
 
+function normalizeInput(dx: number, dy: number): Vector {
+  const length = Math.hypot(dx, dy);
+  if (length <= 1) return { x: dx, y: dy };
+  return { x: dx / length, y: dy / length };
+}
+
+function approachVelocity(current: number, target: number): number {
+  return current + (target - current) * ACCELERATION;
+}
+
+function applyIdleDrag(velocity: number): number {
+  const nextVelocity = velocity * IDLE_DRAG;
+  return Math.abs(nextVelocity) < STOP_SPEED ? 0 : nextVelocity;
+}
+
+function updatePlayerVelocity(player: Player): void {
+  const input = normalizeInput(player.dx, player.dy);
+
+  player.vx = input.x !== 0
+    ? approachVelocity(player.vx, input.x * MAX_SPEED)
+    : applyIdleDrag(player.vx);
+  player.vy = input.y !== 0
+    ? approachVelocity(player.vy, input.y * MAX_SPEED)
+    : applyIdleDrag(player.vy);
+}
+
+function movePlayer(player: Player): void {
+  const nextX = player.x + player.vx;
+  const nextY = player.y + player.vy;
+
+  player.x = Math.max(PLAYER_RADIUS, Math.min(ARENA_W - PLAYER_RADIUS, nextX));
+  player.y = Math.max(PLAYER_RADIUS, Math.min(ARENA_H - PLAYER_RADIUS, nextY));
+
+  if (player.x !== nextX) player.vx = 0;
+  if (player.y !== nextY) player.vy = 0;
+}
+
 function tick(room: GameRoom) {
   const now = Date.now();
 
@@ -564,23 +607,8 @@ function tick(room: GameRoom) {
   for (const player of room.players.values()) {
     if (!player.alive) continue;
 
-    player.vx = player.dx !== 0
-      ? player.vx + (player.dx * MAX_SPEED - player.vx) * ACCELERATION
-      : player.vx * FRICTION;
-    player.vy = player.dy !== 0
-      ? player.vy + (player.dy * MAX_SPEED - player.vy) * ACCELERATION
-      : player.vy * FRICTION;
-    if (Math.abs(player.vx) < 0.05) player.vx = 0;
-    if (Math.abs(player.vy) < 0.05) player.vy = 0;
-
-    player.x = Math.max(
-      PLAYER_RADIUS,
-      Math.min(ARENA_W - PLAYER_RADIUS, player.x + player.vx),
-    );
-    player.y = Math.max(
-      PLAYER_RADIUS,
-      Math.min(ARENA_H - PLAYER_RADIUS, player.y + player.vy),
-    );
+    updatePlayerVelocity(player);
+    movePlayer(player);
 
     for (const rock of room.rocks) resolvePlayerRockCollision(player, rock);
     for (const cactus of room.cacti) {
