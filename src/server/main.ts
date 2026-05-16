@@ -13,6 +13,7 @@ import {
   shoot,
 } from "./game.ts";
 import type { ClientMessage } from "../shared/protocol.ts";
+import { handleVisitorRequest } from "./visitor.ts";
 
 // Seed some default rooms
 createRoom("dots", "Dot Arena", 8);
@@ -163,8 +164,12 @@ function tryUpgrade(
   }
 }
 
-Deno.serve((req) => {
+Deno.serve(async (req) => {
   const url = new URL(req.url);
+
+  if (url.pathname === "/api/visitor") {
+    return await handleVisitorRequest(req);
+  }
 
   if (url.pathname === "/ws/lobby") {
     const upgrade = tryUpgrade(req);

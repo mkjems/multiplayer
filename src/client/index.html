@@ -16,116 +16,25 @@
     <meta name="theme-color" content="#0f0f1a" />
     <link rel="manifest" href="/manifest.json" />
     <title>Multiplayer</title>
-    <style>
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
-      body {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #0f0f1a;
-        font-family: system-ui, sans-serif;
-        color: #e0e0e0;
-      }
-
-      .card {
-        background: #1a1a2e;
-        border: 1px solid #2a2a4a;
-        border-radius: 16px;
-        padding: 48px 40px;
-        width: 360px;
-        text-align: center;
-        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
-      }
-
-      h1 {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 8px;
-        background: linear-gradient(135deg, #6c63ff, #3ecfcf);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-
-      p.subtitle {
-        color: #888;
-        margin-bottom: 36px;
-        font-size: 0.9rem;
-      }
-
-      label {
-        display: block;
-        text-align: left;
-        font-size: 0.8rem;
-        color: #aaa;
-        margin-bottom: 6px;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-      }
-
-      input[type="text"] {
-        width: 100%;
-        padding: 12px 16px;
-        border-radius: 8px;
-        border: 1px solid #2a2a4a;
-        background: #0f0f1a;
-        color: #e0e0e0;
-        font-size: 1rem;
-        margin-bottom: 24px;
-        outline: none;
-        transition: border-color 0.2s;
-      }
-
-      input[type="text"]:focus {
-        border-color: #6c63ff;
-      }
-
-      button {
-        width: 100%;
-        padding: 14px;
-        border-radius: 8px;
-        border: none;
-        background: linear-gradient(135deg, #6c63ff, #3ecfcf);
-        color: #fff;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: opacity 0.2s, transform 0.1s;
-      }
-
-      button:hover {
-        opacity: 0.9;
-      }
-      button:active {
-        transform: scale(0.98);
-      }
-      button:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-      }
-    </style>
+    <link rel="stylesheet" href="/index.css" />
   </head>
   <body>
     <div class="card">
       <h1>Multiplayer</h1>
       <p class="subtitle">Pick a name and jump into a game</p>
 
-      <label for="name">Your name</label>
-      <input
-        type="text"
-        id="name"
-        placeholder="Enter your name..."
-        maxlength="20"
-        autocomplete="off"
-      />
+      <form id="landing-form">
+        <label for="name">Your name</label>
+        <input
+          type="text"
+          id="name"
+          placeholder="Enter your name..."
+          maxlength="20"
+          autocomplete="off"
+        />
 
-      <button id="enter" disabled>Enter Lobby</button>
+        <button id="enter" type="submit" disabled>Enter Lobby</button>
+      </form>
     </div>
 
     <script type="module" src="/index.ts"></script>
