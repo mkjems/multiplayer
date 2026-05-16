@@ -24,10 +24,6 @@ if (!playerName || !gameId) {
   throw new Error("Missing session data");
 }
 
-// Update page title
-requireElement("game-title").textContent = gameId.charAt(0).toUpperCase() +
-  gameId.slice(1);
-
 // Initialize systems
 const sounds = createSounds();
 const gameState = createGameState();

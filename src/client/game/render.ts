@@ -278,7 +278,7 @@ export function createRenderer(
     const me = gameState.getLocalPlayer();
     if (!me || !me.alive) return;
 
-    const size = 8, gap = 4, px = 14, py = window.innerHeight - 20;
+    const size = 8, gap = 4, px = 14, py = 24;
     ctx.font = "bold 10px system-ui";
     ctx.textAlign = "left";
 
