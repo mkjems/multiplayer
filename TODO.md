@@ -6,8 +6,7 @@
 
 ## Sprint 21
 
-## Backlog
-- Do not commit the result of build process to git  
+## Backlog 
 - Add a background image of wild west texture to arena
 - Find a way to use ntfy to send Martin a message when someone enters a name in the landing page https://ntfy.sh/mkjems-multiplayer-visit' method: 'POST', body: ` 😀 New multiplayer visitor: ${name}`
 - When all players are dead everyone should return to the lobby. (If a sole player shoot him or her self)

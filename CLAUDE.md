@@ -14,7 +14,7 @@
 - **Deployment**: Deno Deploy
 - Server holds source of truth for all games, broadcasts at 20 Hz
 - Clients run their own animations at 60 Hz
-- Do not commit the result of build process to git
+- Do not commit the result of build a process to git
 
 # Game Overview
 
@@ -43,3 +43,8 @@ Pixel art retro cowboy shooting game. Players join rooms via a lobby and fight i
 - Desktop: keyboard controls
 - Mobile: virtual joystick (future sprint)
 - Canvas fills the full screen; all UI overlays the canvas
+
+
+# User reception
+
+So far the users who have tried this game have been underwhelmed. I think we need to add more interesting artwork to make it interesting to play
