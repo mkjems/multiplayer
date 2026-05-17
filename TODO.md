@@ -93,6 +93,7 @@ If the phone goes to sleep/energy saving mode ( black screen ) and you wakes up 
 - Make it possible to type messages to other players while playing. text should appear in small cartoon like bubbles above the character.
 - Option to not shoot bullets but instead shoot hearts that heal those hit.  
 
+- First sound is always a bit lagging. Can we fix that? Sound we have a short game intro melody?
 - Cacti should have one or two arms and variation in height
 - Use real artwork for character animation. vector or sprites
 - Use real sounds for effects 
