@@ -1,17 +1,5 @@
 # TODO
 
-## Sprint 25
-- Sprint goal: split server game code into clear modules without changing behavior.
-- Split `src/server/game.ts` into explicit, strongly typed modules. It currently combines room lifecycle, arena generation, collision geometry, player movement/energy, bullet simulation, win-condition handling, broadcasting, and metrics. Suggested first split:
-  - `server/arena.ts` for rock/cactus generation and arena config.
-  - `server/room.ts` for room creation, lookup, join/leave, reset, and diagnostics.
-  - `server/simulation.ts` for `tick`, movement, energy, reloads, bullets, hits, and win conditions.
-  - `server/collision.ts` for geometry helpers and collision resolution.
-  - `server/broadcast.ts` or `server/network.ts` for room broadcast helpers and socket backpressure metrics.
-- Move server-side internal types out of `game.ts` once the modules are split. `Bullet`, `Rock`, `Cactus`, `GameRoom`, diagnostics metrics, and broadcast result types should live next to the code that owns them, with explicit exports where cross-module references are needed.
-- Keep module boundaries explicit. Avoid dynamic registration or string-based wiring.
-- Verify the split with tests from Sprint 23 plus `deno task check` and `deno task lint`.
-
 ## Sprint 26
 - Sprint goal: simplify client game state flow.
 - Revisit `src/client/game/state.ts` versus `src/client/game/index.ts`. `GameState.updateFromServerMessage` overlaps with the message handling in `game/index.ts`, but the entry point bypasses it for richer effects/sound behavior. Either remove the unused method or make message application a single explicit path.
