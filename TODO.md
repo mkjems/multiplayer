@@ -1,22 +1,12 @@
 # TODO
 
-## Sprint 20
-- Performance issue: Add server metrics for real gameplay profiling.
-  - Track per-room tick duration, player count, bullet count, payload size, and socket bufferedAmount.
-  - Log or expose simple diagnostics while developing.
-  - Use this to verify whether lag is CPU, bandwidth, or client-render related.
-
-- Performance spike: Investigate spatial partitioning for collision checks.
-  - Evaluate a simple uniform grid for rocks, cacti, players, and bullets.
-  - Compare current all-vs-all collision checks with nearby-object lookup.
-  - Keep implementation TypeScript-friendly and statically navigable.
-
-- Performance issue: Guard against duplicate join_game messages on one socket.
-  - Prevent a single WebSocket from creating multiple players in the same room.
-  - Make repeated join_game messages idempotent or reject them.
-  - Confirm leave_game and onclose cleanup only run once per player.
-
 ## Sprint 21
+- Performance issue: Add rolling graphs to the diagnostics dashboard.
+  - Store diagnostics history locally in the browser tab; no extra server persistence needed.
+  - Keep a bounded one-hour rolling window by default, around 1800 samples at a 2 second polling interval.
+  - Plot small per-room graphs for average tick time, game_state payload size, socket buffered bytes, skipped snapshots, player count, and bullet count.
+  - Keep the current dashboard cards for current values and use graphs to show trends over time.
+
 - Performance issue: Add client viewport culling for rendering.
   - Draw only rocks, cacti, bullets, and players that intersect the visible camera area.
   - Keep minimap rendering independent from viewport culling.
@@ -48,6 +38,8 @@
   - Document tradeoffs before implementation.
 
 ## Backlog 
+- Plot the diagnostics data as graphs.   
+- Do we need a router for our server or is it more performant without one?
 - Show the ammo under the character.
 - When you get low energy (<20%) you should start to move more slowly and the speed should decrease as you loose more energy. But even if you have 0% you should still be able to move very slowly.
 - Integrate chatGPT to do experiments.

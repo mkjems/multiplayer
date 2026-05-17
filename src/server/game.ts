@@ -16,6 +16,7 @@ const STOP_SPEED = 0.05;
 const BULLET_SPEED = 22;
 const TICK_MS = 50;
 const MAX_SOCKET_BUFFERED_BYTES = 256 * 1024;
+const METRICS_AVERAGE_WEIGHT = 0.12;
 const PLAYER_RADIUS = 16;
 const BULLET_RADIUS = 4;
 const SHOOT_COOL_DOWN = 400;
@@ -101,6 +102,33 @@ interface CactusSegmentHit {
   t: number;
 }
 
+interface TickDurationMetrics {
+  lastMilliseconds: number;
+  averageMilliseconds: number;
+  maxMilliseconds: number;
+}
+
+interface NetworkMetrics {
+  lastGameStateBytes: number;
+  totalGameStateBytes: number;
+  lastGameStateRecipientCount: number;
+  skippedGameStateCount: number;
+  lastMaxBufferedBytes: number;
+  maxBufferedBytes: number;
+}
+
+interface RoomPerformanceMetrics {
+  tickCount: number;
+  tickDuration: TickDurationMetrics;
+  network: NetworkMetrics;
+}
+
+interface BroadcastResult {
+  sentCount: number;
+  skippedCount: number;
+  maxBufferedBytes: number;
+}
+
 type CactusDamagedMessage = Extract<
   ServerMessage,
   { type: "cactus_damaged" }
@@ -117,9 +145,48 @@ export interface GameRoom {
   cacti: Cactus[];
   gameOver: boolean;
   interval: number | null;
+  metrics: RoomPerformanceMetrics;
+}
+
+export interface RoomDiagnostics {
+  id: string;
+  name: string;
+  active: boolean;
+  playerCount: number;
+  socketCount: number;
+  bulletCount: number;
+  rockCount: number;
+  cactusCount: number;
+  tickCount: number;
+  tickDurationMilliseconds: TickDurationMetrics;
+  network: NetworkMetrics;
 }
 
 const rooms = new Map<string, GameRoom>();
+const textEncoder = new TextEncoder();
+
+function createRoomPerformanceMetrics(): RoomPerformanceMetrics {
+  return {
+    tickCount: 0,
+    tickDuration: {
+      lastMilliseconds: 0,
+      averageMilliseconds: 0,
+      maxMilliseconds: 0,
+    },
+    network: {
+      lastGameStateBytes: 0,
+      totalGameStateBytes: 0,
+      lastGameStateRecipientCount: 0,
+      skippedGameStateCount: 0,
+      lastMaxBufferedBytes: 0,
+      maxBufferedBytes: 0,
+    },
+  };
+}
+
+function getPayloadByteLength(payload: string): number {
+  return textEncoder.encode(payload).length;
+}
 
 function generatePolygonVertices(
   cx: number,
@@ -280,6 +347,7 @@ export function createRoom(id: string, name: string, maxPlayers = 8): GameRoom {
     cacti,
     gameOver: false,
     interval: null,
+    metrics: createRoomPerformanceMetrics(),
   };
   rooms.set(id, room);
   return room;
@@ -315,6 +383,22 @@ export function listRooms(): GameInfo[] {
     playerCount: r.players.size,
     maxPlayers: r.maxPlayers,
     status: r.players.size > 0 ? "playing" : "waiting",
+  }));
+}
+
+export function getRoomDiagnostics(): RoomDiagnostics[] {
+  return [...rooms.values()].map((room) => ({
+    id: room.id,
+    name: room.name,
+    active: room.interval !== null,
+    playerCount: room.players.size,
+    socketCount: room.sockets.size,
+    bulletCount: room.bullets.length,
+    rockCount: room.rocks.length,
+    cactusCount: room.cacti.length,
+    tickCount: room.metrics.tickCount,
+    tickDurationMilliseconds: { ...room.metrics.tickDuration },
+    network: { ...room.metrics.network },
   }));
 }
 
@@ -432,21 +516,64 @@ function broadcast(
   room: GameRoom,
   msg: string,
   options: { dropIfBackedUp: boolean } = { dropIfBackedUp: false },
-) {
+): BroadcastResult {
+  let sentCount = 0;
+  let skippedCount = 0;
+  let maxBufferedBytes = 0;
+
   for (const [id, socket] of room.sockets) {
     try {
       if (socket.readyState !== WebSocket.OPEN) continue;
+      maxBufferedBytes = Math.max(maxBufferedBytes, socket.bufferedAmount);
       if (
         options.dropIfBackedUp &&
         socket.bufferedAmount > MAX_SOCKET_BUFFERED_BYTES
       ) {
+        skippedCount++;
         continue;
       }
       socket.send(msg);
+      sentCount++;
     } catch {
       leaveRoom(room, id);
     }
   }
+
+  return { sentCount, skippedCount, maxBufferedBytes };
+}
+
+function recordTickDuration(
+  room: GameRoom,
+  durationMilliseconds: number,
+): void {
+  const tickDuration = room.metrics.tickDuration;
+  room.metrics.tickCount++;
+  tickDuration.lastMilliseconds = durationMilliseconds;
+  tickDuration.maxMilliseconds = Math.max(
+    tickDuration.maxMilliseconds,
+    durationMilliseconds,
+  );
+  tickDuration.averageMilliseconds = tickDuration.averageMilliseconds === 0
+    ? durationMilliseconds
+    : tickDuration.averageMilliseconds * (1 - METRICS_AVERAGE_WEIGHT) +
+      durationMilliseconds * METRICS_AVERAGE_WEIGHT;
+}
+
+function recordGameStateBroadcast(
+  room: GameRoom,
+  payloadBytes: number,
+  broadcastResult: BroadcastResult,
+): void {
+  const network = room.metrics.network;
+  network.lastGameStateBytes = payloadBytes;
+  network.totalGameStateBytes += payloadBytes * broadcastResult.sentCount;
+  network.lastGameStateRecipientCount = broadcastResult.sentCount;
+  network.skippedGameStateCount += broadcastResult.skippedCount;
+  network.lastMaxBufferedBytes = broadcastResult.maxBufferedBytes;
+  network.maxBufferedBytes = Math.max(
+    network.maxBufferedBytes,
+    broadcastResult.maxBufferedBytes,
+  );
 }
 
 function closestPointOnSegment(
@@ -752,6 +879,7 @@ function updatePlayerEnergy(player: Player, movedDistance: number): void {
 }
 
 function tick(room: GameRoom) {
+  const tickStartedAt = performance.now();
   const now = Date.now();
   const cactusDamagedMessages: CactusDamagedMessage[] = [];
 
@@ -884,7 +1012,10 @@ function tick(room: GameRoom) {
 
   room.bullets = surviving;
 
-  if (room.sockets.size === 0) return;
+  if (room.sockets.size === 0) {
+    recordTickDuration(room, performance.now() - tickStartedAt);
+    return;
+  }
 
   // Win condition: 1 alive, 1+ dead
   if (!room.gameOver) {
@@ -910,9 +1041,20 @@ function tick(room: GameRoom) {
   for (const cactusDamagedMessage of cactusDamagedMessages) {
     broadcast(room, JSON.stringify(cactusDamagedMessage));
   }
-  broadcast(
+  const gameStateMessage = JSON.stringify({
+    type: "game_state",
+    players,
+    bullets,
+  });
+  const gameStateBroadcast = broadcast(
     room,
-    JSON.stringify({ type: "game_state", players, bullets }),
+    gameStateMessage,
     { dropIfBackedUp: true },
   );
+  recordGameStateBroadcast(
+    room,
+    getPayloadByteLength(gameStateMessage),
+    gameStateBroadcast,
+  );
+  recordTickDuration(room, performance.now() - tickStartedAt);
 }

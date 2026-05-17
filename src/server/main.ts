@@ -5,6 +5,7 @@ import {
   getCactiData,
   getRockData,
   getRoom,
+  getRoomDiagnostics,
   joinRoom,
   leaveRoom,
   listRooms,
@@ -50,6 +51,14 @@ function sendLobbyState(ws: WebSocket) {
   } catch { /* ignore */ }
 }
 
+function sendError(ws: WebSocket, message: string): void {
+  try {
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: "error", message }));
+    }
+  } catch { /* ignore */ }
+}
+
 function handleLobbySocket(ws: WebSocket) {
   lobbyClients.add(ws);
 
@@ -80,8 +89,16 @@ function handleGameSocket(ws: WebSocket, roomId: string) {
     ws.close(1008, "Room not found");
     return;
   }
+  const gameRoom = room;
 
   let playerId: string | null = null;
+
+  function leaveJoinedPlayer(): void {
+    if (!playerId) return;
+    leaveRoom(gameRoom, playerId);
+    playerId = null;
+    broadcastLobby();
+  }
 
   ws.onmessage = (e) => {
     let msg: ClientMessage;
@@ -92,42 +109,45 @@ function handleGameSocket(ws: WebSocket, roomId: string) {
     }
 
     if (msg.type === "join_game") {
+      if (playerId) {
+        sendError(ws, "Socket has already joined this game");
+        return;
+      }
+      if (msg.gameId !== roomId) {
+        sendError(ws, "Joined game id does not match WebSocket room");
+        return;
+      }
       playerId = crypto.randomUUID();
-      joinRoom(room, playerId, msg.playerName, ws);
+      joinRoom(gameRoom, playerId, msg.playerName, ws);
       ws.send(
         JSON.stringify({ type: "game_joined", playerId, gameId: roomId }),
       );
       ws.send(
         JSON.stringify({
           type: "arena",
-          rocks: getRockData(room),
-          cacti: getCactiData(room),
+          rocks: getRockData(gameRoom),
+          cacti: getCactiData(gameRoom),
           config: getArenaConfig(),
         }),
       );
       broadcastLobby();
     } else if (msg.type === "move" && playerId) {
-      applyInput(room, playerId, msg.dx, msg.dy);
+      applyInput(gameRoom, playerId, msg.dx, msg.dy);
     } else if (msg.type === "arm_angle" && playerId) {
-      setArmAngle(room, playerId, msg.angle);
+      setArmAngle(gameRoom, playerId, msg.angle);
     } else if (msg.type === "shoot" && playerId) {
-      shoot(room, playerId);
+      shoot(gameRoom, playerId);
     } else if (msg.type === "reload" && playerId) {
-      reloadPlayer(room, playerId);
+      reloadPlayer(gameRoom, playerId);
     } else if (msg.type === "leave_game" && playerId) {
-      leaveRoom(room, playerId);
-      broadcastLobby();
-      playerId = null;
+      leaveJoinedPlayer();
     }
   };
 
   ws.onerror = () => {/* ignore */};
 
   ws.onclose = () => {
-    if (playerId) {
-      leaveRoom(room, playerId);
-      broadcastLobby();
-    }
+    leaveJoinedPlayer();
   };
 }
 
@@ -169,6 +189,16 @@ Deno.serve(async (req) => {
 
   if (url.pathname === "/api/visitor") {
     return await handleVisitorRequest(req);
+  }
+
+  if (url.pathname === "/api/diagnostics/rooms") {
+    return Response.json(
+      {
+        generatedAt: new Date().toISOString(),
+        rooms: getRoomDiagnostics(),
+      },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   }
 
   if (url.pathname === "/ws/lobby") {
