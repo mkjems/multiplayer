@@ -1,18 +1,6 @@
 # TODO
 
-## Sprint 23
-- Sprint goal: prepare the codebase for cleanup without changing gameplay behavior.
-- Fix formatting so `deno fmt --check src/` passes. It currently reports `src/server/visitor.ts` missing a trailing newline.
-- Normalize import specifiers in client TypeScript. Several type imports omit the `.ts` extension (for example `../../shared/protocol`), while the rest of the project mostly uses explicit `.ts`. Consistent explicit imports support navigation and match the project's refactoring goals.
-- Add focused tests before the larger cleanup. Highest-value targets:
-  - Protocol parsers.
-  - Arena generation avoids overlaps.
-  - Collision helpers.
-  - Energy drain/regain.
-  - Bullet ricochet and cactus damage.
-  - Win-condition timeout behavior.
-  - A basic canvas/browser smoke test.
-- Keep `deno task check`, `deno task lint`, and `deno fmt --check src/` passing during the sprint.
+
 
 ## Sprint 24
 - Sprint goal: make protocol and diagnostics contracts strongly typed across client and server.
