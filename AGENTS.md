@@ -1,3 +1,7 @@
+Please read PROJECT_CONTEXT.md to understand what this project is about
+
+Feel free to make additional files in memory folder
+
 # Developer Experience Requirements
 
 ## Strong IDE Refactoring

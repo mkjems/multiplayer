@@ -1,19 +1,80 @@
 # TODO
 
 ## Sprint 19
+- Performance issue: Stop sending full cactus state every game tick.
+  - Move cactus positions/static geometry to the initial arena payload only.
+  - Send cactus damage as small deltas, such as cactus id + segment index.
+  - Keep the client-side cactus state authoritative from the arena snapshot plus damage events.
+
+- Performance issue: Stop ticking empty rooms.
+  - Start a room simulation interval when the first player joins.
+  - Stop the interval when the last player leaves.
+  - Reset room state safely without leaving stale timers running.
+
+- Performance issue: Add WebSocket send backpressure handling.
+  - Check socket bufferedAmount before sending game_state snapshots.
+  - Drop or coalesce outdated snapshots for slow clients.
+  - Avoid letting one slow connection build an ever-growing send queue.
 
 ## Sprint 20
+- Performance issue: Add server metrics for real gameplay profiling.
+  - Track per-room tick duration, player count, bullet count, payload size, and socket bufferedAmount.
+  - Log or expose simple diagnostics while developing.
+  - Use this to verify whether lag is CPU, bandwidth, or client-render related.
+
+- Performance spike: Investigate spatial partitioning for collision checks.
+  - Evaluate a simple uniform grid for rocks, cacti, players, and bullets.
+  - Compare current all-vs-all collision checks with nearby-object lookup.
+  - Keep implementation TypeScript-friendly and statically navigable.
+
+- Performance issue: Guard against duplicate join_game messages on one socket.
+  - Prevent a single WebSocket from creating multiple players in the same room.
+  - Make repeated join_game messages idempotent or reject them.
+  - Confirm leave_game and onclose cleanup only run once per player.
 
 ## Sprint 21
+- Performance issue: Add client viewport culling for rendering.
+  - Draw only rocks, cacti, bullets, and players that intersect the visible camera area.
+  - Keep minimap rendering independent from viewport culling.
+  - Measure canvas render time before and after.
+
+- Performance spike: Cache static arena rendering.
+  - Investigate rendering rocks and static cactus bases to an offscreen canvas or cached layer.
+  - Redraw the cached layer each frame with camera offset instead of rebuilding all paths.
+  - Confirm this helps on mobile before committing to the approach.
+
+- Performance issue: Optimize bullet bookkeeping on the client.
+  - Replace repeated msg.bullets.some(...) cleanup scans with a Set of live bullet ids.
+  - Keep bullet trail and bounce tracking cleanup linear in bullet count.
+
+## Sprint 22
+- Performance spike: Design a smaller network protocol.
+  - Define the smallest recurring game_state payload needed for responsive play.
+  - Separate static arena data, frequently changing state, and one-off events.
+  - Consider sequence numbers/server timestamps for interpolation and debugging.
+
+- Performance issue: Split game_state into snapshots and events.
+  - Keep players and bullets in recurring snapshots.
+  - Move cactus hits, player joins/leaves, deaths, reload events, and game_over into event messages where practical.
+  - Preserve strongly typed protocol unions in src/shared/protocol.ts.
+
+- Performance spike: Investigate client interpolation.
+  - Test whether lower-frequency server snapshots still feel good with interpolation.
+  - Decide whether local player prediction is needed or whether remote interpolation is enough.
+  - Document tradeoffs before implementation.
 
 ## Backlog 
-- Performance improvements brainstorm.
-- Performance, What is the smallest amount of data that we need to send to the client.
-- Performance, Do we need to send all the rocks to all the players all the time? Probably not.    
-- Show the ammo under the character 
+- Show the ammo under the character.
+- When you get low energy (<20%) you should start to move more slowly and the speed should decrease as you loose more energy. But even if you have 0% you should still be able to move very slowly.
+- Integrate chatGPT to do experiments.
 
 
 ## Bugs
+- Performance bug: Stale game_over timeout may fire after a room resets.
+  - Store pending game_over timeout ids per room.
+  - Cancel them when a room becomes empty or restarts.
+  - Verify new players cannot receive an old winner message.
+
 - Bug. When you have added the Progressive Web App to the home screen and you are playing a game. 
 If the phone goes to sleep/energy saving mode ( black screen ) and you wakes up again, then  the server connection is not restored and the player can not move. only move the arm will move
 - When all players are dead everyone should return to the lobby. (If a sole player shoot him or her self)
@@ -24,13 +85,18 @@ If the phone goes to sleep/energy saving mode ( black screen ) and you wakes up 
 - Have a random Tank that passes through the arena and shoots like a crazy person 
 - Health pills that can be found that restore player health
 - Steroids pills that can be found that give more energy for a period of time.
-- Make it easy to change the name of your character
-- Make it possible to draw your own character
+- Make it easier to change the name of your character
+
+- Make it possible to draw your own character. Allow upload of an image of a child's drawing, send the drawing to chatGPT and ask it to make a sprite sheet from it.
+    post process the sprites to make sure it is transparent and the right size. Then use that sprite for the character.
+    Created sprites should be saved for reuse.
+- Make it possible to type messages to other players while playing. text should appear in small cartoon like bubbles above the character.
+- Option to not shoot bullets but instead shoot hearts that heal those hit.  
+
 - Cacti should have one or two arms and variation in height
 - Use real artwork for character animation. vector or sprites
 - Use real sounds for effects 
 - Make overlay where user can read about the controls of the game.
 - Should we have a walking sound?
 - When new players join character should be placed as far away for the other players as possible but 30px from the edge 
-
 

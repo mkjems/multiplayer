@@ -16,6 +16,16 @@
 - Clients run their own animations at 60 Hz
 - Do not commit the result of build a process to git
 
+# Protocol Model
+
+- Shared client/server message types live in `src/shared/protocol.ts`
+- Keep protocol types explicit, strongly typed, and easy to navigate with IDE refactoring tools
+- `arena` messages are for initial/static room data, such as rocks, cactus positions, and arena config
+- `game_state` messages are for frequently changing state, such as players and bullets
+- Prefer event or delta messages for one-off changes, such as cactus damage, player death, reload events, game over, and join/leave events
+- Avoid repeatedly sending static geometry or unchanged object state in every game tick
+- The server remains authoritative; clients may render and animate locally, but gameplay state should be confirmed by server messages
+
 # Game Overview
 
 Pixel art retro cowboy shooting game. Players join rooms via a lobby and fight in a 2D arena with rocks and cacti.
