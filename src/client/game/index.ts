@@ -49,35 +49,23 @@ globalThis.addEventListener("resize", resizeCanvas);
 function handleGameJoined(
   msg: Extract<ServerMessage, { type: "game_joined" }>,
 ): void {
-  gameState.myId = msg.playerId;
+  gameState.setLocalPlayerId(msg.playerId);
 }
 
 function handleArena(msg: Extract<ServerMessage, { type: "arena" }>): void {
-  gameState.rocks = msg.rocks;
-  gameState.cacti = msg.cacti;
-  gameState.arenaConfig = { ...msg.config };
-  gameState.previousCactiSegments.clear();
-  for (const cactus of msg.cacti) {
-    gameState.previousCactiSegments.set(cactus.id, [...cactus.segments]);
-  }
+  gameState.applyArena(msg.rocks, msg.cacti, msg.config);
 }
 
 function handlePlayerJoined(
   msg: Extract<ServerMessage, { type: "player_joined" }>,
 ): void {
-  gameState.playerInfos.set(msg.player.id, msg.player);
+  gameState.setPlayerInfo(msg.player);
 }
 
 function handlePlayerLeft(
   msg: Extract<ServerMessage, { type: "player_left" }>,
 ): void {
-  gameState.playerInfos.delete(msg.playerId);
-  gameState.players = gameState.players.filter((player) =>
-    player.id !== msg.playerId
-  );
-  gameState.deathTimes.delete(msg.playerId);
-  gameState.hitTimes.delete(msg.playerId);
-  gameState.previousHealth.delete(msg.playerId);
+  gameState.removePlayer(msg.playerId);
 }
 
 function handleGameState(
@@ -105,7 +93,7 @@ function handleGameState(
   }
 
   gameState.applyPlayerStates(msg.players);
-  gameState.bullets = msg.bullets;
+  gameState.setBullets(msg.bullets);
   const liveBulletIds = new Set(msg.bullets.map((bullet) => bullet.id));
 
   for (const b of msg.bullets) {
@@ -145,20 +133,7 @@ function handleGameState(
 function handleCactusDamaged(
   msg: Extract<ServerMessage, { type: "cactus_damaged" }>,
 ): void {
-  const cactus = gameState.cacti.find((candidate) =>
-    candidate.id === msg.cactusId
-  );
-  if (
-    !cactus ||
-    msg.segmentIndex < 0 ||
-    msg.segmentIndex >= cactus.segments.length
-  ) {
-    return;
-  }
-
-  if (cactus.segments[msg.segmentIndex]) {
-    cactus.segments[msg.segmentIndex] = false;
-    gameState.previousCactiSegments.set(cactus.id, [...cactus.segments]);
+  if (gameState.damageCactusSegment(msg.cactusId, msg.segmentIndex)) {
     sounds.playCactusHit();
   }
 }

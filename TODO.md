@@ -1,10 +1,5 @@
 # TODO
 
-## Sprint 26
-- Sprint goal: simplify client game state flow.
-- Revisit `src/client/game/state.ts` versus `src/client/game/index.ts`. `GameState.updateFromServerMessage` overlaps with the message handling in `game/index.ts`, but the entry point bypasses it for richer effects/sound behavior. Either remove the unused method or make message application a single explicit path.
-- Keep side effects such as sounds, hit flashes, death times, and cactus effects easy to follow from the message handlers.
-- Make sure local prediction state (`localArmAngle`, `localFacing`, bullet trails, previous health/bounces) remains explicit and strongly typed.
 
 ## Sprint 27
 - Sprint goal: split rendering into smaller client modules.

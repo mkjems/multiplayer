@@ -20,7 +20,6 @@ import type {
   PlayerSnapshot,
   PlayerStateSnapshot,
   RockData,
-  ServerMessage,
 } from "../../shared/protocol";
 
 export interface GameState {
@@ -39,9 +38,13 @@ export interface GameState {
   previousHealth: Map<string, number>;
   previousBounces: Map<string, number>;
   bulletTrails: Map<string, { x: number; y: number }[]>;
-  previousCactiSegments: Map<string, boolean[]>;
-  updateFromServerMessage(msg: ServerMessage): void;
+  setLocalPlayerId(playerId: string): void;
+  applyArena(rocks: RockData[], cacti: CactusData[], config: ArenaConfig): void;
+  setPlayerInfo(playerInfo: PlayerInfo): void;
+  removePlayer(playerId: string): void;
   applyPlayerStates(playerStates: PlayerStateSnapshot[]): void;
+  setBullets(bullets: BulletSnapshot[]): void;
+  damageCactusSegment(cactusId: string, segmentIndex: number): boolean;
   getLocalPlayer(): PlayerSnapshot | undefined;
   reset(): void;
 }
@@ -100,40 +103,56 @@ export function createGameState(): GameState {
     previousHealth: new Map<string, number>(),
     previousBounces: new Map<string, number>(),
     bulletTrails: new Map<string, { x: number; y: number }[]>(),
-    previousCactiSegments: new Map<string, boolean[]>(),
 
-    // Apply server state update to game state
-    updateFromServerMessage(msg: ServerMessage): void {
-      if (msg.type === "game_state") {
-        this.applyPlayerStates(msg.players);
-        this.bullets = msg.bullets;
-      } else if (msg.type === "player_joined") {
-        this.playerInfos.set(msg.player.id, msg.player);
-      } else if (msg.type === "player_left") {
-        this.playerInfos.delete(msg.playerId);
-        this.players = this.players.filter((player) => player.id !== msg.playerId);
-      } else if (msg.type === "arena") {
-        this.rocks = msg.rocks;
-        this.cacti = msg.cacti;
-        if (msg.config) this.arenaConfig = { ...msg.config };
-      } else if (msg.type === "cactus_damaged") {
-        const cactus = this.cacti.find((candidate) =>
-          candidate.id === msg.cactusId
-        );
-        if (
-          cactus &&
-          msg.segmentIndex >= 0 &&
-          msg.segmentIndex < cactus.segments.length
-        ) {
-          cactus.segments[msg.segmentIndex] = false;
-        }
-      }
+    setLocalPlayerId(playerId: string): void {
+      this.myId = playerId;
+    },
+
+    applyArena(
+      rocks: RockData[],
+      cacti: CactusData[],
+      config: ArenaConfig,
+    ): void {
+      this.rocks = rocks;
+      this.cacti = cacti;
+      this.arenaConfig = { ...config };
+    },
+
+    setPlayerInfo(playerInfo: PlayerInfo): void {
+      this.playerInfos.set(playerInfo.id, playerInfo);
+    },
+
+    removePlayer(playerId: string): void {
+      this.playerInfos.delete(playerId);
+      this.players = this.players.filter((player) => player.id !== playerId);
+      this.deathTimes.delete(playerId);
+      this.hitTimes.delete(playerId);
+      this.previousHealth.delete(playerId);
     },
 
     applyPlayerStates(playerStates: PlayerStateSnapshot[]): void {
       this.players = playerStates.map((playerState) =>
         mergePlayerState(this.playerInfos.get(playerState.id), playerState)
       );
+    },
+
+    setBullets(bullets: BulletSnapshot[]): void {
+      this.bullets = bullets;
+    },
+
+    damageCactusSegment(cactusId: string, segmentIndex: number): boolean {
+      const cactus = this.cacti.find((candidate) => candidate.id === cactusId);
+      if (
+        !cactus ||
+        segmentIndex < 0 ||
+        segmentIndex >= cactus.segments.length ||
+        !cactus.segments[segmentIndex]
+      ) {
+        return false;
+      }
+
+      cactus.segments[segmentIndex] = false;
+      return true;
     },
 
     // Get current player
@@ -167,7 +186,6 @@ export function createGameState(): GameState {
       this.previousHealth.clear();
       this.previousBounces.clear();
       this.bulletTrails.clear();
-      this.previousCactiSegments.clear();
     },
   };
 }
