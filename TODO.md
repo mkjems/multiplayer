@@ -1,21 +1,5 @@
 # TODO
 
-## Sprint 22
-- Performance spike: Design a smaller network protocol.
-  - Define the smallest recurring game_state payload needed for responsive play.
-  - Separate static arena data, frequently changing state, and one-off events.
-  - Consider sequence numbers/server timestamps for interpolation and debugging.
-
-- Performance issue: Split game_state into snapshots and events.
-  - Keep players and bullets in recurring snapshots.
-  - Move cactus hits, player joins/leaves, deaths, reload events, and game_over into event messages where practical.
-  - Preserve strongly typed protocol unions in src/shared/protocol.ts.
-
-- Performance spike: Investigate client interpolation.
-  - Test whether lower-frequency server snapshots still feel good with interpolation.
-  - Decide whether local player prediction is needed or whether remote interpolation is enough.
-  - Document tradeoffs before implementation.
-
 ## Backlog 
 - Plot the diagnostics data as graphs.   
 - Do we need a router for our server or is it more performant without one?

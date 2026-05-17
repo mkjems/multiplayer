@@ -62,30 +62,49 @@ function handleArena(msg: Extract<ServerMessage, { type: "arena" }>): void {
   }
 }
 
+function handlePlayerJoined(
+  msg: Extract<ServerMessage, { type: "player_joined" }>,
+): void {
+  gameState.playerInfos.set(msg.player.id, msg.player);
+}
+
+function handlePlayerLeft(
+  msg: Extract<ServerMessage, { type: "player_left" }>,
+): void {
+  gameState.playerInfos.delete(msg.playerId);
+  gameState.players = gameState.players.filter((player) =>
+    player.id !== msg.playerId
+  );
+  gameState.deathTimes.delete(msg.playerId);
+  gameState.hitTimes.delete(msg.playerId);
+  gameState.previousHealth.delete(msg.playerId);
+}
+
 function handleGameState(
   msg: Extract<ServerMessage, { type: "game_state" }>,
 ): void {
   const now = Date.now();
 
-  for (const p of msg.players) {
-    if (!p.alive && !gameState.deathTimes.has(p.id)) {
-      gameState.deathTimes.set(p.id, now);
+  for (const playerState of msg.players) {
+    if (!playerState.alive && !gameState.deathTimes.has(playerState.id)) {
+      gameState.deathTimes.set(playerState.id, now);
       sounds.playDeath();
     }
-    const prev = gameState.previousHealth.get(p.id) ?? p.health;
-    if (p.health < prev) {
-      gameState.hitTimes.set(p.id, now);
-      if (p.id === gameState.myId) {
+    const previousHealth = gameState.previousHealth.get(playerState.id) ??
+      playerState.health;
+    if (playerState.health < previousHealth) {
+      gameState.hitTimes.set(playerState.id, now);
+      if (playerState.id === gameState.myId) {
         effects.trigger();
         sounds.playHit(true);
       } else {
         sounds.playHit(false);
       }
     }
-    gameState.previousHealth.set(p.id, p.health);
+    gameState.previousHealth.set(playerState.id, playerState.health);
   }
 
-  gameState.players = msg.players;
+  gameState.applyPlayerStates(msg.players);
   gameState.bullets = msg.bullets;
   const liveBulletIds = new Set(msg.bullets.map((bullet) => bullet.id));
 
@@ -151,6 +170,14 @@ function handleStateUpdate(msg: ServerMessage): void {
   }
   if (msg.type === "arena") {
     handleArena(msg);
+    return;
+  }
+  if (msg.type === "player_joined") {
+    handlePlayerJoined(msg);
+    return;
+  }
+  if (msg.type === "player_left") {
+    handlePlayerLeft(msg);
     return;
   }
   if (msg.type === "game_state") {

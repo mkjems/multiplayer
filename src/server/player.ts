@@ -1,4 +1,4 @@
-import type { PlayerSnapshot } from "../shared/protocol.ts";
+import type { PlayerInfo, PlayerStateSnapshot } from "../shared/protocol.ts";
 
 const COLORS = [
   "#e74c3c",
@@ -59,13 +59,19 @@ export function createPlayer(id: string, name: string): Player {
   };
 }
 
-export function toSnapshot(player: Player): PlayerSnapshot {
+export function toPlayerInfo(player: Player): PlayerInfo {
   return {
     id: player.id,
     name: player.name,
+    color: player.color,
+  };
+}
+
+export function toSnapshot(player: Player): PlayerStateSnapshot {
+  return {
+    id: player.id,
     x: player.x,
     y: player.y,
-    color: player.color,
     health: player.health,
     energy: player.energy,
     ammo: player.ammo,

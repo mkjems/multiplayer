@@ -25,6 +25,10 @@ function isServerMessage(value: unknown): value is ServerMessage {
     case "game_joined":
       return typeof value.playerId === "string" &&
         typeof value.gameId === "string";
+    case "player_joined":
+      return isPlayerInfo(value.player);
+    case "player_left":
+      return typeof value.playerId === "string";
     case "arena":
       return Array.isArray(value.rocks) &&
         Array.isArray(value.cacti) &&
@@ -55,6 +59,13 @@ function isGameInfo(value: unknown): value is GameInfo {
     typeof value.playerCount === "number" &&
     typeof value.maxPlayers === "number" &&
     (value.status === "waiting" || value.status === "playing");
+}
+
+function isPlayerInfo(value: unknown): boolean {
+  if (!isObject(value)) return false;
+  return typeof value.id === "string" &&
+    typeof value.name === "string" &&
+    typeof value.color === "string";
 }
 
 function isObject(value: unknown): value is JsonObject {

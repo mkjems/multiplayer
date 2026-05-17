@@ -11,6 +11,8 @@ export type ClientMessage =
 export type ServerMessage =
   | { type: "lobby_state"; games: GameInfo[]; lobbyCount: number }
   | { type: "game_joined"; playerId: string; gameId: string }
+  | { type: "player_joined"; player: PlayerInfo }
+  | { type: "player_left"; playerId: string }
   | {
     type: "arena";
     rocks: RockData[];
@@ -19,7 +21,7 @@ export type ServerMessage =
   }
   | {
     type: "game_state";
-    players: PlayerSnapshot[];
+    players: PlayerStateSnapshot[];
     bullets: BulletSnapshot[];
   }
   | { type: "cactus_damaged"; cactusId: string; segmentIndex: number }
@@ -34,12 +36,16 @@ export interface GameInfo {
   status: "waiting" | "playing";
 }
 
-export interface PlayerSnapshot {
+export interface PlayerInfo {
   id: string;
   name: string;
+  color: string;
+}
+
+export interface PlayerStateSnapshot {
+  id: string;
   x: number;
   y: number;
-  color: string;
   health: number;
   energy: number;
   ammo: number;
@@ -49,6 +55,8 @@ export interface PlayerSnapshot {
   reloading: boolean;
   kills: number;
 }
+
+export type PlayerSnapshot = PlayerInfo & PlayerStateSnapshot;
 
 export interface BulletSnapshot {
   id: string;

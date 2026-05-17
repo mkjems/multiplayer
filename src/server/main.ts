@@ -3,6 +3,7 @@ import {
   createRoom,
   getArenaConfig,
   getCactiData,
+  getPlayerInfos,
   getRockData,
   getRoom,
   getRoomDiagnostics,
@@ -13,7 +14,7 @@ import {
   setArmAngle,
   shoot,
 } from "./game.ts";
-import type { ClientMessage } from "../shared/protocol.ts";
+import type { ClientMessage, ServerMessage } from "../shared/protocol.ts";
 import { handleVisitorRequest } from "./visitor.ts";
 
 // Seed some default rooms
@@ -57,6 +58,28 @@ function sendError(ws: WebSocket, message: string): void {
       ws.send(JSON.stringify({ type: "error", message }));
     }
   } catch { /* ignore */ }
+}
+
+function sendJson(ws: WebSocket, message: ServerMessage): void {
+  try {
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify(message));
+    }
+  } catch { /* ignore */ }
+}
+
+function broadcastGameRoom(
+  roomSockets: Iterable<WebSocket>,
+  message: ServerMessage,
+  exceptSocket?: WebSocket,
+): void {
+  const payload = JSON.stringify(message);
+  for (const socket of roomSockets) {
+    if (socket === exceptSocket) continue;
+    try {
+      if (socket.readyState === WebSocket.OPEN) socket.send(payload);
+    } catch { /* ignore */ }
+  }
 }
 
 function handleLobbySocket(ws: WebSocket) {
@@ -119,17 +142,24 @@ function handleGameSocket(ws: WebSocket, roomId: string) {
       }
       playerId = crypto.randomUUID();
       joinRoom(gameRoom, playerId, msg.playerName, ws);
-      ws.send(
-        JSON.stringify({ type: "game_joined", playerId, gameId: roomId }),
-      );
-      ws.send(
-        JSON.stringify({
-          type: "arena",
-          rocks: getRockData(gameRoom),
-          cacti: getCactiData(gameRoom),
-          config: getArenaConfig(),
-        }),
-      );
+      sendJson(ws, { type: "game_joined", playerId, gameId: roomId });
+      sendJson(ws, {
+        type: "arena",
+        rocks: getRockData(gameRoom),
+        cacti: getCactiData(gameRoom),
+        config: getArenaConfig(),
+      });
+      const players = getPlayerInfos(gameRoom);
+      for (const player of players) {
+        sendJson(ws, { type: "player_joined", player });
+      }
+      const joinedPlayer = players.find((player) => player.id === playerId);
+      if (joinedPlayer) {
+        broadcastGameRoom(gameRoom.sockets.values(), {
+          type: "player_joined",
+          player: joinedPlayer,
+        }, ws);
+      }
       broadcastLobby();
     } else if (msg.type === "move" && playerId) {
       applyInput(gameRoom, playerId, msg.dx, msg.dy);
@@ -140,6 +170,10 @@ function handleGameSocket(ws: WebSocket, roomId: string) {
     } else if (msg.type === "reload" && playerId) {
       reloadPlayer(gameRoom, playerId);
     } else if (msg.type === "leave_game" && playerId) {
+      broadcastGameRoom(gameRoom.sockets.values(), {
+        type: "player_left",
+        playerId,
+      }, ws);
       leaveJoinedPlayer();
     }
   };
@@ -147,6 +181,12 @@ function handleGameSocket(ws: WebSocket, roomId: string) {
   ws.onerror = () => {/* ignore */};
 
   ws.onclose = () => {
+    if (playerId) {
+      broadcastGameRoom(gameRoom.sockets.values(), {
+        type: "player_left",
+        playerId,
+      }, ws);
+    }
     leaveJoinedPlayer();
   };
 }

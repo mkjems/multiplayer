@@ -16,7 +16,9 @@ import type {
   ArenaConfig,
   BulletSnapshot,
   CactusData,
+  PlayerInfo,
   PlayerSnapshot,
+  PlayerStateSnapshot,
   RockData,
   ServerMessage,
 } from "../../shared/protocol";
@@ -24,6 +26,7 @@ import type {
 export interface GameState {
   myId: string | null;
   players: PlayerSnapshot[];
+  playerInfos: Map<string, PlayerInfo>;
   bullets: BulletSnapshot[];
   rocks: RockData[];
   cacti: CactusData[];
@@ -38,8 +41,26 @@ export interface GameState {
   bulletTrails: Map<string, { x: number; y: number }[]>;
   previousCactiSegments: Map<string, boolean[]>;
   updateFromServerMessage(msg: ServerMessage): void;
+  applyPlayerStates(playerStates: PlayerStateSnapshot[]): void;
   getLocalPlayer(): PlayerSnapshot | undefined;
   reset(): void;
+}
+
+const UNKNOWN_PLAYER_NAME = "Unknown";
+const UNKNOWN_PLAYER_COLOR = "#ffffff";
+
+function mergePlayerState(
+  playerInfo: PlayerInfo | undefined,
+  playerState: PlayerStateSnapshot,
+): PlayerSnapshot {
+  return {
+    ...(playerInfo ?? {
+      id: playerState.id,
+      name: UNKNOWN_PLAYER_NAME,
+      color: UNKNOWN_PLAYER_COLOR,
+    }),
+    ...playerState,
+  };
 }
 
 /**
@@ -51,6 +72,7 @@ export function createGameState(): GameState {
     // Player and entity data
     myId: null,
     players: [],
+    playerInfos: new Map<string, PlayerInfo>(),
     bullets: [],
     rocks: [],
     cacti: [],
@@ -83,8 +105,13 @@ export function createGameState(): GameState {
     // Apply server state update to game state
     updateFromServerMessage(msg: ServerMessage): void {
       if (msg.type === "game_state") {
-        this.players = msg.players;
+        this.applyPlayerStates(msg.players);
         this.bullets = msg.bullets;
+      } else if (msg.type === "player_joined") {
+        this.playerInfos.set(msg.player.id, msg.player);
+      } else if (msg.type === "player_left") {
+        this.playerInfos.delete(msg.playerId);
+        this.players = this.players.filter((player) => player.id !== msg.playerId);
       } else if (msg.type === "arena") {
         this.rocks = msg.rocks;
         this.cacti = msg.cacti;
@@ -103,6 +130,12 @@ export function createGameState(): GameState {
       }
     },
 
+    applyPlayerStates(playerStates: PlayerStateSnapshot[]): void {
+      this.players = playerStates.map((playerState) =>
+        mergePlayerState(this.playerInfos.get(playerState.id), playerState)
+      );
+    },
+
     // Get current player
     getLocalPlayer(): PlayerSnapshot | undefined {
       return this.players.find((p) => p.id === this.myId);
@@ -112,6 +145,7 @@ export function createGameState(): GameState {
     reset(): void {
       this.myId = null;
       this.players = [];
+      this.playerInfos.clear();
       this.bullets = [];
       this.rocks = [];
       this.cacti = [];

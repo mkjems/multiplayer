@@ -15,3 +15,6 @@
   — Recommends a simple uniform grid for static arena collision candidates
 - [Sprint 21 static arena cache spike](project_sprint21_static_arena_cache_spike.md)
   — Recommends measuring viewport culling before adding a rock-only render cache
+- [Sprint 22 protocol and interpolation notes](project_sprint22_protocol_and_interpolation.md)
+  — Split player identity from recurring state and deferred interpolation until
+  sequence timing is added

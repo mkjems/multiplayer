@@ -29,13 +29,19 @@ export type ServerMessage = {
     playerId: string;
     gameId: string;
 } | {
+    type: "player_joined";
+    player: PlayerInfo;
+} | {
+    type: "player_left";
+    playerId: string;
+} | {
     type: "arena";
     rocks: RockData[];
     cacti: CactusData[];
     config: ArenaConfig;
 } | {
     type: "game_state";
-    players: PlayerSnapshot[];
+    players: PlayerStateSnapshot[];
     bullets: BulletSnapshot[];
 } | {
     type: "cactus_damaged";
@@ -55,12 +61,15 @@ export interface GameInfo {
     maxPlayers: number;
     status: "waiting" | "playing";
 }
-export interface PlayerSnapshot {
+export interface PlayerInfo {
     id: string;
     name: string;
+    color: string;
+}
+export interface PlayerStateSnapshot {
+    id: string;
     x: number;
     y: number;
-    color: string;
     health: number;
     energy: number;
     ammo: number;
@@ -70,6 +79,7 @@ export interface PlayerSnapshot {
     reloading: boolean;
     kills: number;
 }
+export type PlayerSnapshot = PlayerInfo & PlayerStateSnapshot;
 export interface BulletSnapshot {
     id: string;
     x: number;

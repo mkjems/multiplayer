@@ -1,10 +1,16 @@
-import { createPlayer, type Player, toSnapshot } from "./player.ts";
+import {
+  createPlayer,
+  type Player,
+  toPlayerInfo,
+  toSnapshot,
+} from "./player.ts";
 import type {
   ArenaConfig,
   BulletSnapshot,
   CactusData,
   GameInfo,
-  PlayerSnapshot,
+  PlayerInfo,
+  PlayerStateSnapshot,
   RockData,
   ServerMessage,
 } from "../shared/protocol.ts";
@@ -319,6 +325,10 @@ export function getCactiData(room: GameRoom): CactusData[] {
     y: c.y,
     segments: [...c.segments],
   }));
+}
+
+export function getPlayerInfos(room: GameRoom): PlayerInfo[] {
+  return [...room.players.values()].map(toPlayerInfo);
 }
 
 export function getArenaConfig(): ArenaConfig {
@@ -1031,7 +1041,9 @@ function tick(room: GameRoom) {
     }
   }
 
-  const players: PlayerSnapshot[] = [...room.players.values()].map(toSnapshot);
+  const players: PlayerStateSnapshot[] = [...room.players.values()].map(
+    toSnapshot,
+  );
   const bullets: BulletSnapshot[] = room.bullets.map((b) => ({
     id: b.id,
     x: b.x,
