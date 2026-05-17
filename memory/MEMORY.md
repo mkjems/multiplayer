@@ -13,3 +13,5 @@
   full-screen shipped and tested on real iPhone
 - [Sprint 20 spatial partitioning spike](project_sprint20_spatial_partitioning_spike.md)
   — Recommends a simple uniform grid for static arena collision candidates
+- [Sprint 21 static arena cache spike](project_sprint21_static_arena_cache_spike.md)
+  — Recommends measuring viewport culling before adding a rock-only render cache

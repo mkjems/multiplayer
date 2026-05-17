@@ -87,22 +87,15 @@ function handleGameState(
 
   gameState.players = msg.players;
   gameState.bullets = msg.bullets;
+  const liveBulletIds = new Set(msg.bullets.map((bullet) => bullet.id));
 
   for (const b of msg.bullets) {
-    const prev = gameState.previousBounces.get(b.id) ?? 0;
-    if (b.bounces > prev) sounds.playRicochet();
+    const previousBounceCount = gameState.previousBounces.get(b.id) ?? 0;
+    if (b.bounces > previousBounceCount) sounds.playRicochet();
     gameState.previousBounces.set(b.id, b.bounces);
-  }
-  for (const id of gameState.previousBounces.keys()) {
-    if (!msg.bullets.some((b) => b.id === id)) {
-      gameState.previousBounces.delete(id);
-    }
-  }
 
-  for (const b of msg.bullets) {
-    const prevBounces = gameState.previousBounces.get(b.id) ?? 0;
     const trail = gameState.bulletTrails.get(b.id) ?? [];
-    if (b.bounces > prevBounces) {
+    if (b.bounces > previousBounceCount) {
       gameState.bulletTrails.set(b.id, [{ x: b.x, y: b.y }]);
     } else {
       trail.push({ x: b.x, y: b.y });
@@ -110,8 +103,14 @@ function handleGameState(
       gameState.bulletTrails.set(b.id, trail);
     }
   }
+
+  for (const id of gameState.previousBounces.keys()) {
+    if (!liveBulletIds.has(id)) {
+      gameState.previousBounces.delete(id);
+    }
+  }
   for (const id of gameState.bulletTrails.keys()) {
-    if (!msg.bullets.some((b) => b.id === id)) {
+    if (!liveBulletIds.has(id)) {
       gameState.bulletTrails.delete(id);
     }
   }

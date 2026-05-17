@@ -1,26 +1,5 @@
 # TODO
 
-## Sprint 21
-- Performance issue: Add rolling graphs to the diagnostics dashboard.
-  - Store diagnostics history locally in the browser tab; no extra server persistence needed.
-  - Keep a bounded one-hour rolling window by default, around 1800 samples at a 2 second polling interval.
-  - Plot small per-room graphs for average tick time, game_state payload size, socket buffered bytes, skipped snapshots, player count, and bullet count.
-  - Keep the current dashboard cards for current values and use graphs to show trends over time.
-
-- Performance issue: Add client viewport culling for rendering.
-  - Draw only rocks, cacti, bullets, and players that intersect the visible camera area.
-  - Keep minimap rendering independent from viewport culling.
-  - Measure canvas render time before and after.
-
-- Performance spike: Cache static arena rendering.
-  - Investigate rendering rocks and static cactus bases to an offscreen canvas or cached layer.
-  - Redraw the cached layer each frame with camera offset instead of rebuilding all paths.
-  - Confirm this helps on mobile before committing to the approach.
-
-- Performance issue: Optimize bullet bookkeeping on the client.
-  - Replace repeated msg.bullets.some(...) cleanup scans with a Set of live bullet ids.
-  - Keep bullet trail and bounce tracking cleanup linear in bullet count.
-
 ## Sprint 22
 - Performance spike: Design a smaller network protocol.
   - Define the smallest recurring game_state payload needed for responsive play.
@@ -71,7 +50,7 @@ If the phone goes to sleep/energy saving mode ( black screen ) and you wakes up 
 
 - First sound is always a bit lagging. Can we fix that? Sound we have a short game intro melody?
 - Cacti should have one or two arms and variation in height
-- Use real artwork for character animation. vector or sprites
+- Use real artwork for character animation sprites
 - Use real sounds for effects 
 - Make overlay where user can read about the controls of the game.
 - Should we have a walking sound?

@@ -17,6 +17,13 @@ interface InputProcessor {
   processInput(): void;
 }
 
+interface Bounds {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
 export interface Renderer {
   render(inputProcessor: InputProcessor): void;
   drawDisconnected(): void;
@@ -40,6 +47,64 @@ export function createRenderer(
   let cameraX = 0;
   let cameraY = 0;
   let cameraInitialized = false;
+
+  function intersectsViewport(bounds: Bounds, viewport: Bounds): boolean {
+    return bounds.right >= viewport.left &&
+      bounds.left <= viewport.right &&
+      bounds.bottom >= viewport.top &&
+      bounds.top <= viewport.bottom;
+  }
+
+  function getRockBounds(rock: RockData): Bounds {
+    let left = Infinity;
+    let top = Infinity;
+    let right = -Infinity;
+    let bottom = -Infinity;
+    for (const vertex of rock.vertices) {
+      left = Math.min(left, vertex.x);
+      top = Math.min(top, vertex.y);
+      right = Math.max(right, vertex.x);
+      bottom = Math.max(bottom, vertex.y);
+    }
+    return { left, top, right, bottom };
+  }
+
+  function getCactusBounds(cactus: CactusData): Bounds {
+    const {
+      cactusHalfWidth,
+      cactusSegmentStride,
+      cactusSegmentWidth,
+      cactusSegmentHeight,
+    } = gameState.arenaConfig;
+    return {
+      left: cactus.x - cactusHalfWidth,
+      top: cactus.y,
+      right: cactus.x - cactusHalfWidth + cactusSegmentWidth,
+      bottom: cactus.y +
+        (cactus.segments.length - 1) * cactusSegmentStride +
+        cactusSegmentHeight,
+    };
+  }
+
+  function getBulletBounds(bullet: BulletSnapshot): Bounds {
+    const radius = 12;
+    return {
+      left: bullet.x - radius,
+      top: bullet.y - radius,
+      right: bullet.x + radius,
+      bottom: bullet.y + radius,
+    };
+  }
+
+  function getPlayerBounds(player: PlayerSnapshot): Bounds {
+    const radius = 48;
+    return {
+      left: player.x - radius,
+      top: player.y - radius,
+      right: player.x + radius,
+      bottom: player.y + radius,
+    };
+  }
 
   // Draw a rock
   function drawRock(rock: RockData): void {
@@ -407,11 +472,37 @@ export function createRenderer(
       // Camera transform: shift world coordinates to screen space
       ctx.save();
       ctx.translate(-cameraX, -cameraY);
-      for (const rock of gameState.rocks) drawRock(rock);
-      for (const cactus of gameState.cacti) drawCactus(cactus);
-      for (const b of gameState.bullets) drawBulletTrail(b);
-      for (const b of gameState.bullets) drawBullet(b);
-      for (const p of gameState.players) drawPlayer(p);
+      const worldViewport = {
+        left: cameraX,
+        top: cameraY,
+        right: cameraX + viewportWidth,
+        bottom: cameraY + viewportHeight,
+      };
+      for (const rock of gameState.rocks) {
+        if (intersectsViewport(getRockBounds(rock), worldViewport)) {
+          drawRock(rock);
+        }
+      }
+      for (const cactus of gameState.cacti) {
+        if (intersectsViewport(getCactusBounds(cactus), worldViewport)) {
+          drawCactus(cactus);
+        }
+      }
+      for (const b of gameState.bullets) {
+        if (intersectsViewport(getBulletBounds(b), worldViewport)) {
+          drawBulletTrail(b);
+        }
+      }
+      for (const b of gameState.bullets) {
+        if (intersectsViewport(getBulletBounds(b), worldViewport)) {
+          drawBullet(b);
+        }
+      }
+      for (const p of gameState.players) {
+        if (intersectsViewport(getPlayerBounds(p), worldViewport)) {
+          drawPlayer(p);
+        }
+      }
       ctx.restore();
 
       drawHUD();
