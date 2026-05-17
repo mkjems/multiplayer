@@ -1,7 +1,7 @@
 # TODO
 
 ## Sprint 23
-- Do a code quality pass. Is the code readable understandable, well organized into modules with interfaces, well structured. Easy to maintain.
+- Do a code quality pass. Is the code readable understandable, well organized into modules and  interfaces. Is it well structured. Easy to maintain and expand.
 - The src/server/game.ts file is more than a 1000 lines for example, should we break it up into modules? Does that make sense?
 
 ## Backlog 
