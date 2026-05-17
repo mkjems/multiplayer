@@ -21,8 +21,8 @@ export type ServerMessage =
     type: "game_state";
     players: PlayerSnapshot[];
     bullets: BulletSnapshot[];
-    cacti: CactusData[];
   }
+  | { type: "cactus_damaged"; cactusId: string; segmentIndex: number }
   | { type: "game_over"; winnerName: string }
   | { type: "error"; message: string };
 

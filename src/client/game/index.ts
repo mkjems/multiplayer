@@ -56,6 +56,10 @@ function handleArena(msg: Extract<ServerMessage, { type: "arena" }>): void {
   gameState.rocks = msg.rocks;
   gameState.cacti = msg.cacti;
   gameState.arenaConfig = { ...msg.config };
+  gameState.previousCactiSegments.clear();
+  for (const cactus of msg.cacti) {
+    gameState.previousCactiSegments.set(cactus.id, [...cactus.segments]);
+  }
 }
 
 function handleGameState(
@@ -112,26 +116,33 @@ function handleGameState(
     }
   }
 
-  for (const cactus of msg.cacti) {
-    const prev = gameState.previousCactiSegments.get(cactus.id);
-    if (prev) {
-      for (let i = 0; i < cactus.segments.length; i++) {
-        if (prev[i] && !cactus.segments[i]) {
-          sounds.playCactusHit();
-          break;
-        }
-      }
-    }
-    gameState.previousCactiSegments.set(cactus.id, [...cactus.segments]);
-  }
-  gameState.cacti = msg.cacti;
-
   countEl.textContent = `${gameState.players.length} player${
     gameState.players.length !== 1 ? "s" : ""
   }`;
 
   const me = gameState.getLocalPlayer();
   if (me) gameState.localFacing = me.facing;
+}
+
+function handleCactusDamaged(
+  msg: Extract<ServerMessage, { type: "cactus_damaged" }>,
+): void {
+  const cactus = gameState.cacti.find((candidate) =>
+    candidate.id === msg.cactusId
+  );
+  if (
+    !cactus ||
+    msg.segmentIndex < 0 ||
+    msg.segmentIndex >= cactus.segments.length
+  ) {
+    return;
+  }
+
+  if (cactus.segments[msg.segmentIndex]) {
+    cactus.segments[msg.segmentIndex] = false;
+    gameState.previousCactiSegments.set(cactus.id, [...cactus.segments]);
+    sounds.playCactusHit();
+  }
 }
 
 function handleStateUpdate(msg: ServerMessage): void {
@@ -145,6 +156,10 @@ function handleStateUpdate(msg: ServerMessage): void {
   }
   if (msg.type === "game_state") {
     handleGameState(msg);
+    return;
+  }
+  if (msg.type === "cactus_damaged") {
+    handleCactusDamaged(msg);
   }
 }
 

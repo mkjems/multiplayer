@@ -85,11 +85,21 @@ export function createGameState(): GameState {
       if (msg.type === "game_state") {
         this.players = msg.players;
         this.bullets = msg.bullets;
-        this.cacti = msg.cacti;
       } else if (msg.type === "arena") {
         this.rocks = msg.rocks;
         this.cacti = msg.cacti;
         if (msg.config) this.arenaConfig = { ...msg.config };
+      } else if (msg.type === "cactus_damaged") {
+        const cactus = this.cacti.find((candidate) =>
+          candidate.id === msg.cactusId
+        );
+        if (
+          cactus &&
+          msg.segmentIndex >= 0 &&
+          msg.segmentIndex < cactus.segments.length
+        ) {
+          cactus.segments[msg.segmentIndex] = false;
+        }
       }
     },
 

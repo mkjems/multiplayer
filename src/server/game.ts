@@ -6,6 +6,7 @@ import type {
   GameInfo,
   PlayerSnapshot,
   RockData,
+  ServerMessage,
 } from "../shared/protocol.ts";
 
 const MAX_SPEED = 10;
@@ -14,6 +15,7 @@ const IDLE_DRAG = 0;
 const STOP_SPEED = 0.05;
 const BULLET_SPEED = 22;
 const TICK_MS = 50;
+const MAX_SOCKET_BUFFERED_BYTES = 256 * 1024;
 const PLAYER_RADIUS = 16;
 const BULLET_RADIUS = 4;
 const SHOOT_COOL_DOWN = 400;
@@ -98,6 +100,11 @@ interface CactusSegmentHit {
   segmentIndex: number;
   t: number;
 }
+
+type CactusDamagedMessage = Extract<
+  ServerMessage,
+  { type: "cactus_damaged" }
+>;
 
 export interface GameRoom {
   id: string;
@@ -275,8 +282,26 @@ export function createRoom(id: string, name: string, maxPlayers = 8): GameRoom {
     interval: null,
   };
   rooms.set(id, room);
-  room.interval = setInterval(() => tick(room), TICK_MS);
   return room;
+}
+
+function startRoomInterval(room: GameRoom): void {
+  if (room.interval !== null) return;
+  room.interval = setInterval(() => tick(room), TICK_MS);
+}
+
+function stopRoomInterval(room: GameRoom): void {
+  if (room.interval === null) return;
+  clearInterval(room.interval);
+  room.interval = null;
+}
+
+function resetRoomArena(room: GameRoom): void {
+  room.gameOver = false;
+  const { rocks, cacti } = generateArena();
+  room.rocks = rocks;
+  room.cacti = cacti;
+  room.bullets = [];
 }
 
 export function getRoom(id: string): GameRoom | undefined {
@@ -332,23 +357,22 @@ export function joinRoom(
   playerName: string,
   socket: WebSocket,
 ) {
+  const wasEmpty = room.players.size === 0;
   const player = createPlayer(playerId, playerName);
   const spawn = findSafeSpawnPosition(room);
   player.x = spawn.x;
   player.y = spawn.y;
   room.players.set(playerId, player);
   room.sockets.set(playerId, socket);
+  if (wasEmpty) startRoomInterval(room);
 }
 
 export function leaveRoom(room: GameRoom, playerId: string) {
   room.players.delete(playerId);
   room.sockets.delete(playerId);
   if (room.players.size === 0) {
-    room.gameOver = false;
-    const { rocks, cacti } = generateArena();
-    room.rocks = rocks;
-    room.cacti = cacti;
-    room.bullets = [];
+    stopRoomInterval(room);
+    resetRoomArena(room);
   }
 }
 
@@ -404,10 +428,21 @@ export function reloadPlayer(room: GameRoom, playerId: string) {
   player.reloadStart = Date.now();
 }
 
-function broadcast(room: GameRoom, msg: string) {
+function broadcast(
+  room: GameRoom,
+  msg: string,
+  options: { dropIfBackedUp: boolean } = { dropIfBackedUp: false },
+) {
   for (const [id, socket] of room.sockets) {
     try {
-      if (socket.readyState === WebSocket.OPEN) socket.send(msg);
+      if (socket.readyState !== WebSocket.OPEN) continue;
+      if (
+        options.dropIfBackedUp &&
+        socket.bufferedAmount > MAX_SOCKET_BUFFERED_BYTES
+      ) {
+        continue;
+      }
+      socket.send(msg);
     } catch {
       leaveRoom(room, id);
     }
@@ -718,6 +753,7 @@ function updatePlayerEnergy(player: Player, movedDistance: number): void {
 
 function tick(room: GameRoom) {
   const now = Date.now();
+  const cactusDamagedMessages: CactusDamagedMessage[] = [];
 
   // Move alive players
   for (const player of room.players.values()) {
@@ -813,6 +849,11 @@ function tick(room: GameRoom) {
       );
       if (cactusHit !== null) {
         cactusHit.cactus.segments[cactusHit.segmentIndex] = false;
+        cactusDamagedMessages.push({
+          type: "cactus_damaged",
+          cactusId: cactusHit.cactus.id,
+          segmentIndex: cactusHit.segmentIndex,
+        });
         alive = false;
       }
     }
@@ -866,14 +907,12 @@ function tick(room: GameRoom) {
     y: b.y,
     bounces: b.bounces,
   }));
-  const cacti: CactusData[] = room.cacti.map((c) => ({
-    id: c.id,
-    x: c.x,
-    y: c.y,
-    segments: [...c.segments],
-  }));
+  for (const cactusDamagedMessage of cactusDamagedMessages) {
+    broadcast(room, JSON.stringify(cactusDamagedMessage));
+  }
   broadcast(
     room,
-    JSON.stringify({ type: "game_state", players, bullets, cacti }),
+    JSON.stringify({ type: "game_state", players, bullets }),
+    { dropIfBackedUp: true },
   );
 }

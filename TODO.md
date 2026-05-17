@@ -1,21 +1,5 @@
 # TODO
 
-## Sprint 19
-- Performance issue: Stop sending full cactus state every game tick.
-  - Move cactus positions/static geometry to the initial arena payload only.
-  - Send cactus damage as small deltas, such as cactus id + segment index.
-  - Keep the client-side cactus state authoritative from the arena snapshot plus damage events.
-
-- Performance issue: Stop ticking empty rooms.
-  - Start a room simulation interval when the first player joins.
-  - Stop the interval when the last player leaves.
-  - Reset room state safely without leaving stale timers running.
-
-- Performance issue: Add WebSocket send backpressure handling.
-  - Check socket bufferedAmount before sending game_state snapshots.
-  - Drop or coalesce outdated snapshots for slow clients.
-  - Avoid letting one slow connection build an ever-growing send queue.
-
 ## Sprint 20
 - Performance issue: Add server metrics for real gameplay profiling.
   - Track per-room tick duration, player count, bullet count, payload size, and socket bufferedAmount.

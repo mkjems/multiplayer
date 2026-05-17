@@ -31,8 +31,10 @@ function isServerMessage(value: unknown): value is ServerMessage {
         isObject(value.config);
     case "game_state":
       return Array.isArray(value.players) &&
-        Array.isArray(value.bullets) &&
-        Array.isArray(value.cacti);
+        Array.isArray(value.bullets);
+    case "cactus_damaged":
+      return typeof value.cactusId === "string" &&
+        typeof value.segmentIndex === "number";
     case "game_over":
       return typeof value.winnerName === "string";
     case "error":
