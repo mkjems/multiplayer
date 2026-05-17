@@ -14,7 +14,8 @@ import {
   setArmAngle,
   shoot,
 } from "./game.ts";
-import type { ClientMessage, ServerMessage } from "../shared/protocol.ts";
+import type { ServerMessage } from "../shared/protocol.ts";
+import { parseClientMessage } from "../shared/protocol-guards.ts";
 import { handleVisitorRequest } from "./visitor.ts";
 
 // Seed some default rooms
@@ -90,10 +91,8 @@ function handleLobbySocket(ws: WebSocket) {
   broadcastLobby();
 
   ws.onmessage = (e) => {
-    try {
-      const msg = JSON.parse(e.data);
-      if (msg.type === "ping") ws.send(JSON.stringify({ type: "pong" }));
-    } catch { /* ignore */ }
+    const msg = parseClientMessage(e.data);
+    if (msg?.type === "ping") ws.send(JSON.stringify({ type: "pong" }));
   };
 
   ws.onerror = () => {
@@ -124,12 +123,8 @@ function handleGameSocket(ws: WebSocket, roomId: string) {
   }
 
   ws.onmessage = (e) => {
-    let msg: ClientMessage;
-    try {
-      msg = JSON.parse(e.data);
-    } catch {
-      return;
-    }
+    const msg = parseClientMessage(e.data);
+    if (!msg) return;
 
     if (msg.type === "join_game") {
       if (playerId) {

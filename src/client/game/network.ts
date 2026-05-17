@@ -2,7 +2,7 @@
 // Network Management
 // ═════════════════════════════════════════════════════════════════════════════
 
-import { parseServerMessage } from "../protocol-guards.ts";
+import { parseServerMessage } from "../../shared/protocol-guards";
 import type { ClientMessage, ServerMessage } from "../../shared/protocol";
 
 export interface NetworkManager {

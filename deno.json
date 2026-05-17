@@ -8,9 +8,9 @@
     "client:typecheck": "deno run -A npm:typescript/tsc --project src/client/tsconfig.json --noEmit",
     "start": "deno task build && deno run --allow-net --allow-read --allow-env src/server/main.ts",
     "dev": "deno task build && (deno task client:watch & deno run --allow-net --allow-read --allow-env --watch src/server/main.ts)",
-    "fmt": "deno fmt src/",
-    "lint": "deno lint src/server",
-    "test": "deno test src/server",
+    "fmt": "deno fmt src/ && deno fmt --no-config src/shared",
+    "lint": "deno lint src/server && deno lint --no-config src/shared",
+    "test": "deno test src/server && deno test --no-config src/shared",
     "check": "deno check src/server/main.ts && deno task client:typecheck"
   },
   "lint": {

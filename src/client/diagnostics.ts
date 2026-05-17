@@ -1,36 +1,7 @@
-interface TickDurationMetrics {
-  lastMilliseconds: number;
-  averageMilliseconds: number;
-  maxMilliseconds: number;
-}
-
-interface NetworkMetrics {
-  lastGameStateBytes: number;
-  totalGameStateBytes: number;
-  lastGameStateRecipientCount: number;
-  skippedGameStateCount: number;
-  lastMaxBufferedBytes: number;
-  maxBufferedBytes: number;
-}
-
-interface RoomDiagnostics {
-  id: string;
-  name: string;
-  active: boolean;
-  playerCount: number;
-  socketCount: number;
-  bulletCount: number;
-  rockCount: number;
-  cactusCount: number;
-  tickCount: number;
-  tickDurationMilliseconds: TickDurationMetrics;
-  network: NetworkMetrics;
-}
-
-interface DiagnosticsResponse {
-  generatedAt: string;
-  rooms: RoomDiagnostics[];
-}
+import type {
+  DiagnosticsResponse,
+  RoomDiagnostics,
+} from "../shared/diagnostics";
 
 interface RoomHistorySample {
   sampledAtMilliseconds: number;

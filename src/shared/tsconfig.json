@@ -6,8 +6,10 @@
     "composite": true,
     "declaration": true,
     "emitDeclarationOnly": true,
+    "allowImportingTsExtensions": true,
     "rootDir": ".",
     "outDir": "../../dist/shared"
   },
-  "include": ["./**/*.ts"]
+  "include": ["./**/*.ts"],
+  "exclude": ["./**/*_test.ts"]
 }

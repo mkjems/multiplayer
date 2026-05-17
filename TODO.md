@@ -1,14 +1,5 @@
 # TODO
 
-
-
-## Sprint 24
-- Sprint goal: make protocol and diagnostics contracts strongly typed across client and server.
-- Add a shared server-side protocol parser/guard for `ClientMessage`. `src/server/main.ts` currently uses raw `JSON.parse` for WebSocket payloads and then trusts `msg.type`, while the client has `parseServerMessage`. A typed `parseClientMessage` would make message handling safer and more IDE-navigable.
-- Strengthen `src/client/protocol-guards.ts`. The current guard only shallow-checks several messages (`arena`, `game_state`) and accepts arrays without validating item shapes, so malformed protocol data can still enter typed client state.
-- Share diagnostics response types instead of duplicating them. `TickDurationMetrics`, `NetworkMetrics`, and `RoomDiagnostics` are defined separately in `src/server/game.ts` and `src/client/diagnostics.ts`; put the contract in a shared module so rename/find-references works across the diagnostics boundary.
-- Keep shared protocol APIs explicit and easy to navigate with Find All References / Go To Definition.
-
 ## Sprint 25
 - Sprint goal: split server game code into clear modules without changing behavior.
 - Split `src/server/game.ts` into explicit, strongly typed modules. It currently combines room lifecycle, arena generation, collision geometry, player movement/energy, bullet simulation, win-condition handling, broadcasting, and metrics. Suggested first split:

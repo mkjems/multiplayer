@@ -1,5 +1,5 @@
 import type { ClientMessage, GameInfo } from "../shared/protocol";
-import { parseServerMessage } from "./protocol-guards.ts";
+import { parseServerMessage } from "../shared/protocol-guards";
 
 const playerName = sessionStorage.getItem("playerName");
 if (!playerName) {

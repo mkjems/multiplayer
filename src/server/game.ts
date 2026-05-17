@@ -14,6 +14,11 @@ import type {
   RockData,
   ServerMessage,
 } from "../shared/protocol.ts";
+import type {
+  NetworkMetrics,
+  RoomDiagnostics,
+  TickDurationMetrics,
+} from "../shared/diagnostics.ts";
 
 const MAX_SPEED = 10;
 const ACCELERATION = 1;
@@ -108,21 +113,6 @@ interface CactusSegmentHit {
   t: number;
 }
 
-interface TickDurationMetrics {
-  lastMilliseconds: number;
-  averageMilliseconds: number;
-  maxMilliseconds: number;
-}
-
-interface NetworkMetrics {
-  lastGameStateBytes: number;
-  totalGameStateBytes: number;
-  lastGameStateRecipientCount: number;
-  skippedGameStateCount: number;
-  lastMaxBufferedBytes: number;
-  maxBufferedBytes: number;
-}
-
 interface RoomPerformanceMetrics {
   tickCount: number;
   tickDuration: TickDurationMetrics;
@@ -152,20 +142,6 @@ export interface GameRoom {
   gameOver: boolean;
   interval: number | null;
   metrics: RoomPerformanceMetrics;
-}
-
-export interface RoomDiagnostics {
-  id: string;
-  name: string;
-  active: boolean;
-  playerCount: number;
-  socketCount: number;
-  bulletCount: number;
-  rockCount: number;
-  cactusCount: number;
-  tickCount: number;
-  tickDurationMilliseconds: TickDurationMetrics;
-  network: NetworkMetrics;
 }
 
 const rooms = new Map<string, GameRoom>();
