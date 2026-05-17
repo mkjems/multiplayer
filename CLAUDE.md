@@ -47,4 +47,5 @@ Pixel art retro cowboy shooting game. Players join rooms via a lobby and fight i
 
 # User reception
 
-So far the users who have tried this game have been underwhelmed. I think we need to add more interesting artwork to make it interesting to play
+So far the users who have tried this game have been moderately positive. Especially among the very young, playing with their parents
+The introduction of energy changes the dynamics of the game to the better.
