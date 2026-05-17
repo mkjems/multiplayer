@@ -1,19 +1,15 @@
 # TODO
 
-
 ## Sprint 28
-- Sprint goal: tidy DOM rendering and UI construction.
-- Prefer DOM-building helpers over HTML string rendering in `src/client/lobby.ts`, `src/client/diagnostics.ts`, and parts of `src/client/game/touch-controls.ts`. Current template strings rely on manual escaping and `dataset.id!`; explicit elements/events would be safer and easier to refactor.
-- Remove non-null assertions like `dataset.id!` where small typed helpers would make intent clearer.
-- Keep user-visible behavior the same while improving static navigability.
+
 
 ## Backlog 
 - Show the ammo under the character.
-- Do we need a router for our server or is it more performant without one?
+
 - When you get low energy (<20%) you should start to move more slowly and the speed should decrease as you loose more energy. But even if you have 0% you should still be able to move very slowly.
 - Integrate chatGPT API to do experiments.
-- Make the diagnostics graphs bigger and have lines and numbers on the y axis.   
 
+- Switch to a sprite for the player character
 
 ## Boring Bugs
 - Performance bug: Stale game_over timeout may fire after a room resets.
@@ -22,7 +18,7 @@
   - Verify new players cannot receive an old winner message.
 
 - Bug. When you have added the Progressive Web App to the home screen and you are playing a game. 
-If the phone goes to sleep/energy saving mode ( black screen ) and you wakes up again, then  the server connection is not restored and the player can not move. only move the arm will move
+    If the phone goes to sleep/energy saving mode ( black screen ) and you wakes up again, then  the server connection is not restored and the player can not move. only move the arm will move
 - When all players are dead everyone should return to the lobby. (If a sole player shoot him or her self)
 - Gun should also be part of collision geometry. Mussel should not poke through rock/cacti.
 - In game. For some reason the sound for the first shot is lagging way more than the following shots
@@ -33,7 +29,6 @@ If the phone goes to sleep/energy saving mode ( black screen ) and you wakes up 
 - Steroids pills that can be found that give more energy for a period of time.
 - Make it easier to change the name of your character
 
-- Switch to a sprite for the player character
 - Make it possible to draw your own character. Allow upload of an image of a child's drawing, send the drawing to chatGPT and ask it to make a sprite sheet from it.
     post process the sprites to make sure it is transparent and the right size. Then use that sprite for the character.
     Created sprites should be saved for reuse.
@@ -47,3 +42,7 @@ If the phone goes to sleep/energy saving mode ( black screen ) and you wakes up 
 - Should we have a walking sound?
 - When new players join character should be placed as far away for the other players as possible but 30px from the edge 
 - Add some testing with playwright and a few canvas smoke tests.
+
+- Make the diagnostics graphs bigger and have lines and numbers on the x and y axis.   
+
+- Do we need a router for our server or is it more performant without one?
