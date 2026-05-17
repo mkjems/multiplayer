@@ -1,14 +1,18 @@
 # TODO
 
+## Sprint 23
+- Do a code quality pass. Is the code readable understandable, well organized into modules with interfaces, well structured. Easy to maintain.
+- The src/server/game.ts file is more than a 1000 lines for example, should we break it up into modules? Does that make sense?
+
 ## Backlog 
-- Plot the diagnostics data as graphs.   
-- Do we need a router for our server or is it more performant without one?
 - Show the ammo under the character.
+- Do we need a router for our server or is it more performant without one?
 - When you get low energy (<20%) you should start to move more slowly and the speed should decrease as you loose more energy. But even if you have 0% you should still be able to move very slowly.
-- Integrate chatGPT to do experiments.
+- Integrate chatGPT API to do experiments.
+- Make the diagnostics graphs bigger and have lines and numbers on the y axis.   
 
 
-## Bugs
+## Boring Bugs
 - Performance bug: Stale game_over timeout may fire after a room resets.
   - Store pending game_over timeout ids per room.
   - Cancel them when a room becomes empty or restarts.
@@ -26,6 +30,7 @@ If the phone goes to sleep/energy saving mode ( black screen ) and you wakes up 
 - Steroids pills that can be found that give more energy for a period of time.
 - Make it easier to change the name of your character
 
+- Switch to a sprite for the player character
 - Make it possible to draw your own character. Allow upload of an image of a child's drawing, send the drawing to chatGPT and ask it to make a sprite sheet from it.
     post process the sprites to make sure it is transparent and the right size. Then use that sprite for the character.
     Created sprites should be saved for reuse.
@@ -34,7 +39,6 @@ If the phone goes to sleep/energy saving mode ( black screen ) and you wakes up 
 
 - First sound is always a bit lagging. Can we fix that? Sound we have a short game intro melody?
 - Cacti should have one or two arms and variation in height
-- Use real artwork for character animation sprites
 - Use real sounds for effects 
 - Make overlay where user can read about the controls of the game.
 - Should we have a walking sound?
