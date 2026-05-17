@@ -1,12 +1,6 @@
 # TODO
 
 
-## Sprint 27
-- Sprint goal: split rendering into smaller client modules.
-- Break up `src/client/game/render.ts` after the server cleanup. At 530 lines it is still manageable, but it mixes camera control, viewport culling, world drawing, HUD, minimap, and disconnected state. Candidate modules: `camera.ts`, `world-renderer.ts`, `hud-renderer.ts`, and `minimap-renderer.ts`.
-- Keep the public renderer API small and explicit.
-- Preserve canvas behavior on desktop and mobile, including camera dead zone, minimap, HUD, and disconnected screen.
-
 ## Sprint 28
 - Sprint goal: tidy DOM rendering and UI construction.
 - Prefer DOM-building helpers over HTML string rendering in `src/client/lobby.ts`, `src/client/diagnostics.ts`, and parts of `src/client/game/touch-controls.ts`. Current template strings rely on manual escaping and `dataset.id!`; explicit elements/events would be safer and easier to refactor.

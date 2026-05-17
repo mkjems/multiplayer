@@ -2,36 +2,21 @@
 // Rendering
 // ═════════════════════════════════════════════════════════════════════════════
 
-import { lerpColor } from "./utils.ts";
-import type {
-  BulletSnapshot,
-  CactusData,
-  PlayerSnapshot,
-  RockData,
-} from "../../shared/protocol";
 import type { GameState } from "./state.ts";
 import type { Effects } from "./effects.ts";
 import type * as ConstantsModule from "./constants.ts";
-
-interface InputProcessor {
-  processInput(): void;
-}
-
-interface Bounds {
-  left: number;
-  top: number;
-  right: number;
-  bottom: number;
-}
+import { createCamera } from "./camera.ts";
+import { drawWorld } from "./world-renderer.ts";
+import { drawHud } from "./hud-renderer.ts";
+import { drawMinimap } from "./minimap-renderer.ts";
+import { drawVignette } from "./screen-effects-renderer.ts";
+import type { InputProcessor, ViewportSize } from "./render-types.ts";
 
 export interface Renderer {
   render(inputProcessor: InputProcessor): void;
   drawDisconnected(): void;
 }
 
-/**
- * Factory function to create renderer.
- */
 export function createRenderer(
   canvas: HTMLCanvasElement,
   gameState: GameState,
@@ -43,369 +28,13 @@ export function createRenderer(
     throw new Error("Canvas 2D context is not available");
   }
   const ctx = ctxOrNull;
+  const camera = createCamera(gameState, constants);
 
-  let cameraX = 0;
-  let cameraY = 0;
-  let cameraInitialized = false;
-
-  function intersectsViewport(bounds: Bounds, viewport: Bounds): boolean {
-    return bounds.right >= viewport.left &&
-      bounds.left <= viewport.right &&
-      bounds.bottom >= viewport.top &&
-      bounds.top <= viewport.bottom;
-  }
-
-  function getRockBounds(rock: RockData): Bounds {
-    let left = Infinity;
-    let top = Infinity;
-    let right = -Infinity;
-    let bottom = -Infinity;
-    for (const vertex of rock.vertices) {
-      left = Math.min(left, vertex.x);
-      top = Math.min(top, vertex.y);
-      right = Math.max(right, vertex.x);
-      bottom = Math.max(bottom, vertex.y);
-    }
-    return { left, top, right, bottom };
-  }
-
-  function getCactusBounds(cactus: CactusData): Bounds {
-    const {
-      cactusHalfWidth,
-      cactusSegmentStride,
-      cactusSegmentWidth,
-      cactusSegmentHeight,
-    } = gameState.arenaConfig;
+  function getViewport(): ViewportSize {
     return {
-      left: cactus.x - cactusHalfWidth,
-      top: cactus.y,
-      right: cactus.x - cactusHalfWidth + cactusSegmentWidth,
-      bottom: cactus.y +
-        (cactus.segments.length - 1) * cactusSegmentStride +
-        cactusSegmentHeight,
+      width: window.innerWidth,
+      height: window.innerHeight,
     };
-  }
-
-  function getBulletBounds(bullet: BulletSnapshot): Bounds {
-    const radius = 12;
-    return {
-      left: bullet.x - radius,
-      top: bullet.y - radius,
-      right: bullet.x + radius,
-      bottom: bullet.y + radius,
-    };
-  }
-
-  function getPlayerBounds(player: PlayerSnapshot): Bounds {
-    const radius = 48;
-    return {
-      left: player.x - radius,
-      top: player.y - radius,
-      right: player.x + radius,
-      bottom: player.y + radius,
-    };
-  }
-
-  // Draw a rock
-  function drawRock(rock: RockData): void {
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(rock.vertices[0].x, rock.vertices[0].y);
-    for (let i = 1; i < rock.vertices.length; i++) {
-      ctx.lineTo(rock.vertices[i].x, rock.vertices[i].y);
-    }
-    ctx.closePath();
-    ctx.fillStyle = constants.COLOR_ROCK_FILL;
-    ctx.fill();
-    ctx.strokeStyle = constants.COLOR_ROCK_STROKE;
-    ctx.lineWidth = 4;
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  // Draw a cactus
-  function drawCactus(cactus: CactusData): void {
-    const {
-      cactusHalfWidth,
-      cactusSegmentStride,
-      cactusSegmentWidth,
-      cactusSegmentHeight,
-    } = gameState.arenaConfig;
-    for (let i = 0; i < cactus.segments.length; i++) {
-      if (!cactus.segments[i]) continue;
-      const sx = cactus.x - cactusHalfWidth;
-      const sy = cactus.y + i * cactusSegmentStride;
-      ctx.fillStyle = constants.COLOR_CACTUS_FILL;
-      ctx.fillRect(sx, sy, cactusSegmentWidth, cactusSegmentHeight);
-      ctx.strokeStyle = constants.COLOR_CACTUS_STROKE;
-      ctx.lineWidth = 1;
-      ctx.strokeRect(sx, sy, cactusSegmentWidth, cactusSegmentHeight);
-    }
-  }
-
-  // Draw a player
-  function drawPlayer(p: PlayerSnapshot): void {
-    if (!p.alive) {
-      const deathTime = gameState.deathTimes.get(p.id) ?? Date.now();
-      const t = Math.min(1, (Date.now() - deathTime) / 1500);
-      const radius = 14 - t * 6;
-      const color = lerpColor(p.color, constants.COLOR_PLAYER_DEAD, t);
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
-      ctx.fillStyle = color;
-      ctx.fill();
-      ctx.font = "bold 11px system-ui";
-      ctx.textAlign = "center";
-      ctx.globalAlpha = 0.4 + 0.6 * (1 - t * 0.5);
-      ctx.fillStyle = constants.COLOR_PLAYER_DEAD_NAME;
-      ctx.fillText(p.name, p.x, p.y + 20);
-      ctx.globalAlpha = 1;
-      return;
-    }
-
-    const isMe = p.id === gameState.myId;
-    const angle = isMe ? gameState.localArmAngle : p.armAngle;
-    const facing = isMe ? gameState.localFacing : p.facing;
-    const dir = facing === "right" ? 1 : -1;
-    const { armLength } = gameState.arenaConfig;
-
-    if (isMe) {
-      ctx.save();
-      ctx.shadowColor = p.color;
-      ctx.shadowBlur = 14;
-    }
-
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, 14, 0, Math.PI * 2);
-    ctx.fillStyle = p.color;
-    ctx.fill();
-
-    if (isMe) ctx.restore();
-
-    // Hit flash overlay
-    const hitTime = gameState.hitTimes.get(p.id);
-    if (hitTime) {
-      const flashT = (Date.now() - hitTime) / constants.HIT_FLASH_DURATION;
-      if (flashT < 1) {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 14, 0, Math.PI * 2);
-        ctx.fillStyle = constants.COLOR_HIT_FLASH;
-        ctx.globalAlpha = (1 - flashT) * 0.7;
-        ctx.fill();
-        ctx.globalAlpha = 1;
-      }
-    }
-
-    // Arm
-    if (!p.reloading) {
-      ctx.beginPath();
-      ctx.moveTo(p.x, p.y);
-      ctx.lineTo(
-        p.x + dir * armLength * Math.cos(angle),
-        p.y - armLength * Math.sin(angle),
-      );
-      ctx.strokeStyle = p.color;
-      ctx.lineWidth = 5;
-      ctx.lineCap = "round";
-      ctx.stroke();
-    }
-
-    // Energy + health bars
-    const barW = 36, barH = 4, bx = p.x - 18, by = p.y - 26;
-    const energyY = by - 6;
-    ctx.fillStyle = constants.COLOR_ENERGY_BG;
-    ctx.fillRect(bx, energyY, barW, barH);
-    ctx.fillStyle = constants.COLOR_ENERGY_FILL;
-    ctx.fillRect(bx, energyY, barW * (p.energy / 100), barH);
-
-    ctx.fillStyle = constants.COLOR_HEALTH_BG;
-    ctx.fillRect(bx, by, barW, barH);
-    ctx.fillStyle = p.health > 60
-      ? constants.COLOR_HEALTH_HIGH
-      : p.health > 30
-      ? constants.COLOR_HEALTH_MID
-      : constants.COLOR_HEALTH_LOW;
-    ctx.fillRect(bx, by, barW * (p.health / 100), barH);
-
-    // Name + kills
-    ctx.fillStyle = constants.COLOR_PLAYER_NAME;
-    ctx.font = "bold 11px system-ui";
-    ctx.textAlign = "center";
-    ctx.fillText(p.name, p.x, p.y + 26);
-    if (p.kills > 0) {
-      ctx.fillStyle = constants.COLOR_PLAYER_KILLS;
-      ctx.font = "9px system-ui";
-      ctx.fillText(`★ ${p.kills}`, p.x, p.y + 37);
-    }
-  }
-
-  // Draw bullet trail
-  function drawBulletTrail(b: BulletSnapshot): void {
-    const trail = gameState.bulletTrails.get(b.id);
-    if (!trail || trail.length < 2) return;
-
-    const segmentCount = trail.length - 1;
-    for (let i = 0; i < segmentCount; i++) {
-      const from = trail[i];
-      const to = trail[i + 1];
-      const progress = (i + 1) / segmentCount;
-
-      ctx.beginPath();
-      ctx.moveTo(from.x, from.y);
-      ctx.lineTo(to.x, to.y);
-      ctx.lineCap = "round";
-      ctx.lineWidth = 7 * progress;
-      ctx.strokeStyle = `rgba(249, 202, 36, ${0.15 * progress})`;
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(from.x, from.y);
-      ctx.lineTo(to.x, to.y);
-      ctx.lineCap = "round";
-      ctx.lineWidth = 2.5 * progress;
-      ctx.strokeStyle = `rgba(240, 147, 43, ${0.7 * progress})`;
-      ctx.stroke();
-    }
-  }
-
-  // Draw a bullet
-  function drawBullet(b: BulletSnapshot): void {
-    ctx.beginPath();
-    ctx.arc(b.x, b.y, 3, 0, Math.PI * 2);
-    ctx.fillStyle = constants.COLOR_BULLET_FILL;
-    ctx.fill();
-    ctx.strokeStyle = constants.COLOR_BULLET_STROKE;
-    ctx.lineWidth = 1;
-    ctx.stroke();
-  }
-
-  // Draw minimap
-  function drawMinimap(): void {
-    const worldWidth = gameState.arenaConfig.arenaWidth;
-    const worldHeight = gameState.arenaConfig.arenaHeight;
-    const viewportWidth = window.innerWidth;
-
-    const isMobile = viewportWidth < constants.MINIMAP_MOBILE_BREAKPOINT;
-    const minimapWidth = isMobile
-      ? constants.MINIMAP_WIDTH_MOBILE
-      : constants.MINIMAP_WIDTH_DESKTOP;
-    const minimapHeight = minimapWidth * (worldHeight / worldWidth);
-    const minimapX = viewportWidth - minimapWidth - constants.MINIMAP_MARGIN;
-    const minimapY = constants.MINIMAP_NAVBAR_HEIGHT + constants.MINIMAP_MARGIN;
-    const scaleX = minimapWidth / worldWidth;
-    const scaleY = minimapHeight / worldHeight;
-
-    ctx.save();
-
-    ctx.globalAlpha = constants.MINIMAP_BACKGROUND_OPACITY;
-    ctx.fillStyle = constants.COLOR_MINIMAP_BG;
-    ctx.beginPath();
-    ctx.roundRect(
-      minimapX,
-      minimapY,
-      minimapWidth,
-      minimapHeight,
-      constants.MINIMAP_BORDER_RADIUS,
-    );
-    ctx.fill();
-
-    ctx.globalAlpha = 1;
-    ctx.strokeStyle = constants.COLOR_MINIMAP_BORDER;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.roundRect(
-      minimapX,
-      minimapY,
-      minimapWidth,
-      minimapHeight,
-      constants.MINIMAP_BORDER_RADIUS,
-    );
-    ctx.stroke();
-
-    for (const player of gameState.players) {
-      const dotX = minimapX + player.x * scaleX;
-      const dotY = minimapY + player.y * scaleY;
-      const isLocalPlayer = player.id === gameState.myId;
-      const radius = isLocalPlayer
-        ? constants.MINIMAP_LOCAL_DOT_RADIUS
-        : constants.MINIMAP_OTHER_DOT_RADIUS;
-
-      if (isLocalPlayer) {
-        ctx.fillStyle = constants.COLOR_MINIMAP_LOCAL_PLAYER;
-      } else if (player.alive) {
-        ctx.fillStyle = constants.COLOR_MINIMAP_OTHER_PLAYER_ALIVE;
-      } else {
-        ctx.fillStyle = constants.COLOR_MINIMAP_OTHER_PLAYER_DEAD;
-      }
-
-      ctx.beginPath();
-      ctx.arc(dotX, dotY, radius, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    ctx.restore();
-  }
-
-  // Draw HUD (ammo, kills)
-  function drawHUD(): void {
-    const me = gameState.getLocalPlayer();
-    if (!me || !me.alive) return;
-
-    const size = 8, gap = 4, px = 14, py = 24;
-    const killsX = px + 6 * (size + gap) + 18;
-    ctx.font = "bold 10px system-ui";
-    ctx.textAlign = "left";
-
-    if (me.reloading) {
-      ctx.fillStyle = constants.COLOR_RELOAD_TEXT;
-      ctx.fillText("RELOADING…", px, py + 8);
-    } else {
-      ctx.fillStyle = constants.COLOR_HUD_LABEL;
-      ctx.fillText("AMMO", px, py - 2);
-      for (let i = 0; i < 6; i++) {
-        ctx.beginPath();
-        ctx.arc(
-          px + i * (size + gap) + size / 2,
-          py + size / 2,
-          size / 2,
-          0,
-          Math.PI * 2,
-        );
-        ctx.fillStyle = i < me.ammo
-          ? constants.COLOR_AMMO_FULL
-          : constants.COLOR_AMMO_EMPTY;
-        ctx.fill();
-      }
-    }
-
-    ctx.textAlign = "left";
-    ctx.fillStyle = constants.COLOR_HUD_LABEL;
-    ctx.font = "bold 10px system-ui";
-    ctx.fillText("KILLS", killsX, py - 2);
-    ctx.fillStyle = me.kills > 0
-      ? constants.COLOR_KILLS_ACTIVE
-      : constants.COLOR_KILLS_ZERO;
-    ctx.font = "bold 18px system-ui";
-    ctx.fillText(String(me.kills), killsX, py + 10);
-  }
-
-  // Draw vignette effect
-  function drawVignette(): void {
-    const alpha = effects.getVignetteAlpha();
-    if (alpha <= 0) return;
-
-    const gradient = ctx.createRadialGradient(
-      window.innerWidth / 2,
-      window.innerHeight / 2,
-      window.innerHeight * 0.25,
-      window.innerWidth / 2,
-      window.innerHeight / 2,
-      window.innerHeight * 0.85,
-    );
-    gradient.addColorStop(0, `rgba(${constants.COLOR_VIGNETTE},0)`);
-    gradient.addColorStop(1, `rgba(${constants.COLOR_VIGNETTE},${alpha})`);
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
   }
 
   return {
@@ -415,51 +44,9 @@ export function createRenderer(
       const dpr = window.devicePixelRatio || 1;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-      const worldWidth = gameState.arenaConfig.arenaWidth;
-      const worldHeight = gameState.arenaConfig.arenaHeight;
+      const viewport = getViewport();
+      const cameraPosition = camera.update(viewport);
 
-      // Initialize camera centered on local player on first appearance
-      if (!cameraInitialized) {
-        const localPlayer = gameState.getLocalPlayer();
-        if (localPlayer) {
-          cameraX = localPlayer.x - viewportWidth / 2;
-          cameraY = localPlayer.y - viewportHeight / 2;
-          cameraX = Math.max(0, Math.min(worldWidth - viewportWidth, cameraX));
-          cameraY = Math.max(
-            0,
-            Math.min(worldHeight - viewportHeight, cameraY),
-          );
-          cameraInitialized = true;
-        }
-      }
-
-      // Dead-zone camera: only scroll when the local player exits the centered rectangle
-      const localPlayer = gameState.getLocalPlayer();
-      if (localPlayer && localPlayer.alive) {
-        const deadZoneWidth = viewportWidth *
-          constants.CAMERA_DEAD_ZONE_FRACTION;
-        const deadZoneHeight = viewportHeight *
-          constants.CAMERA_DEAD_ZONE_FRACTION;
-        const deadZoneLeft = (viewportWidth - deadZoneWidth) / 2;
-        const deadZoneRight = deadZoneLeft + deadZoneWidth;
-        const deadZoneTop = (viewportHeight - deadZoneHeight) / 2;
-        const deadZoneBottom = deadZoneTop + deadZoneHeight;
-
-        const screenX = localPlayer.x - cameraX;
-        const screenY = localPlayer.y - cameraY;
-
-        if (screenX < deadZoneLeft) cameraX = localPlayer.x - deadZoneLeft;
-        if (screenX > deadZoneRight) cameraX = localPlayer.x - deadZoneRight;
-        if (screenY < deadZoneTop) cameraY = localPlayer.y - deadZoneTop;
-        if (screenY > deadZoneBottom) cameraY = localPlayer.y - deadZoneBottom;
-
-        cameraX = Math.max(0, Math.min(worldWidth - viewportWidth, cameraX));
-        cameraY = Math.max(0, Math.min(worldHeight - viewportHeight, cameraY));
-      }
-
-      // Screen shake is applied outside camera transform so the whole viewport shakes
       ctx.save();
       const shake = effects.getShakeOffset();
       if (shake.x !== 0 || shake.y !== 0) {
@@ -467,63 +54,33 @@ export function createRenderer(
       }
 
       ctx.fillStyle = constants.COLOR_GROUND;
-      ctx.fillRect(0, 0, viewportWidth, viewportHeight);
+      ctx.fillRect(0, 0, viewport.width, viewport.height);
 
-      // Camera transform: shift world coordinates to screen space
       ctx.save();
-      ctx.translate(-cameraX, -cameraY);
-      const worldViewport = {
-        left: cameraX,
-        top: cameraY,
-        right: cameraX + viewportWidth,
-        bottom: cameraY + viewportHeight,
-      };
-      for (const rock of gameState.rocks) {
-        if (intersectsViewport(getRockBounds(rock), worldViewport)) {
-          drawRock(rock);
-        }
-      }
-      for (const cactus of gameState.cacti) {
-        if (intersectsViewport(getCactusBounds(cactus), worldViewport)) {
-          drawCactus(cactus);
-        }
-      }
-      for (const b of gameState.bullets) {
-        if (intersectsViewport(getBulletBounds(b), worldViewport)) {
-          drawBulletTrail(b);
-        }
-      }
-      for (const b of gameState.bullets) {
-        if (intersectsViewport(getBulletBounds(b), worldViewport)) {
-          drawBullet(b);
-        }
-      }
-      for (const p of gameState.players) {
-        if (intersectsViewport(getPlayerBounds(p), worldViewport)) {
-          drawPlayer(p);
-        }
-      }
+      ctx.translate(-cameraPosition.x, -cameraPosition.y);
+      drawWorld(ctx, gameState, constants, camera.getWorldViewport(viewport));
       ctx.restore();
 
-      drawHUD();
-      drawMinimap();
+      drawHud(ctx, gameState, constants);
+      drawMinimap(ctx, gameState, constants, viewport);
       ctx.restore();
 
-      drawVignette();
+      drawVignette(ctx, effects, constants, viewport);
 
       requestAnimationFrame(() => this.render(inputProcessor));
     },
 
     drawDisconnected(): void {
+      const viewport = getViewport();
       ctx.fillStyle = constants.COLOR_DISCONNECT_BG;
-      ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+      ctx.fillRect(0, 0, viewport.width, viewport.height);
       ctx.fillStyle = constants.COLOR_DISCONNECT_TEXT;
       ctx.font = "16px system-ui";
       ctx.textAlign = "center";
       ctx.fillText(
         "Disconnected — go back to lobby",
-        window.innerWidth / 2,
-        window.innerHeight / 2,
+        viewport.width / 2,
+        viewport.height / 2,
       );
     },
   };
