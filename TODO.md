@@ -76,4 +76,5 @@ If the phone goes to sleep/energy saving mode ( black screen ) and you wakes up 
 - Make overlay where user can read about the controls of the game.
 - Should we have a walking sound?
 - When new players join character should be placed as far away for the other players as possible but 30px from the edge 
+- Add some testing with playwright and a few canvas smoke tests.
 
