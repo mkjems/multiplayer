@@ -1,8 +1,55 @@
 # TODO
 
 ## Sprint 23
-- Do a code quality pass. Is the code readable understandable, well organized into modules and  interfaces. Is it well structured. Easy to maintain and expand.
-- The src/server/game.ts file is more than a 1000 lines for example, should we break it up into modules? Does that make sense?
+- Sprint goal: prepare the codebase for cleanup without changing gameplay behavior.
+- Fix formatting so `deno fmt --check src/` passes. It currently reports `src/server/visitor.ts` missing a trailing newline.
+- Normalize import specifiers in client TypeScript. Several type imports omit the `.ts` extension (for example `../../shared/protocol`), while the rest of the project mostly uses explicit `.ts`. Consistent explicit imports support navigation and match the project's refactoring goals.
+- Add focused tests before the larger cleanup. Highest-value targets:
+  - Protocol parsers.
+  - Arena generation avoids overlaps.
+  - Collision helpers.
+  - Energy drain/regain.
+  - Bullet ricochet and cactus damage.
+  - Win-condition timeout behavior.
+  - A basic canvas/browser smoke test.
+- Keep `deno task check`, `deno task lint`, and `deno fmt --check src/` passing during the sprint.
+
+## Sprint 24
+- Sprint goal: make protocol and diagnostics contracts strongly typed across client and server.
+- Add a shared server-side protocol parser/guard for `ClientMessage`. `src/server/main.ts` currently uses raw `JSON.parse` for WebSocket payloads and then trusts `msg.type`, while the client has `parseServerMessage`. A typed `parseClientMessage` would make message handling safer and more IDE-navigable.
+- Strengthen `src/client/protocol-guards.ts`. The current guard only shallow-checks several messages (`arena`, `game_state`) and accepts arrays without validating item shapes, so malformed protocol data can still enter typed client state.
+- Share diagnostics response types instead of duplicating them. `TickDurationMetrics`, `NetworkMetrics`, and `RoomDiagnostics` are defined separately in `src/server/game.ts` and `src/client/diagnostics.ts`; put the contract in a shared module so rename/find-references works across the diagnostics boundary.
+- Keep shared protocol APIs explicit and easy to navigate with Find All References / Go To Definition.
+
+## Sprint 25
+- Sprint goal: split server game code into clear modules without changing behavior.
+- Split `src/server/game.ts` into explicit, strongly typed modules. It currently combines room lifecycle, arena generation, collision geometry, player movement/energy, bullet simulation, win-condition handling, broadcasting, and metrics. Suggested first split:
+  - `server/arena.ts` for rock/cactus generation and arena config.
+  - `server/room.ts` for room creation, lookup, join/leave, reset, and diagnostics.
+  - `server/simulation.ts` for `tick`, movement, energy, reloads, bullets, hits, and win conditions.
+  - `server/collision.ts` for geometry helpers and collision resolution.
+  - `server/broadcast.ts` or `server/network.ts` for room broadcast helpers and socket backpressure metrics.
+- Move server-side internal types out of `game.ts` once the modules are split. `Bullet`, `Rock`, `Cactus`, `GameRoom`, diagnostics metrics, and broadcast result types should live next to the code that owns them, with explicit exports where cross-module references are needed.
+- Keep module boundaries explicit. Avoid dynamic registration or string-based wiring.
+- Verify the split with tests from Sprint 23 plus `deno task check` and `deno task lint`.
+
+## Sprint 26
+- Sprint goal: simplify client game state flow.
+- Revisit `src/client/game/state.ts` versus `src/client/game/index.ts`. `GameState.updateFromServerMessage` overlaps with the message handling in `game/index.ts`, but the entry point bypasses it for richer effects/sound behavior. Either remove the unused method or make message application a single explicit path.
+- Keep side effects such as sounds, hit flashes, death times, and cactus effects easy to follow from the message handlers.
+- Make sure local prediction state (`localArmAngle`, `localFacing`, bullet trails, previous health/bounces) remains explicit and strongly typed.
+
+## Sprint 27
+- Sprint goal: split rendering into smaller client modules.
+- Break up `src/client/game/render.ts` after the server cleanup. At 530 lines it is still manageable, but it mixes camera control, viewport culling, world drawing, HUD, minimap, and disconnected state. Candidate modules: `camera.ts`, `world-renderer.ts`, `hud-renderer.ts`, and `minimap-renderer.ts`.
+- Keep the public renderer API small and explicit.
+- Preserve canvas behavior on desktop and mobile, including camera dead zone, minimap, HUD, and disconnected screen.
+
+## Sprint 28
+- Sprint goal: tidy DOM rendering and UI construction.
+- Prefer DOM-building helpers over HTML string rendering in `src/client/lobby.ts`, `src/client/diagnostics.ts`, and parts of `src/client/game/touch-controls.ts`. Current template strings rely on manual escaping and `dataset.id!`; explicit elements/events would be safer and easier to refactor.
+- Remove non-null assertions like `dataset.id!` where small typed helpers would make intent clearer.
+- Keep user-visible behavior the same while improving static navigability.
 
 ## Backlog 
 - Show the ammo under the character.
@@ -44,4 +91,3 @@ If the phone goes to sleep/energy saving mode ( black screen ) and you wakes up 
 - Should we have a walking sound?
 - When new players join character should be placed as far away for the other players as possible but 30px from the edge 
 - Add some testing with playwright and a few canvas smoke tests.
-

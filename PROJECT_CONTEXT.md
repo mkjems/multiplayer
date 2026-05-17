@@ -15,6 +15,8 @@
 - Server holds source of truth for all games, broadcasts at 20 Hz
 - Clients run their own animations at 60 Hz
 - Do not commit the result of build a process to git
+- We want Separation of Concerns (SoC)
+- We want modularity and clear responsibility 
 
 # Protocol Model
 
