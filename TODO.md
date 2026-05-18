@@ -1,22 +1,5 @@
 # TODO
 
-## Sprint 30 
-- Sprint goal: Convert the lobby to React and remove manual DOM rendering
-- Build the lobby route as declarative React components.
-- Convert lobby WebSocket handling into a typed hook or route-level controller.
-- Render game cards with JSX instead of `innerHTML`.
-- Keep lobby messages strongly typed through the shared protocol types and guards.
-- Replace manual event listener attachment on game cards with React event handlers.
-- Navigate to `/game/:gameId` when a room is selected.
-- Remove the need to store `gameId` in `sessionStorage` for normal navigation.
-- Keep a fallback path for reload/direct game links where the route param is the source of truth.
-- Preserve the keyboard controls panel and mobile hiding behavior.
-- Add clear lobby connection states:
-  - connecting
-  - connected
-  - disconnected
-  - no games available
-
 ## Sprint 31
 - Sprint goal: Create the typed boundary between React and the game engine
 - Add a `GameSession` interface as the only public bridge from React into the game world.
