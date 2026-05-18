@@ -186,20 +186,21 @@ export function setupTouchControls(
   // ── Add-to-Home-Screen tip ─────────────────────────────────────────────────
   const isStandalone = (navigator as unknown as { standalone?: boolean })
     .standalone === true;
-  const tipDismissed = sessionStorage.getItem("homescreenTipDismissed");
+  const tipDismissed = sessionStorage.getItem("homeScreenTipDismissed");
+  let homeScreenTip: HTMLDivElement | null = null;
   if (!isStandalone && !tipDismissed) {
-    const homescreenTip = document.createElement("div");
-    homescreenTip.id = "touch-homescreen-tip";
-    homescreenTip.innerHTML = `
+    homeScreenTip = document.createElement("div");
+    homeScreenTip.id = "touch-homeScreen-tip";
+    homeScreenTip.innerHTML = `
       <span>Add to Home Screen for full-screen play</span>
-      <button id="touch-homescreen-dismiss" aria-label="Dismiss">✕</button>
+      <button id="touch-homeScreen-dismiss" aria-label="Dismiss">✕</button>
     `;
-    document.body.appendChild(homescreenTip);
+    document.body.appendChild(homeScreenTip);
     document
-      .getElementById("touch-homescreen-dismiss")
+      .getElementById("touch-homeScreen-dismiss")
       ?.addEventListener("click", () => {
-        sessionStorage.setItem("homescreenTipDismissed", "1");
-        homescreenTip.remove();
+        sessionStorage.setItem("homeScreenTipDismissed", "1");
+        homeScreenTip?.remove();
       });
   }
 
@@ -214,5 +215,6 @@ export function setupTouchControls(
     window.removeEventListener("resize", onOrientationChange);
     overlay.remove();
     rotatePrompt.remove();
+    homeScreenTip?.remove();
   };
 }

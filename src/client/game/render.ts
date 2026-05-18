@@ -13,7 +13,8 @@ import { drawVignette } from "./screen-effects-renderer.ts";
 import type { InputProcessor, ViewportSize } from "./render-types.ts";
 
 export interface Renderer {
-  render(inputProcessor: InputProcessor): void;
+  start(inputProcessor: InputProcessor): void;
+  dispose(): void;
   drawDisconnected(): void;
 }
 
@@ -29,6 +30,8 @@ export function createRenderer(
   }
   const ctx = ctxOrNull;
   const camera = createCamera(gameState, constants);
+  let animationFrameId: number | null = null;
+  let isDisposed = false;
 
   function getViewport(): ViewportSize {
     return {
@@ -37,40 +40,60 @@ export function createRenderer(
     };
   }
 
+  function renderFrame(inputProcessor: InputProcessor): void {
+    if (isDisposed) return;
+
+    inputProcessor.processInput();
+
+    const dpr = window.devicePixelRatio || 1;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const viewport = getViewport();
+    const cameraPosition = camera.update(viewport);
+
+    ctx.save();
+    const shake = effects.getShakeOffset();
+    if (shake.x !== 0 || shake.y !== 0) {
+      ctx.translate(shake.x, shake.y);
+    }
+
+    ctx.fillStyle = constants.COLOR_GROUND;
+    ctx.fillRect(0, 0, viewport.width, viewport.height);
+
+    ctx.save();
+    ctx.translate(-cameraPosition.x, -cameraPosition.y);
+    drawWorld(ctx, gameState, constants, camera.getWorldViewport(viewport));
+    ctx.restore();
+
+    drawHud(ctx, gameState, constants);
+    drawMinimap(ctx, gameState, constants, viewport);
+    ctx.restore();
+
+    drawVignette(ctx, effects, constants, viewport);
+
+    animationFrameId = requestAnimationFrame(() => renderFrame(inputProcessor));
+  }
+
   return {
-    render(inputProcessor: InputProcessor): void {
-      inputProcessor.processInput();
+    start(inputProcessor: InputProcessor): void {
+      if (animationFrameId !== null) return;
+      isDisposed = false;
+      animationFrameId = requestAnimationFrame(() => {
+        animationFrameId = null;
+        renderFrame(inputProcessor);
+      });
+    },
 
-      const dpr = window.devicePixelRatio || 1;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      const viewport = getViewport();
-      const cameraPosition = camera.update(viewport);
-
-      ctx.save();
-      const shake = effects.getShakeOffset();
-      if (shake.x !== 0 || shake.y !== 0) {
-        ctx.translate(shake.x, shake.y);
+    dispose(): void {
+      isDisposed = true;
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
       }
-
-      ctx.fillStyle = constants.COLOR_GROUND;
-      ctx.fillRect(0, 0, viewport.width, viewport.height);
-
-      ctx.save();
-      ctx.translate(-cameraPosition.x, -cameraPosition.y);
-      drawWorld(ctx, gameState, constants, camera.getWorldViewport(viewport));
-      ctx.restore();
-
-      drawHud(ctx, gameState, constants);
-      drawMinimap(ctx, gameState, constants, viewport);
-      ctx.restore();
-
-      drawVignette(ctx, effects, constants, viewport);
-
-      requestAnimationFrame(() => this.render(inputProcessor));
     },
 
     drawDisconnected(): void {
+      if (isDisposed) return;
       const viewport = getViewport();
       ctx.fillStyle = constants.COLOR_DISCONNECT_BG;
       ctx.fillRect(0, 0, viewport.width, viewport.height);

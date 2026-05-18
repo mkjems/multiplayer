@@ -1,30 +1,5 @@
 # TODO
 
-## Sprint 31
-- Sprint goal: Create the typed boundary between React and the game engine
-- Add a `GameSession` interface as the only public bridge from React into the game world.
-- Add a `createGameSession(...)` factory that accepts typed dependencies:
-  - canvas element
-  - game id
-  - player name
-  - UI event callback
-  - optional initial settings such as muted state
-- Move the current game entry orchestration out of `game/index.ts` and behind the session factory.
-- Keep the existing renderer, camera, state, network, effects, and input modules mostly intact.
-- Add explicit lifecycle methods:
-  - `start()`
-  - `dispose()`
-  - `leaveGame()`
-- Ensure `dispose()` cleans up:
-  - animation frame loop
-  - keyboard listeners
-  - touch listeners
-  - WebSocket handlers
-  - pending game-over countdown timers
-  - resize listeners
-- Prevent React from reading or writing high-frequency game state directly.
-- Document the boundary rule: React orchestrates UI, the game engine owns the 60 FPS loop.
-
 ## Sprint 32
 - Sprint goal: Mount the canvas game from a React Router game route
 - Build a `GameRoute` that reads `gameId` from React Router params.

@@ -166,7 +166,7 @@
 
 /* ── Add-to-Home-Screen tip ─────────────────────────────────────────────── */
 
-#touch-homescreen-tip {
+#touch-homeScreen-tip {
   position: fixed;
   top: 48px;
   left: 0;
@@ -183,7 +183,7 @@
   color: rgba(255, 255, 255, 0.80);
 }
 
-#touch-homescreen-dismiss {
+#touch-homeScreen-dismiss {
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.55);

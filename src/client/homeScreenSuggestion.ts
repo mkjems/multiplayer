@@ -2,25 +2,25 @@ interface StandaloneNavigator extends Navigator {
   readonly standalone?: boolean;
 }
 
-const homeScreenSuggestion = document.getElementById("home-screen-suggestion");
+const homeScreenSuggestion = document.getElementById("homeScreenSuggestion");
 const dismissHomeScreenSuggestion = document.getElementById(
-  "dismiss-home-screen-suggestion",
+  "dismissHomeScreenSuggestion",
 );
 const homeScreenInstructions = document.getElementById(
-  "home-screen-instructions",
+  "homeScreenInstructions",
 );
 
 if (!(homeScreenSuggestion instanceof HTMLElement)) {
-  throw new Error("Missing required element: #home-screen-suggestion");
+  throw new Error("Missing required element: #homeScreenSuggestion");
 }
 if (!(dismissHomeScreenSuggestion instanceof HTMLButtonElement)) {
   throw new Error(
-    "Missing required button element: #dismiss-home-screen-suggestion",
+    "Missing required button element: #dismissHomeScreenSuggestion",
   );
 }
 if (!(homeScreenInstructions instanceof HTMLParagraphElement)) {
   throw new Error(
-    "Missing required paragraph element: #home-screen-instructions",
+    "Missing required paragraph element: #homeScreenInstructions",
   );
 }
 

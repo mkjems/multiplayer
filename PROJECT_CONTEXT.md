@@ -2,10 +2,14 @@
 
 - No hardcoded colors or magic values — use descriptively named variables
 - No abbreviations in variable names
+- booleans should start with is or has, and should not contain a negation.
 - TypeScript for all client and server code; all functions must be typed
 - Scripts in HTML files belong in separate files
 - Deno tasks must cover all steps needed to develop and run the project
 - Do not touch TODO.md unless the human asks
+- Use camelCase for JS variable names.
+- Use kebab case for css classes
+- Use camelCase for new filenames. Its ok to leave old kebab-case file names for now. 
 
 # Architecture
 

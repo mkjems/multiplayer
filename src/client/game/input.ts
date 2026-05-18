@@ -6,7 +6,6 @@ import type { ClientMessage } from "../../shared/protocol";
 import type { GameState } from "./state.ts";
 import type { Sounds } from "../sounds.ts";
 import type * as ConstantsModule from "./constants.ts";
-import { requireElement } from "./utils.ts";
 
 export interface InputHandler {
   processInput(): void;
@@ -32,7 +31,6 @@ export function setupInputHandler(
   let lastAngleSent = 0;
   let lastShootSent = 0;
   let touchMoveActive = false;
-  const muteBtn = requireElement("mute-btn");
 
   function tryShoot(): void {
     const me = gameState.getLocalPlayer();
@@ -73,14 +71,8 @@ export function setupInputHandler(
     keys.delete(e.key.toLowerCase());
   };
 
-  // Mute button
-  const onMuteClick = (): void => {
-    muteBtn.textContent = sounds.toggleMute() ? "🔇" : "🔊";
-  };
-
   document.addEventListener("keydown", onKeyDown);
   document.addEventListener("keyup", onKeyUp);
-  muteBtn.addEventListener("click", onMuteClick);
 
   // Called once per frame to process input and send to server
   function processInput(): void {
@@ -128,7 +120,6 @@ export function setupInputHandler(
     keys.clear();
     document.removeEventListener("keydown", onKeyDown);
     document.removeEventListener("keyup", onKeyUp);
-    muteBtn.removeEventListener("click", onMuteClick);
   }
 
   function setTouchMove(dx: number, dy: number): void {

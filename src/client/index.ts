@@ -1,4 +1,4 @@
-import { initializeHomeScreenSuggestion } from "./home-screen-suggestion.ts";
+import { initializeHomeScreenSuggestion } from "./homeScreenSuggestion.ts";
 
 const input = document.getElementById("name");
 const btn = document.getElementById("enter");

@@ -1,5 +1,6 @@
 export interface Sounds {
   isMuted(): boolean;
+  setMuted(isMuted: boolean): boolean;
   toggleMute(): boolean;
   playShoot(): void;
   playCactusHit(): void;
@@ -218,14 +219,19 @@ export function createSounds(): Sounds {
     return muted;
   }
 
-  function toggleMute(): boolean {
-    muted = !muted;
+  function setMuted(isMuted: boolean): boolean {
+    muted = isMuted;
     if (muted && audioCtx) audioCtx.suspend();
     return muted;
   }
 
+  function toggleMute(): boolean {
+    return setMuted(!muted);
+  }
+
   return {
     isMuted,
+    setMuted,
     toggleMute,
     playShoot,
     playCactusHit,
