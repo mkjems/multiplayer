@@ -1,7 +1,7 @@
 # TODO
 
 ## After Sprint 34 
-- [ ] Verify Deno Deploy serves all SPA routes correctly after the next deployment.
+- [x] Verify Deno Deploy serves all SPA routes correctly after the next deployment.
 
 ## Sprint 35
 - Sprint goal: Strengthen architecture, tests, and refactoring safety after the SPA migration
