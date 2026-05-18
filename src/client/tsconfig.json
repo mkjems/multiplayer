@@ -17,5 +17,5 @@
     "rewriteRelativeImportExtensions": true
   },
   "include": ["./**/*.ts", "./**/*.tsx", "../shared/**/*.ts"],
-  "exclude": ["../shared/**/*_test.ts"]
+  "exclude": ["./**/*_test.ts", "../shared/**/*_test.ts"]
 }

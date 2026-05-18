@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { DiagnosticsResponse } from "../../../shared/diagnostics";
+import type { DiagnosticsResponse } from "../../../shared/diagnostics.ts";
 import {
   type RoomHistoryById,
   updateDiagnosticsHistory,

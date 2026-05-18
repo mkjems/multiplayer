@@ -1,4 +1,4 @@
-import type { RoomDiagnostics } from "../../../shared/diagnostics";
+import type { RoomDiagnostics } from "../../../shared/diagnostics.ts";
 import { formatNumber } from "./diagnostics-format.ts";
 
 interface DiagnosticsSummaryProps {

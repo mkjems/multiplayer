@@ -1,24 +1,5 @@
 # TODO
 
-## After Sprint 34 
-- [x] Verify Deno Deploy serves all SPA routes correctly after the next deployment.
-
-## Sprint 35
-- Sprint goal: Strengthen architecture, tests, and refactoring safety after the SPA migration
-- Add focused tests for typed route helpers and session storage helpers.
-- Add tests or smoke checks for game session lifecycle cleanup.
-- Add browser smoke tests for:
-  - landing to lobby
-  - lobby to game
-  - game back to lobby
-  - direct route refresh
-- Add a canvas smoke test that verifies the game canvas renders non-empty pixels.
-- Run TypeScript checks across client, shared, and server code.
-- Run lint and formatting checks.
-- Review imports/exports to make sure symbols remain easy to find, rename, and navigate in the IDE.
-- Remove obsolete TODO items related to moving to a true SPA once the migration is complete.
-
-
 ## Backlog 
 - Show the ammo under the character.
 
@@ -26,7 +7,7 @@
 - Integrate chatGPT API to do experiments.
 
 - Switch to a sprite for the player character
-- Move to a true SPA like React
+- Show a list of names of the players currently in the lobby.
 
 ## Boring Bugs
 - Performance bug: Stale game_over timeout may fire after a room resets.
@@ -58,7 +39,6 @@
 - Make overlay where user can read about the controls of the game.
 - Should we have a walking sound?
 - When new players join character should be placed as far away for the other players as possible but 30px from the edge 
-- Add some testing with playwright and a few canvas smoke tests.
 
 - Make the diagnostics graphs bigger and have lines and numbers on the x and y axis.   
 

@@ -1,4 +1,4 @@
-import type { DiagnosticsResponse } from "../../../shared/diagnostics";
+import type { DiagnosticsResponse } from "../../../shared/diagnostics.ts";
 
 export interface RoomHistorySample {
   sampledAtMilliseconds: number;
