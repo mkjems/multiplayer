@@ -219,6 +219,13 @@ function tryUpgrade(
   }
 }
 
+function isSpaRoute(pathname: string): boolean {
+  return pathname === "/" ||
+    pathname === "/lobby" ||
+    pathname === "/diagnostics" ||
+    /^\/game\/[^/]+\/?$/.test(pathname);
+}
+
 Deno.serve(async (req) => {
   const url = new URL(req.url);
 
@@ -255,10 +262,9 @@ Deno.serve(async (req) => {
     return upgrade.response;
   }
 
-  let filePath = `public${url.pathname}`;
-  if (url.pathname === "/" || url.pathname === "") {
-    filePath = "public/index.html";
+  if (url.pathname === "/" || url.pathname === "" || isSpaRoute(url.pathname)) {
+    return serveFile("public/index.html");
   }
 
-  return serveFile(filePath);
+  return serveFile(`public${url.pathname}`);
 });

@@ -7,6 +7,7 @@
     "outDir": "../public",
     "tsBuildInfoFile": "../../dist/client.tsbuildinfo",
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "jsx": "react-jsx",
     "composite": true,
     "strict": true,
     "noEmitOnError": true,
@@ -15,6 +16,6 @@
     "verbatimModuleSyntax": true,
     "rewriteRelativeImportExtensions": true
   },
-  "include": ["./**/*.ts", "../shared/**/*.ts"],
+  "include": ["./**/*.ts", "./**/*.tsx", "../shared/**/*.ts"],
   "exclude": ["../shared/**/*_test.ts"]
 }

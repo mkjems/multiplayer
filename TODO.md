@@ -1,24 +1,5 @@
 # TODO
 
-## Sprint 28
-- Sprint goal: Begin the migration to a real SPA using React
-- Add React, React DOM, React Router, and the minimum Vite wiring needed for a single client app entry.
-- Replace the current Vite multi-page app inputs with one SPA entry point.
-- Create a declarative route tree with React Router:
-  - `/` for landing
-  - `/lobby` for lobby
-  - `/game/:gameId` for game
-  - `/diagnostics` for diagnostics
-- Add a root app shell component that owns shared app providers and route rendering.
-- Add typed route helpers for navigation so route paths and params are not scattered as string literals.
-- Preserve strong IDE refactoring:
-  - Use explicit imports and exports.
-  - Keep route modules named and discoverable.
-  - Type route params and navigation helpers.
-  - Avoid dynamic route/component loading for now unless there is a clear need.
-- Update the server static file fallback so direct visits to SPA routes serve the app entry.
-- Keep the existing HTML pages in place until each page has been migrated and verified.
-
 ## Sprint 29
 - Sprint goal: Convert landing and app-level session state to React
 - Build the landing route as a React component.
