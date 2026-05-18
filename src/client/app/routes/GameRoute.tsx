@@ -5,8 +5,10 @@ import { appRoutes } from "../routes.ts";
 import { useDocumentTitle } from "../use-document-title.ts";
 import {
   createGameSession,
+  type GameConnectionStatus,
   type GameSession,
   type GameUiEvent,
+  type LocalPlayerHudSnapshot,
 } from "../../game/game-session.ts";
 
 interface GameRouteParams {
@@ -40,14 +42,30 @@ function GameRouteContent(
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const sessionRef = useRef<GameSession | null>(null);
+  const [connectionStatus, setConnectionStatus] = useState<
+    GameConnectionStatus
+  >("connecting");
   const [playerCount, setPlayerCount] = useState(0);
+  const [localPlayerHud, setLocalPlayerHud] = useState<
+    LocalPlayerHudSnapshot | null
+  >(null);
   const [isMuted, setIsMuted] = useState(false);
   const [winnerName, setWinnerName] = useState<string | null>(null);
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
 
   const handleUiEvent = useCallback((event: GameUiEvent): void => {
+    if (event.type === "connection_changed") {
+      setConnectionStatus(event.status);
+      return;
+    }
+
     if (event.type === "player_count_changed") {
       setPlayerCount(event.playerCount);
+      return;
+    }
+
+    if (event.type === "local_player_hud_changed") {
+      setLocalPlayerHud(event.hud);
       return;
     }
 
@@ -71,6 +89,8 @@ function GameRouteContent(
     if (!canvas) return;
 
     setPlayerCount(0);
+    setConnectionStatus("connecting");
+    setLocalPlayerHud(null);
     setIsMuted(false);
     setWinnerName(null);
     setRemainingSeconds(null);
@@ -130,6 +150,8 @@ function GameRouteContent(
         </button>
       </nav>
 
+      <GameHud hud={localPlayerHud} connectionStatus={connectionStatus} />
+
       <div className={`game-overlay${winnerName ? " visible" : ""}`}>
         <h2>{winnerName ? `🏆 ${winnerName} wins!` : ""}</h2>
         <p>
@@ -139,5 +161,50 @@ function GameRouteContent(
         </p>
       </div>
     </main>
+  );
+}
+
+interface GameHudProps {
+  hud: LocalPlayerHudSnapshot | null;
+  connectionStatus: GameConnectionStatus;
+}
+
+function GameHud({ hud, connectionStatus }: GameHudProps): React.JSX.Element {
+  return (
+    <section className="game-hud" aria-label="Player status">
+      {connectionStatus === "disconnected"
+        ? <div className="game-status-banner">Disconnected</div>
+        : null}
+
+      {hud
+        ? (
+          <>
+            <div className="game-hud-row">
+              <span>Ammo</span>
+              <div className="game-ammo" aria-label={`${hud.ammo} bullets`}>
+                {Array.from({ length: 6 }, (_, index) => (
+                  <span
+                    className={`game-ammo-dot${
+                      index < hud.ammo ? " filled" : ""
+                    }`}
+                    key={index}
+                  >
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="game-hud-callout">
+              {hud.reloading ? "Reloading" : ""}
+            </div>
+
+            <div className="game-hud-row">
+              <span>Kills</span>
+              <strong>{hud.kills}</strong>
+            </div>
+          </>
+        )
+        : <div className="game-hud-callout">Joining</div>}
+    </section>
   );
 }

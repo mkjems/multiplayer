@@ -421,6 +421,72 @@ kbd {
   image-rendering: pixelated;
 }
 
+.game-hud {
+  position: fixed;
+  top: 56px;
+  left: 14px;
+  z-index: 6;
+  display: grid;
+  gap: 8px;
+  min-width: 170px;
+  padding: 10px 12px;
+  border: 1px solid rgba(224, 224, 224, 0.14);
+  border-radius: 8px;
+  background: rgba(15, 15, 26, 0.62);
+  color: var(--color-text);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.game-hud-row {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  align-items: center;
+  gap: 12px;
+  min-height: 18px;
+}
+
+.game-hud-row span {
+  color: var(--color-text-muted);
+}
+
+.game-hud-row strong {
+  color: var(--color-accent-secondary);
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.game-ammo {
+  display: grid;
+  grid-template-columns: repeat(6, 10px);
+  gap: 5px;
+}
+
+.game-ammo-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+}
+
+.game-ammo-dot.filled {
+  background: #f9ca24;
+  border-color: #f9ca24;
+}
+
+.game-hud-callout,
+.game-status-banner {
+  min-height: 18px;
+  color: #f9ca24;
+  line-height: 18px;
+}
+
+.game-status-banner {
+  color: #ff6b6b;
+}
+
 .game-overlay {
   display: none;
   position: fixed;

@@ -50,3 +50,7 @@ Preferred:
 import { Player } from "./Player.ts";
 
 player.move();
+
+
+### Working in Sprints
+- When working in sprints please mark the tasks/bulletPoints complete with a '[x]' when they are done

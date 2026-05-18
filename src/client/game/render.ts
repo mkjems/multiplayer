@@ -7,7 +7,6 @@ import type { Effects } from "./effects.ts";
 import type * as ConstantsModule from "./constants.ts";
 import { createCamera } from "./camera.ts";
 import { drawWorld } from "./world-renderer.ts";
-import { drawHud } from "./hud-renderer.ts";
 import { drawMinimap } from "./minimap-renderer.ts";
 import { drawVignette } from "./screen-effects-renderer.ts";
 import type { InputProcessor, ViewportSize } from "./render-types.ts";
@@ -65,7 +64,6 @@ export function createRenderer(
     drawWorld(ctx, gameState, constants, camera.getWorldViewport(viewport));
     ctx.restore();
 
-    drawHud(ctx, gameState, constants);
     drawMinimap(ctx, gameState, constants, viewport);
     ctx.restore();
 

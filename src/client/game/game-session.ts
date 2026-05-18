@@ -18,6 +18,7 @@ export type GameConnectionStatus =
 export type GameUiEvent =
   | { type: "connection_changed"; status: GameConnectionStatus }
   | { type: "player_count_changed"; playerCount: number }
+  | { type: "local_player_hud_changed"; hud: LocalPlayerHudSnapshot | null }
   | { type: "muted_changed"; isMuted: boolean }
   | {
     type: "game_over";
@@ -28,6 +29,15 @@ export type GameUiEvent =
   | { type: "disconnected" };
 
 export type GameUiEventListener = (event: GameUiEvent) => void;
+
+export interface LocalPlayerHudSnapshot {
+  health: number;
+  energy: number;
+  ammo: number;
+  kills: number;
+  reloading: boolean;
+  alive: boolean;
+}
 
 export interface CreateGameSessionOptions {
   canvas: HTMLCanvasElement;
@@ -100,7 +110,7 @@ function handleGameState(
   gameState: GameState,
   sounds: Sounds,
   effects: ReturnType<typeof createEffects>,
-  emitUiEvent: GameUiEventListener,
+  emitGameStateUi: () => void,
   message: Extract<ServerMessage, { type: "game_state" }>,
 ): void {
   const now = Date.now();
@@ -155,13 +165,10 @@ function handleGameState(
     }
   }
 
-  emitUiEvent({
-    type: "player_count_changed",
-    playerCount: gameState.players.length,
-  });
-
   const localPlayer = gameState.getLocalPlayer();
   if (localPlayer) gameState.localFacing = localPlayer.facing;
+
+  emitGameStateUi();
 }
 
 function handleCactusDamaged(
@@ -192,6 +199,8 @@ export function createGameSession(
   let touchControlsDispose: (() => void) | null = null;
   let returnCountdownInterval: number | null = null;
   let returnToLobbyTimeout: number | null = null;
+  let lastPlayerCount: number | null = null;
+  let lastLocalPlayerHudSnapshot: LocalPlayerHudSnapshot | null = null;
   let hasStarted = false;
   let hasDisposed = false;
 
@@ -201,6 +210,56 @@ export function createGameSession(
 
   function emitUiEvent(event: GameUiEvent): void {
     options.onUiEvent?.(event);
+  }
+
+  function toLocalPlayerHudSnapshot(): LocalPlayerHudSnapshot | null {
+    const localPlayer = gameState.getLocalPlayer();
+    if (!localPlayer) return null;
+
+    return {
+      health: localPlayer.health,
+      energy: localPlayer.energy,
+      ammo: localPlayer.ammo,
+      kills: localPlayer.kills,
+      reloading: localPlayer.reloading,
+      alive: localPlayer.alive,
+    };
+  }
+
+  function hasSameLocalPlayerHudSnapshot(
+    left: LocalPlayerHudSnapshot | null,
+    right: LocalPlayerHudSnapshot | null,
+  ): boolean {
+    if (left === null || right === null) return left === right;
+
+    return left.health === right.health &&
+      left.energy === right.energy &&
+      left.ammo === right.ammo &&
+      left.kills === right.kills &&
+      left.reloading === right.reloading &&
+      left.alive === right.alive;
+  }
+
+  function emitGameStateUi(): void {
+    const playerCount = gameState.players.length;
+    if (playerCount !== lastPlayerCount) {
+      lastPlayerCount = playerCount;
+      emitUiEvent({ type: "player_count_changed", playerCount });
+    }
+
+    const localPlayerHudSnapshot = toLocalPlayerHudSnapshot();
+    if (
+      !hasSameLocalPlayerHudSnapshot(
+        localPlayerHudSnapshot,
+        lastLocalPlayerHudSnapshot,
+      )
+    ) {
+      lastLocalPlayerHudSnapshot = localPlayerHudSnapshot;
+      emitUiEvent({
+        type: "local_player_hud_changed",
+        hud: localPlayerHudSnapshot,
+      });
+    }
   }
 
   function clearGameOverTimers(): void {
@@ -254,7 +313,7 @@ export function createGameSession(
       return;
     }
     if (message.type === "game_state") {
-      handleGameState(gameState, sounds, effects, emitUiEvent, message);
+      handleGameState(gameState, sounds, effects, emitGameStateUi, message);
       return;
     }
     if (message.type === "cactus_damaged") {
@@ -302,6 +361,7 @@ export function createGameSession(
 
     emitUiEvent({ type: "connection_changed", status: "connecting" });
     emitUiEvent({ type: "muted_changed", isMuted: sounds.isMuted() });
+    emitUiEvent({ type: "local_player_hud_changed", hud: null });
 
     network = createNetworkManager(
       options.gameId,

@@ -1,21 +1,5 @@
 # TODO
 
-## Sprint 33
-- Sprint goal: Move low-frequency game UI from manual DOM/canvas coupling into React
-- Define typed UI events emitted by the game session, for example:
-  - connection status changed
-  - player count changed
-  - local player HUD changed
-  - game over
-  - disconnected
-- Move the mute button out of `input.ts` and into React.
-- Move the player count display into React.
-- Move the game-over winner overlay and countdown into React.
-- Keep world rendering, camera movement, bullets, players, rocks, cacti, effects, and minimap in canvas.
-- Decide whether ammo and kills remain in canvas short term or move to React HUD.
-- Throttle or de-duplicate UI events so React updates only when displayed values change.
-- Avoid putting `players`, `bullets`, camera position, or per-frame data in React state.
-
 ## Sprint 34
 - Sprint goal: Convert diagnostics and remove old multi-page app artifacts
 - Convert diagnostics to a React Router route.
