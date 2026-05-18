@@ -2,7 +2,7 @@
 // Game Constants
 // ═════════════════════════════════════════════════════════════════════════════
 
-// Color palette — canvas/JS colors (CSS equivalents live in game.html :root)
+// Color palette — canvas/JS colors (CSS equivalents live in the React app CSS)
 export const COLOR_GROUND = "#232121";
 export const COLOR_ROCK_FILL = "#4a4a5a";
 export const COLOR_ROCK_STROKE = "#6a6a7a";

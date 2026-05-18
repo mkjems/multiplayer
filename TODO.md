@@ -1,15 +1,7 @@
 # TODO
 
-## Sprint 34
-- Sprint goal: Convert diagnostics and remove old multi-page app artifacts
-- Convert diagnostics to a React Router route.
-- Make diagnostics use typed hooks/components instead of standalone page scripts.
-- Remove migrated HTML entry files once their routes are fully replaced.
-- Remove old direct DOM client entry scripts that are no longer used.
-- Update Vite config to reflect the final single-entry SPA structure.
-- Update Deno tasks if needed so build, dev, check, and deploy still work with the SPA.
-- Verify production build output is not committed.
-- Verify Deno Deploy serves all SPA routes correctly.
+## After Sprint 34 
+- [ ] Verify Deno Deploy serves all SPA routes correctly after the next deployment.
 
 ## Sprint 35
 - Sprint goal: Strengthen architecture, tests, and refactoring safety after the SPA migration
