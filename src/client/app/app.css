@@ -360,6 +360,97 @@ kbd {
   font-size: 0.9rem;
 }
 
+.game-page {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--color-background);
+}
+
+.game-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 10px 20px;
+}
+
+.game-player-count {
+  font-size: 0.8rem;
+  color: var(--color-text-subtle);
+}
+
+.game-nav a,
+.game-nav button {
+  color: var(--color-text-subtle);
+}
+
+.game-nav a {
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.game-nav a:hover {
+  color: var(--color-text);
+}
+
+.game-mute-button {
+  background: none;
+  border: 1px solid var(--color-border);
+  font-size: 1rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.game-mute-button:hover {
+  color: var(--color-text);
+}
+
+.game-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.game-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 10;
+}
+
+.game-overlay.visible {
+  display: flex;
+}
+
+.game-overlay h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #f9ca24, #f0932b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.game-overlay p {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+}
+
 @media (max-width: 640px) {
   .lobby-header,
   .player-info {

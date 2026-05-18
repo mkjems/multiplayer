@@ -1,17 +1,5 @@
 # TODO
 
-## Sprint 32
-- Sprint goal: Mount the canvas game from a React Router game route
-- Build a `GameRoute` that reads `gameId` from React Router params.
-- Validate required route/session data before creating the game session.
-- Mount the canvas with a React ref and pass it into `createGameSession(...)`.
-- Start the game session in a React effect and dispose it on route exit.
-- Keep the canvas full screen and preserve current desktop/mobile viewport behavior.
-- Replace game-page redirects with React Router navigation.
-- Add a route-level "Back to lobby" action that calls `leaveGame()` before navigating.
-- Verify that entering and leaving games repeatedly does not leak WebSockets or input handlers.
-- Verify that direct navigation to `/game/:gameId` behaves predictably.
-
 ## Sprint 33
 - Sprint goal: Move low-frequency game UI from manual DOM/canvas coupling into React
 - Define typed UI events emitted by the game session, for example:
