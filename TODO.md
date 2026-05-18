@@ -1,16 +1,5 @@
 # TODO
 
-## Sprint 29
-- Sprint goal: Convert landing and app-level session state to React
-- Build the landing route as a React component.
-- Move player name input state from direct DOM access into React state.
-- Preserve the existing `/api/visitor` notification behavior.
-- Store and read the player name through a small typed client session module.
-- Redirect users without a player name to `/`.
-- Replace `globalThis.location.href` navigation with React Router navigation.
-- Move shared PWA metadata, app title behavior, and root CSS assumptions into the SPA structure.
-- Verify landing works on refresh, back/forward navigation, and direct entry.
-
 ## Sprint 30 
 - Sprint goal: Convert the lobby to React and remove manual DOM rendering
 - Build the lobby route as declarative React components.
