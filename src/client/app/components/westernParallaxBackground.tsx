@@ -1,6 +1,9 @@
 import type { CSSProperties, ReactNode } from "react";
 
 const cloudsImagePath = "/clouds.png";
+const distantMountainImagePath = "/distant_mountain.png";
+const hillsAndCactiImagePath = "/hills_and_cacti.png";
+const foregroundImagePath = "/Foreground_layer.png";
 
 interface WesternParallaxBackgroundProps {
   children: ReactNode;
@@ -8,6 +11,9 @@ interface WesternParallaxBackgroundProps {
 
 interface WesternParallaxStyle extends CSSProperties {
   "--western-clouds-image": string;
+  "--western-distant-mountain-image": string;
+  "--western-hills-and-cacti-image": string;
+  "--western-foreground-image": string;
 }
 
 export function WesternParallaxBackground({
@@ -15,6 +21,9 @@ export function WesternParallaxBackground({
 }: WesternParallaxBackgroundProps): React.JSX.Element {
   const backgroundStyle: WesternParallaxStyle = {
     "--western-clouds-image": `url("${cloudsImagePath}")`,
+    "--western-distant-mountain-image": `url("${distantMountainImagePath}")`,
+    "--western-hills-and-cacti-image": `url("${hillsAndCactiImagePath}")`,
+    "--western-foreground-image": `url("${foregroundImagePath}")`,
   };
 
   return (

@@ -43,7 +43,7 @@ export function LandingRoute(): React.JSX.Element {
     <WesternParallaxBackground>
       <main className="landing-page">
         <section className="card">
-          <h1>Multiplayer</h1>
+          <h1>Gunfight</h1>
           <p className="subtitle">Pick a name and jump into a game</p>
 
           <HomeScreenSuggestion />
