@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { HomeScreenSuggestion } from "../components/HomeScreenSuggestion.tsx";
 import { WesternParallaxBackground } from "../components/westernParallaxBackground.tsx";
 import { getStoredPlayerName, storePlayerName } from "../client-session.ts";
+import { playLandingPageTune } from "../landingTune.ts";
 import { appRoutes } from "../routes.ts";
 import { useDocumentTitle } from "../use-document-title.ts";
 import { notifyVisitor } from "../visitor.ts";
@@ -17,6 +18,14 @@ export function LandingRoute(): React.JSX.Element {
 
   useEffect(() => {
     nameInputRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    const tunePlayback = playLandingPageTune({ repetitions: 3 });
+
+    return () => {
+      tunePlayback.stop();
+    };
   }, []);
 
   async function handleSubmit(
