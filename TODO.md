@@ -1,7 +1,5 @@
 # TODO
-## Sprint 38 Prepare landing page for parallax background effect
  
-      
 
 ## Backlog 
 - The arena should have a background of tiles the 
@@ -9,7 +7,8 @@
 - Show a list of names of the players currently in the lobby.
 - When you get low energy (<20%) you should start to move more slowly and the speed should decrease as you loose more energy. But even if you have 0% you should still be able to move very slowly.
 - Integrate chatGPT API to do experiments.
-- Switch to a sprite for the player character
+- Switch to a sprite for the player character.
+- Create a deo task that runs a  Playwright test that clicks trough the site and takes screenshots along the way and saves it. This way the agent can see what it is doing.
 
 
 ## Boring Bugs

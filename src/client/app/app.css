@@ -17,8 +17,28 @@
   --color-accent-secondary: #3ecfcf;
   --color-status-ready: #f39c12;
   --color-status-playing: #2ecc71;
+  --color-western-sky-top: #7ec8f0;
+  --color-western-sky-bottom: #f8c27a;
+  --color-western-mountain: #8e6f7c;
+  --color-western-mountain-shadow: #6b5369;
+  --color-western-hill: #b88455;
+  --color-western-hill-shadow: #946640;
+  --color-western-earth: #6f4327;
+  --color-western-earth-shadow: #4f2e1e;
+  --color-western-cactus: #246b49;
+  --color-western-rock: #8a8172;
   --shadow-card: 0 8px 40px rgba(0, 0, 0, 0.4);
   --shadow-interactive: 0 8px 24px rgba(108, 99, 255, 0.15);
+  --western-layer-overlap-ratio: 0.8;
+  --western-mountain-height: 36vh;
+  --western-hill-height: 28vh;
+  --western-foreground-height: 24vh;
+  --western-mountain-bottom: 41.6vh;
+  --western-hill-bottom: 19.2vh;
+  --western-sky-drift-distance: 320px;
+  --western-mountain-drift-distance: 480px;
+  --western-hill-drift-distance: 560px;
+  --western-foreground-drift-distance: 720px;
 }
 
 body {
@@ -30,6 +50,132 @@ body {
 
 a {
   color: var(--color-accent-secondary);
+}
+
+.western-parallax-background {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background: var(--color-western-sky-bottom);
+}
+
+.western-parallax-layers {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.western-parallax-layer {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  will-change: background-position;
+}
+
+.western-parallax-sky {
+  inset: 0;
+  background-image:
+    var(--western-clouds-image),
+    linear-gradient(
+      180deg,
+      var(--color-western-sky-top) 0%,
+      var(--color-western-sky-bottom) 100%
+    );
+  background-position: 0 0, center;
+  background-repeat: repeat-x, no-repeat;
+  background-size: auto 30%, cover;
+  animation: western-sky-drift 90s linear infinite;
+}
+
+.western-parallax-mountains {
+  bottom: var(--western-mountain-bottom);
+  height: var(--western-mountain-height);
+  background-image:
+    linear-gradient(
+      135deg,
+      transparent 0 22%,
+      var(--color-western-mountain-shadow) 22% 38%,
+      var(--color-western-mountain) 38% 58%,
+      transparent 58% 100%
+    ),
+    linear-gradient(
+      45deg,
+      transparent 0 30%,
+      var(--color-western-mountain) 30% 56%,
+      transparent 56% 100%
+    );
+  background-position: 0 100%, 220px 100%;
+  background-repeat: repeat-x;
+  background-size: 520px 100%, 640px 88%;
+  animation: western-mountain-drift 70s linear infinite;
+}
+
+.western-parallax-hills {
+  bottom: var(--western-hill-bottom);
+  height: var(--western-hill-height);
+  border-radius: 50% 50% 0 0 / 42% 42% 0 0;
+  background-image:
+    radial-gradient(
+      ellipse at 18% 100%,
+      var(--color-western-hill-shadow) 0 28%,
+      transparent 29%
+    ),
+    radial-gradient(
+      ellipse at 60% 105%,
+      var(--color-western-hill) 0 42%,
+      transparent 43%
+    ),
+    linear-gradient(
+      180deg,
+      var(--color-western-hill) 0%,
+      var(--color-western-hill-shadow) 100%
+    );
+  background-position: 0 100%, 120px 100%, center;
+  background-repeat: repeat-x, repeat-x, no-repeat;
+  background-size: 520px 100%, 680px 100%, cover;
+  animation: western-hill-drift 50s linear infinite;
+}
+
+.western-parallax-foreground {
+  bottom: 0;
+  height: var(--western-foreground-height);
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 0 10%,
+      var(--color-western-cactus) 10% 12%,
+      transparent 12% 20%,
+      var(--color-western-rock) 20% 25%,
+      transparent 25% 100%
+    ),
+    radial-gradient(
+      ellipse at 70% 100%,
+      var(--color-western-earth-shadow) 0 12%,
+      transparent 13%
+    ),
+    linear-gradient(
+      180deg,
+      var(--color-western-earth) 0%,
+      var(--color-western-earth-shadow) 100%
+    );
+  background-position: 0 0, 80px 100%, center;
+  background-repeat: repeat-x, repeat-x, no-repeat;
+  background-size: 360px 100%, 280px 60%, cover;
+  animation: western-foreground-drift 32s linear infinite;
+}
+
+.western-parallax-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.western-parallax-content > * {
+  width: 100%;
 }
 
 .landing-page,
@@ -659,6 +805,54 @@ kbd {
 
 .diagnostics-room-card.active {
   border-color: var(--diagnostics-color-border-active);
+}
+
+@keyframes western-sky-drift {
+  from {
+    background-position: 0 0, center;
+  }
+
+  to {
+    background-position: var(--western-sky-drift-distance) 0, center;
+  }
+}
+
+@keyframes western-mountain-drift {
+  from {
+    background-position: 0 100%, 220px 100%;
+  }
+
+  to {
+    background-position:
+      var(--western-mountain-drift-distance) 100%,
+      calc(var(--western-mountain-drift-distance) + 220px) 100%;
+  }
+}
+
+@keyframes western-hill-drift {
+  from {
+    background-position: 0 100%, 120px 100%, center;
+  }
+
+  to {
+    background-position:
+      var(--western-hill-drift-distance) 100%,
+      calc(var(--western-hill-drift-distance) + 120px) 100%,
+      center;
+  }
+}
+
+@keyframes western-foreground-drift {
+  from {
+    background-position: 0 0, 80px 100%, center;
+  }
+
+  to {
+    background-position:
+      var(--western-foreground-drift-distance) 0,
+      calc(var(--western-foreground-drift-distance) + 80px) 100%,
+      center;
+  }
 }
 
 .diagnostics-room-header {
