@@ -29,11 +29,11 @@
   --western-mountain-height: 36vh;
   --western-hill-height: 28vh;
   --western-foreground-height: 400px;
-  --western-mountain-bottom: 38vh;
+  --western-mountain-bottom: 35vh;
   --western-hill-bottom: 20vh;
   --western-foreground-bottom: 0px;
   --western-sky-drift-distance: 320px;
-  --western-clouds-height: 600px;
+  --western-clouds-height: 1200px;
   --western-mountain-drift-distance: 480px;
   --western-hill-drift-distance: 560px;
   --western-foreground-drift-distance: 720px;
@@ -84,7 +84,8 @@ a {
   background-position: 0 0, center;
   background-repeat: repeat-x, no-repeat;
   background-size: auto var(--western-clouds-height), cover;
-  animation: western-sky-drift 160s linear infinite alternate;
+  animation: western-sky-drift 90s linear infinite alternate;
+  image-rendering: pixelated
 }
 
 .western-parallax-mountains {
