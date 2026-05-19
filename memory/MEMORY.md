@@ -18,3 +18,6 @@
 - [Sprint 22 protocol and interpolation notes](project_sprint22_protocol_and_interpolation.md)
   — Split player identity from recurring state and deferred interpolation until
   sequence timing is added
+- [Sprint 36 visual strategy](project_sprint36_visual_strategy.md) — Recommends
+  `16 x 16` source tiles rendered at `32 x 32`, `32 x 32` character sprites,
+  procedural pixel-style weapon arms, and keeping the arena at `2000 x 1500`

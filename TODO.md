@@ -1,20 +1,21 @@
 # TODO
+        
 
 ## Backlog 
+- The arena should have a background of tiles the 
 - Show the ammo under the character.
-
+- Show a list of names of the players currently in the lobby.
 - When you get low energy (<20%) you should start to move more slowly and the speed should decrease as you loose more energy. But even if you have 0% you should still be able to move very slowly.
 - Integrate chatGPT API to do experiments.
-
 - Switch to a sprite for the player character
-- Show a list of names of the players currently in the lobby.
+
 
 ## Boring Bugs
+- Why is there a lag when you are moving the character with the keyboard?
 - Performance bug: Stale game_over timeout may fire after a room resets.
   - Store pending game_over timeout ids per room.
   - Cancel them when a room becomes empty or restarts.
   - Verify new players cannot receive an old winner message.
-
 - Bug. When you have added the Progressive Web App to the home screen and you are playing a game. 
     If the phone goes to sleep/energy saving mode ( black screen ) and you wakes up again, then  the server connection is not restored and the player can not move. only move the arm will move
 - When all players are dead everyone should return to the lobby. (If a sole player shoot him or her self)

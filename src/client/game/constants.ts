@@ -32,8 +32,8 @@ export const COLOR_HIT_FLASH = "#ffffff";
 export const COLOR_VIGNETTE = "220,50,50";
 
 // Gameplay geometry defaults. Server-provided arena config should override these.
-export const DEFAULT_WORLD_WIDTH = 3000;
-export const DEFAULT_WORLD_HEIGHT = 2000;
+export const DEFAULT_WORLD_WIDTH = 2000;
+export const DEFAULT_WORLD_HEIGHT = 1500;
 export const DEFAULT_CACTUS_HALF_WIDTH = 8;
 export const DEFAULT_CACTUS_SEGMENT_STRIDE = 14;
 export const DEFAULT_CACTUS_SEGMENT_WIDTH = 16;
