@@ -39,33 +39,36 @@ export function LandingRoute(): React.JSX.Element {
   }
 
   return (
-    <main className="card">
-      <h1>Multiplayer</h1>
-      <p className="subtitle">Pick a name and jump into a game</p>
+    <main className="landing-page">
+      <section className="card">
+        <h1>Multiplayer</h1>
+        <p className="subtitle">Pick a name and jump into a game</p>
 
-      <HomeScreenSuggestion />
+        <HomeScreenSuggestion />
 
-      <form onSubmit={(event) => void handleSubmit(event)}>
-        <label htmlFor="name">Your name</label>
-        <input
-          ref={nameInputRef}
-          type="text"
-          id="name"
-          placeholder="Enter your name..."
-          maxLength={20}
-          autoComplete="off"
-          value={playerName}
-          onChange={(event) => setPlayerName(event.currentTarget.value)}
-        />
+        <form onSubmit={(event) => void handleSubmit(event)}>
+          <label htmlFor="name">Your name</label>
+          <input
+            ref={nameInputRef}
+            type="text"
+            id="name"
+            placeholder="Enter your name..."
+            maxLength={20}
+            autoComplete="off"
+            value={playerName}
+            onChange={(event) => setPlayerName(event.currentTarget.value)}
+          />
 
-        <button
-          id="enter"
-          type="submit"
-          disabled={isSubmitting || playerName.trim().length === 0}
-        >
-          Enter Lobby
-        </button>
-      </form>
+          <button
+            className="primary-button"
+            id="enter"
+            type="submit"
+            disabled={isSubmitting || playerName.trim().length === 0}
+          >
+            Enter Lobby
+          </button>
+        </form>
+      </section>
     </main>
   );
 }
