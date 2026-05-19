@@ -32,7 +32,7 @@ The flow should be fast and low-friction. A returning player may already have a 
 
 - Center the name entry experience clearly on the page.
 - Make the player name input and primary action feel large enough for children and touch devices.
-- Show a huge parallax background with a desert wild west theme with clouds in the background , mountains an cacti in a playful  exaggerated pixel art   
+- Show a huge parallax background with a desert wild west theme with clouds in the background , mountains an cacti and dessert in the middle and foreground. Playful exaggerated pixel art style.  
 - The page should communicate the cowboy arcade theme immediately, ideally with game-world visual elements rather than abstract decoration.
 - The home-screen suggestion should be secondary and dismissible, not competing with the name entry action.
 - The disabled state for `Enter Lobby` should be obvious when the input is empty or submission is in progress.
