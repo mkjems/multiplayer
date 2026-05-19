@@ -1,5 +1,7 @@
 # TODO
-        
+## Sprint 38 Prepare landing page for parallax background effect
+ 
+      
 
 ## Backlog 
 - The arena should have a background of tiles the 
