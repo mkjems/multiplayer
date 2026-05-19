@@ -84,7 +84,7 @@ a {
   background-position: 0 0, center;
   background-repeat: repeat-x, no-repeat;
   background-size: auto var(--western-clouds-height), cover;
-  animation: western-sky-drift 90s linear infinite;
+  animation: western-sky-drift 160s linear infinite alternate;
 }
 
 .western-parallax-mountains {
@@ -94,7 +94,7 @@ a {
   background-position: 0 100%;
   background-repeat: repeat-x;
   background-size: auto 100%;
-  animation: western-mountain-drift 70s linear infinite;
+  animation: western-mountain-drift 80s linear infinite alternate;
 }
 
 .western-parallax-hills {
@@ -104,7 +104,7 @@ a {
   background-position: 0 100%;
   background-repeat: repeat-x;
   background-size: auto 100%;
-  animation: western-hill-drift 50s linear infinite;
+  animation: western-hill-drift 30s linear infinite alternate;
 }
 
 .western-parallax-foreground {
@@ -114,7 +114,7 @@ a {
   background-position: 0 100%;
   background-repeat: repeat-x;
   background-size: auto 100%;
-  animation: western-foreground-drift 32s linear infinite;
+  animation: western-foreground-drift 10s linear infinite alternate;
 }
 
 .western-parallax-content {
