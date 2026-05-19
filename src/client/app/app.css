@@ -14,7 +14,7 @@
   --color-text-muted: #aaa;
   --color-text-subtle: #888;
   --color-text-faint: #555;
-  --color-accent-primary: #6c63ff;
+  --color-accent-primary: #8ab2fc;
   --color-accent-secondary: #3ecfcf;
   --color-status-ready: #f39c12;
   --color-status-playing: #2ecc71;
@@ -139,13 +139,10 @@ a {
 }
 
 .card {
-  background: var(--color-card-surface);
-  border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 48px 40px;
   width: 360px;
   text-align: center;
-  box-shadow: var(--shadow-card);
 }
 
 .card h1,
@@ -209,15 +206,6 @@ a {
   cursor: pointer;
 }
 
-label {
-  display: block;
-  text-align: left;
-  font-size: 0.8rem;
-  color: var(--color-white);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
 
 input[type="text"] {
   width: 100%;
@@ -259,7 +247,6 @@ input[type="text"]:focus {
 }
 
 .primary-button:disabled {
-  opacity: 0.4;
   cursor: not-allowed;
 }
 

@@ -58,7 +58,6 @@ export function LandingRoute(): React.JSX.Element {
           <HomeScreenSuggestion />
 
           <form onSubmit={(event) => void handleSubmit(event)}>
-            <label htmlFor="name">Your name</label>
             <input
               ref={nameInputRef}
               type="text"

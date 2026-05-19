@@ -55,6 +55,9 @@ const bassNotes: TimedNote[] = [
 ];
 
 const tuneDurationSeconds = 4.7;
+const beatDurationSeconds = 0.3;
+const repeatPauseBeats = 4;
+const repeatPauseSeconds = beatDurationSeconds * repeatPauseBeats;
 let activePlayback: LandingTunePlayback | null = null;
 
 export function playLandingPageTune(
@@ -100,7 +103,7 @@ export function playLandingPageTune(
 
   function scheduleTune(repetitionIndex: number): void {
     const repetitionStartTime = startTime +
-      repetitionIndex * tuneDurationSeconds;
+      repetitionIndex * (tuneDurationSeconds + repeatPauseSeconds);
 
     for (const melodyNote of melodyNotes) {
       scheduleNote(
