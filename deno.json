@@ -1,24 +1,26 @@
 {
   "exclude": ["src/client", "src/shared", "public"],
   "tasks": {
-    "build": "deno task client:typecheck && deno run -A npm:vite build",
-    "build:clean": "rm -rf public",
+    "dev": "deno task build && (deno task client:watch & deno run --allow-net --allow-read --allow-env --watch src/server/main.ts)",
+    "build": "deno task typecheck && deno run -A npm:vite build",
+    "start": "deno task build && deno run --allow-net --allow-read --allow-env src/server/main.ts",
+    "check": "deno task fmt:check && deno task lint && deno task typecheck && deno task test",
+    "fix": "deno task fmt",
+
+    "typecheck": "deno check src/server/main.ts && deno task client:typecheck",
+    "lint": "deno lint src/server && deno lint --no-config src/shared && deno task client:lint",
+    "test": "deno test src/server && deno test --no-config src/shared && deno task client:test",
+    "fmt": "deno fmt src/server && deno fmt --no-config src/shared && deno task client:fmt",
+    "fmt:check": "deno fmt --check src/server && deno fmt --check --no-config src/shared && deno task client:fmt:check",
+    
     "client:dev": "deno run -A npm:vite --host 0.0.0.0",
     "client:watch": "deno run -A npm:vite build --watch",
     "client:typecheck": "deno run -A npm:typescript/tsc --project src/client/tsconfig.json --noEmit",
     "client:test": "deno test --no-config src/client/**/*_test.ts",
     "client:fmt": "deno fmt --no-config src/client",
     "client:fmt:check": "deno fmt --check --no-config src/client",
-    "client:lint": "deno run -A npm:eslint src/client",
-    "browser:smoke": "deno run --allow-net --allow-read --allow-env --allow-run --allow-sys --allow-write scripts/browser-smoke.ts",
-    "start": "deno task build && deno run --allow-net --allow-read --allow-env src/server/main.ts",
-    "dev": "deno task build && (deno task client:watch & deno run --allow-net --allow-read --allow-env --watch src/server/main.ts)",
-    "fmt": "deno fmt src/server && deno fmt --no-config src/shared && deno task client:fmt",
-    "fmt:check": "deno fmt --check src/server && deno fmt --check --no-config src/shared && deno task client:fmt:check",
-    "lint": "deno lint src/server && deno lint --no-config src/shared && deno task client:lint",
-    "test": "deno test src/server && deno test --no-config src/shared && deno task client:test",
-    "check": "deno check src/server/main.ts && deno task client:typecheck",
-    "quality": "deno task fmt:check && deno task lint && deno task check && deno task test"
+    "client:lint": "deno run -A npm:eslint \"src/client/**/*.{ts,tsx}\"",
+    "browser:smoke": "deno run --allow-net --allow-read --allow-env --allow-run --allow-sys --allow-write scripts/browser-smoke.ts"
   },
   "lint": {
     "exclude": ["src/client"]
