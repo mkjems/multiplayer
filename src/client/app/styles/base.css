@@ -1,0 +1,10 @@
+body {
+  min-height: 100vh;
+  background: var(--color-background);
+  font-family: system-ui, sans-serif;
+  color: var(--color-text);
+}
+
+a {
+  color: var(--color-accent-secondary);
+}

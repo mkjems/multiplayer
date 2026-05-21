@@ -1,0 +1,19 @@
+:root {
+  --color-background: #0f0f1a;
+  --color-surface: #1a1a2e;
+  --color-card-surface: rgba(26, 26, 46, 0.38);
+  --color-border: #2a2a4a;
+  --color-border-strong: #3a3a5a;
+  --color-text: #e0e0e0;
+  --color-text-muted: #aaa;
+  --color-text-subtle: #888;
+  --color-text-faint: #555;
+  --color-accent-primary: #8ab2fc;
+  --color-accent-secondary: #3ecfcf;
+  --color-status-ready: #f39c12;
+  --color-status-playing: #2ecc71;
+  --color-black: #000;
+  --color-white: #fff;
+  --shadow-card: 0 8px 40px rgba(0, 0, 0, 0.4);
+  --shadow-interactive: 0 8px 24px rgba(108, 99, 255, 0.15);
+}

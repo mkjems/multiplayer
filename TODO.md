@@ -1,15 +1,5 @@
 # TODO
 
-## Sprint 38
-- Sprint Goal: Split true global CSS concerns out of `src/client/app/app.css` so future styling work has an obvious home.
-- [x] Create `src/client/app/styles/` for global CSS files.
-- [x] Move reset rules into `src/client/app/styles/reset.css`.
-- [x] Move `:root` design tokens into `src/client/app/styles/tokens.css`.
-- [x] Move document-level defaults such as `body` and global link styling into `src/client/app/styles/base.css`.
-- [x] Update `src/client/app/main.tsx` to import the new global CSS files explicitly.
-- [x] Keep `src/client/touch-controls.css` global until the touch controls ownership is reviewed.
-- [x] Run the app and verify landing, lobby, game, diagnostics, and touch controls still receive their expected base styles.
-
 ## Sprint 39
 - Sprint Goal: Make route-level styles statically discoverable from the React files that use them.
 - [ ] Create `LandingRoute.module.css` beside `LandingRoute.tsx`.

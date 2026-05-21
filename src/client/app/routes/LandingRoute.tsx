@@ -62,6 +62,7 @@ export function LandingRoute(): React.JSX.Element {
               ref={nameInputRef}
               type="text"
               id="name"
+              aria-label="Your name"
               placeholder="Enter your name..."
               maxLength={20}
               autoComplete="off"
