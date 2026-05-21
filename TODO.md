@@ -1,5 +1,55 @@
 # TODO
- 
+
+## Sprint 38
+- Sprint Goal: Split true global CSS concerns out of `src/client/app/app.css` so future styling work has an obvious home.
+- [x] Create `src/client/app/styles/` for global CSS files.
+- [x] Move reset rules into `src/client/app/styles/reset.css`.
+- [x] Move `:root` design tokens into `src/client/app/styles/tokens.css`.
+- [x] Move document-level defaults such as `body` and global link styling into `src/client/app/styles/base.css`.
+- [x] Update `src/client/app/main.tsx` to import the new global CSS files explicitly.
+- [x] Keep `src/client/touch-controls.css` global until the touch controls ownership is reviewed.
+- [x] Run the app and verify landing, lobby, game, diagnostics, and touch controls still receive their expected base styles.
+
+## Sprint 39
+- Sprint Goal: Make route-level styles statically discoverable from the React files that use them.
+- [ ] Create `LandingRoute.module.css` beside `LandingRoute.tsx`.
+- [ ] Move landing page and name-entry card styles out of `app.css`.
+- [ ] Create `LobbyRoute.module.css` beside `LobbyRoute.tsx`.
+- [ ] Move lobby layout styles out of `app.css`.
+- [ ] Create `GameRoute.module.css` beside `GameRoute.tsx`.
+- [ ] Move game page, canvas, nav, HUD, ammo, status banner, and winner overlay styles out of `app.css`.
+- [ ] Create `DiagnosticsRoute.module.css` beside `DiagnosticsRoute.tsx`.
+- [ ] Move diagnostics page layout styles out of `app.css`.
+- [ ] Update route components to import module styles and replace string class names with typed `styles.className` references.
+- [ ] Preserve kebab-case CSS class names where plain global CSS remains; use camelCase module properties in TypeScript where CSS Modules are introduced.
+
+## Sprint 40
+- Sprint Goal: Keep reusable component styling local to the component that owns it.
+- [ ] Create `HomeScreenSuggestion.module.css` beside `HomeScreenSuggestion.tsx`.
+- [ ] Move home-screen suggestion and dismiss button styles out of `app.css`.
+- [ ] Create CSS modules for lobby components where ownership is clear, such as `KeyboardControls`, `GamesList`, and `GameCard`.
+- [ ] Move keyboard control, game list, game card, status dot, and player count styles into their component modules.
+- [ ] Create CSS modules for diagnostics child components where ownership is clear, such as `DiagnosticsSummary`, `DiagnosticsRoomCard`, and `SparkLine`.
+- [ ] Move diagnostics tile, room card, metric, graph, bar, and sparkline styles into their component modules.
+- [ ] Keep intentionally shared component styles in a small shared CSS module or global shared file only when more than one component genuinely owns the same visual pattern.
+
+## Sprint 41
+- Sprint Goal: Make `app.css` unnecessary or reduce it to a tiny compatibility file.
+- [ ] Search the client app for remaining string class names that still depend on `app.css`.
+- [ ] Move any remaining route or component-specific selectors to the owning module.
+- [ ] Delete empty or obsolete selectors from `app.css`.
+- [ ] Remove the `app.css` import from `main.tsx` when all styles have clear new owners.
+- [ ] Verify there are no unused CSS module imports or unused global selectors.
+- [ ] Run type checking and the existing test suite.
+
+## Sprint 42
+- Sprint Goal: Improve maintainability without changing the visual design.
+- [ ] Replace hardcoded colors in moved CSS with descriptively named variables from `tokens.css`.
+- [ ] Add missing design tokens for repeated shadows, borders, spacing, and status colors when the names are clear.
+- [ ] Remove duplicate declarations introduced during the split.
+- [ ] Confirm responsive rules live with the components or routes they affect.
+- [ ] Check that CSS module imports preserve IDE navigation and rename support in TypeScript.
+- [ ] Do a browser pass across desktop and mobile widths for landing, lobby, game, diagnostics, and the parked parallax component if it is rendered anywhere.
 
 ## Backlog 
 - The arena should have a background of tiles the 
