@@ -35,12 +35,12 @@
 
 ## Sprint 41
 - Sprint Goal: Make `app.css` unnecessary or reduce it to a tiny compatibility file.
-- [ ] Search the client app for remaining string class names that still depend on `app.css`.
-- [ ] Move any remaining route or component-specific selectors to the owning module.
-- [ ] Delete empty or obsolete selectors from `app.css`.
-- [ ] Remove the `app.css` import from `main.tsx` when all styles have clear new owners.
-- [ ] Verify there are no unused CSS module imports or unused global selectors.
-- [ ] Run type checking and the existing test suite.
+- [x] Search the client app for remaining string class names that still depend on `app.css`.
+- [x] Move any remaining route or component-specific selectors to the owning module.
+- [x] Delete empty or obsolete selectors from `app.css`.
+- [x] Remove the `app.css` import from `main.tsx` when all styles have clear new owners.
+- [x] Verify there are no unused CSS module imports or unused global selectors.
+- [x] Run type checking and the existing test suite.
 
 ## Sprint 42
 - Sprint Goal: Improve maintainability without changing the visual design.

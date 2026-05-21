@@ -4,7 +4,6 @@ import { App } from "./App.tsx";
 import "./styles/reset.css";
 import "./styles/tokens.css";
 import "./styles/base.css";
-import "./app.css";
 import "../touch-controls.css";
 
 const rootElement = document.getElementById("root");
