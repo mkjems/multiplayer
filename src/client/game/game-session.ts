@@ -4,7 +4,7 @@ import * as CONSTANTS from "./constants.ts";
 import { createEffects } from "./effects.ts";
 import { type InputHandler, setupInputHandler } from "./input.ts";
 import { createNetworkManager, type NetworkManager } from "./network.ts";
-import { createRenderer, type Renderer } from "./render.ts";
+import { createRenderer } from "./render.ts";
 import { createGameState, type GameState } from "./state.ts";
 import { setupTouchControls } from "./touch-controls.ts";
 

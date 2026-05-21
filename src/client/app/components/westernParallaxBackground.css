@@ -15,7 +15,6 @@
   --color-western-sky-bottom: #f8c27a;
 }
 
-
 .western-parallax-background {
   position: relative;
   min-height: 100vh;
@@ -43,10 +42,10 @@
   background-image:
     var(--western-clouds-image),
     linear-gradient(
-      180deg,
-      var(--color-western-sky-top) 0%,
-      var(--color-western-sky-bottom) 100%
-    );
+    180deg,
+    var(--color-western-sky-top) 0%,
+    var(--color-western-sky-bottom) 100%
+  );
   background-position: 0 0, center;
   background-repeat: repeat-x, no-repeat;
   background-size: auto var(--western-clouds-height), cover;
@@ -105,7 +104,9 @@
   }
 
   to {
-    background-position: var(--western-sky-drift-distance) 0, center;
+    background-position:
+      var(--western-sky-drift-distance) 0,
+      center;
   }
 }
 
