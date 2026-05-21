@@ -1,3 +1,5 @@
+import styles from "./KeyboardControls.module.css";
+
 function isTouchDevice(): boolean {
   return navigator.maxTouchPoints > 0;
 }
@@ -7,37 +9,37 @@ export function KeyboardControls(): React.JSX.Element | null {
 
   return (
     <section
-      className="keyboard-controls"
+      className={styles.keyboardControls}
       aria-labelledby="keyboard-controls-title"
     >
       <h2 id="keyboard-controls-title">Keyboard controls</h2>
-      <ul className="control-list">
+      <ul className={styles.controlList}>
         <li>
           <span>Move</span>
-          <span className="control-keys">
-            <kbd>↑</kbd>
-            <kbd>←</kbd>
-            <kbd>↓</kbd>
-            <kbd>→</kbd>
+          <span className={styles.controlKeys}>
+            <kbd className={styles.key}>↑</kbd>
+            <kbd className={styles.key}>←</kbd>
+            <kbd className={styles.key}>↓</kbd>
+            <kbd className={styles.key}>→</kbd>
           </span>
         </li>
         <li>
           <span>Aim arm</span>
-          <span className="control-keys">
-            <kbd>A</kbd>
-            <kbd>Z</kbd>
+          <span className={styles.controlKeys}>
+            <kbd className={styles.key}>A</kbd>
+            <kbd className={styles.key}>Z</kbd>
           </span>
         </li>
         <li>
           <span>Fire</span>
-          <span className="control-keys">
-            <kbd>X</kbd>
+          <span className={styles.controlKeys}>
+            <kbd className={styles.key}>X</kbd>
           </span>
         </li>
         <li>
           <span>Reload</span>
-          <span className="control-keys">
-            <kbd>R</kbd>
+          <span className={styles.controlKeys}>
+            <kbd className={styles.key}>R</kbd>
           </span>
         </li>
       </ul>

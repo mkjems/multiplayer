@@ -1,4 +1,5 @@
 import { percentOf } from "./diagnostics-format.ts";
+import styles from "./SparkLine.module.css";
 
 const sparkLineWidth = 220;
 const sparkLineHeight = 52;
@@ -33,7 +34,7 @@ export function SparkLine(
 ): React.JSX.Element {
   return (
     <svg
-      className="diagnostics-sparkLine"
+      className={styles.sparkLine}
       viewBox={`0 0 ${sparkLineWidth} ${sparkLineHeight}`}
       role="img"
       aria-label={`${label} trend`}
@@ -44,12 +45,12 @@ export function SparkLine(
         y1={sparkLineHeight - 1}
         x2={sparkLineWidth}
         y2={sparkLineHeight - 1}
-        className="diagnostics-sparkLine-baseline"
+        className={styles.sparkLineBaseline}
       >
       </line>
       <polyline
         points={createSparkLinePoints(values, referenceValue)}
-        className="diagnostics-sparkLine-line"
+        className={styles.sparkLineLine}
       >
       </polyline>
     </svg>

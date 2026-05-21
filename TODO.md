@@ -25,13 +25,13 @@
 
 ## Sprint 40
 - Sprint Goal: Keep reusable component styling local to the component that owns it.
-- [ ] Create `HomeScreenSuggestion.module.css` beside `HomeScreenSuggestion.tsx`.
-- [ ] Move home-screen suggestion and dismiss button styles out of `app.css`.
-- [ ] Create CSS modules for lobby components where ownership is clear, such as `KeyboardControls`, `GamesList`, and `GameCard`.
-- [ ] Move keyboard control, game list, game card, status dot, and player count styles into their component modules.
-- [ ] Create CSS modules for diagnostics child components where ownership is clear, such as `DiagnosticsSummary`, `DiagnosticsRoomCard`, and `SparkLine`.
-- [ ] Move diagnostics tile, room card, metric, graph, bar, and sparkline styles into their component modules.
-- [ ] Keep intentionally shared component styles in a small shared CSS module or global shared file only when more than one component genuinely owns the same visual pattern.
+- [x] Create `HomeScreenSuggestion.module.css` beside `HomeScreenSuggestion.tsx`.
+- [x] Move home-screen suggestion and dismiss button styles out of `app.css`.
+- [x] Create CSS modules for lobby components where ownership is clear, such as `KeyboardControls`, `GamesList`, and `GameCard`.
+- [x] Move keyboard control, game list, game card, status dot, and player count styles into their component modules.
+- [x] Create CSS modules for diagnostics child components where ownership is clear, such as `DiagnosticsSummary`, `DiagnosticsRoomCard`, and `SparkLine`.
+- [x] Move diagnostics tile, room card, metric, graph, bar, and sparkline styles into their component modules.
+- [x] Keep intentionally shared component styles in a small shared CSS module or global shared file only when more than one component genuinely owns the same visual pattern.
 
 ## Sprint 41
 - Sprint Goal: Make `app.css` unnecessary or reduce it to a tiny compatibility file.

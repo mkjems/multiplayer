@@ -1,6 +1,7 @@
 import type { GameInfo } from "../../../shared/protocol";
 import type { LobbyConnectionStatus } from "./use-lobby-connection.ts";
 import { GameCard } from "./GameCard.tsx";
+import styles from "./GamesList.module.css";
 
 interface GamesListProps {
   games: GameInfo[];
@@ -20,11 +21,11 @@ export function GamesList(
   { games, status, onJoinGame }: GamesListProps,
 ): React.JSX.Element {
   if (status !== "connected" || games.length === 0) {
-    return <div className="loading">{getEmptyMessage(status)}</div>;
+    return <div className={styles.loading}>{getEmptyMessage(status)}</div>;
   }
 
   return (
-    <div className="games">
+    <div className={styles.games}>
       {games.map((game) => (
         <GameCard game={game} key={game.id} onJoinGame={onJoinGame} />
       ))}

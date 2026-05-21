@@ -8,6 +8,7 @@ import {
 } from "./diagnostics-format.ts";
 import type { RoomHistorySample } from "./diagnostics-history.ts";
 import { SparkLine } from "./SparkLine.tsx";
+import styles from "./DiagnosticsRoomCard.module.css";
 
 const tickBudgetMilliseconds = 50;
 const payloadReferenceBytes = 8000;
@@ -44,25 +45,25 @@ export function DiagnosticsRoomCard(
   const averageTickMilliseconds =
     room.tickDurationMilliseconds.averageMilliseconds;
   const activeClassName = room.active
-    ? "diagnostics-room-card active"
-    : "diagnostics-room-card";
+    ? `${styles.roomCard} ${styles.active}`
+    : styles.roomCard;
   const roomStatusClassName = room.active
-    ? "diagnostics-room-status active"
-    : "diagnostics-room-status";
+    ? `${styles.roomStatus} ${styles.activeStatus}`
+    : styles.roomStatus;
 
   return (
     <article className={activeClassName}>
-      <div className="diagnostics-room-header">
+      <div className={styles.roomHeader}>
         <div>
-          <h3 className="diagnostics-room-name">{room.name}</h3>
-          <p className="diagnostics-room-id">{room.id}</p>
+          <h3 className={styles.roomName}>{room.name}</h3>
+          <p className={styles.roomId}>{room.id}</p>
         </div>
         <span className={roomStatusClassName}>
           {room.active ? "Active" : "Idle"}
         </span>
       </div>
 
-      <div className="diagnostics-metric-grid">
+      <div className={styles.metricGrid}>
         <Metric label="Players" value={formatNumber(room.playerCount)} />
         <Metric label="Sockets" value={formatNumber(room.socketCount)} />
         <Metric label="Bullets" value={formatNumber(room.bulletCount)} />
@@ -71,7 +72,7 @@ export function DiagnosticsRoomCard(
         <Metric label="Cacti" value={formatNumber(room.cactusCount)} />
       </div>
 
-      <div className="diagnostics-bar-list">
+      <div className={styles.barList}>
         <BarMetric
           label="Average tick"
           value={formatMilliseconds(averageTickMilliseconds)}
@@ -110,9 +111,9 @@ export function DiagnosticsRoomCard(
 
 function Metric({ label, value }: MetricProps): React.JSX.Element {
   return (
-    <div className="diagnostics-metric">
-      <span className="diagnostics-metric-label">{label}</span>
-      <span className="diagnostics-metric-value">{value}</span>
+    <div className={styles.metric}>
+      <span className={styles.metricLabel}>{label}</span>
+      <span className={styles.metricValue}>{value}</span>
     </div>
   );
 }
@@ -123,11 +124,11 @@ function BarMetric(
   const boundedPercent = Math.round(percentOf(percent, 100));
 
   return (
-    <div className="diagnostics-bar-row">
+    <div className={styles.barRow}>
       <span>{label}</span>
-      <div className="diagnostics-bar-track" aria-hidden="true">
+      <div className={styles.barTrack} aria-hidden="true">
         <div
-          className="diagnostics-bar-fill"
+          className={styles.barFill}
           style={{
             "--bar-percent": `${boundedPercent}%`,
             "--bar-color": getBarColor(boundedPercent),
@@ -148,12 +149,12 @@ function Graphs(
     : `${history.length} samples`;
 
   return (
-    <div className="diagnostics-graph-section">
-      <div className="diagnostics-graph-section-heading">
+    <div className={styles.graphSection}>
+      <div className={styles.graphSectionHeading}>
         <span>One-hour local history</span>
         <span>{sampleText}</span>
       </div>
-      <div className="diagnostics-graph-grid">
+      <div className={styles.graphGrid}>
         {getRoomGraphSeries(room, history).map((series) => (
           <GraphPanel series={series} key={series.label} />
         ))}
@@ -164,8 +165,8 @@ function Graphs(
 
 function GraphPanel({ series }: { series: GraphSeries }): React.JSX.Element {
   return (
-    <div className="diagnostics-graph-panel">
-      <div className="diagnostics-graph-heading">
+    <div className={styles.graphPanel}>
+      <div className={styles.graphHeading}>
         <span>{series.label}</span>
         <strong>{series.formattedValue}</strong>
       </div>

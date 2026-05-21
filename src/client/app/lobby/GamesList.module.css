@@ -1,0 +1,14 @@
+.games {
+  max-width: 800px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.loading {
+  max-width: 800px;
+  margin: 0 auto;
+  color: var(--color-text-faint);
+  font-size: 0.9rem;
+}

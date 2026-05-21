@@ -1,0 +1,152 @@
+.roomCard {
+  border: 1px solid var(--diagnostics-color-border);
+  border-radius: 8px;
+  background: var(--diagnostics-color-surface);
+  box-shadow: 0 12px 28px var(--diagnostics-color-shadow);
+}
+
+.active {
+  border-color: var(--diagnostics-color-border-active);
+}
+
+.roomHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--diagnostics-color-border);
+}
+
+.roomName {
+  margin-bottom: 4px;
+  font-size: 1rem;
+}
+
+.roomId {
+  color: var(--diagnostics-color-text-soft);
+  font-size: 0.78rem;
+}
+
+.roomStatus {
+  padding: 4px 8px;
+  border: 1px solid var(--diagnostics-color-border);
+  border-radius: 4px;
+  color: var(--diagnostics-color-text-muted);
+  font-size: 0.75rem;
+}
+
+.activeStatus {
+  border-color: var(--diagnostics-color-good);
+  color: var(--diagnostics-color-good);
+}
+
+.metricGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding: 14px 16px;
+}
+
+.metric {
+  min-height: 64px;
+  padding: 10px;
+  border-radius: 6px;
+  background: var(--diagnostics-color-surface-strong);
+}
+
+.metricLabel {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--diagnostics-color-text-muted);
+  font-size: 0.74rem;
+}
+
+.metricValue {
+  font-size: 1.08rem;
+  font-weight: 700;
+}
+
+.barList {
+  display: grid;
+  gap: 11px;
+  padding: 0 16px 16px;
+}
+
+.barRow {
+  display: grid;
+  grid-template-columns: 136px minmax(0, 1fr) 72px;
+  align-items: center;
+  gap: 10px;
+  color: var(--diagnostics-color-text-muted);
+  font-size: 0.78rem;
+}
+
+.barTrack {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--diagnostics-color-bar-track);
+}
+
+.barFill {
+  width: var(--bar-percent);
+  height: 100%;
+  border-radius: inherit;
+  background: var(--bar-color);
+}
+
+.graphSection {
+  padding: 0 16px 16px;
+}
+
+.graphSectionHeading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  color: var(--diagnostics-color-text-muted);
+  font-size: 0.76rem;
+}
+
+.graphGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.graphPanel {
+  min-width: 0;
+  padding: 10px;
+  border-radius: 6px;
+  background: var(--diagnostics-color-surface-strong);
+}
+
+.graphHeading {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  color: var(--diagnostics-color-text-muted);
+  font-size: 0.74rem;
+}
+
+.graphHeading strong {
+  color: var(--diagnostics-color-text);
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .metricGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .barRow {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .graphGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,4 +1,5 @@
 import type { GameInfo } from "../../../shared/protocol";
+import styles from "./GameCard.module.css";
 
 interface GameCardProps {
   game: GameInfo;
@@ -15,21 +16,21 @@ export function GameCard(
 ): React.JSX.Element {
   const isFull = game.playerCount >= game.maxPlayers;
   const statusClassName = game.status === "waiting"
-    ? "status-dot waiting"
-    : "status-dot";
+    ? `${styles.statusDot} ${styles.waiting}`
+    : styles.statusDot;
 
   return (
     <button
-      className={`game-card${isFull ? " full" : ""}`}
+      className={`${styles.gameCard}${isFull ? ` ${styles.full}` : ""}`}
       type="button"
       disabled={isFull}
       onClick={() => onJoinGame(game.id)}
     >
-      <div className="game-name">{game.name}</div>
-      <div className="game-meta">
+      <div className={styles.gameName}>{game.name}</div>
+      <div className={styles.gameMeta}>
         <span className={statusClassName}></span>
         <span>{getGameStatusLabel(game)}</span>
-        <span className="player-count">
+        <span className={styles.playerCount}>
           {game.playerCount} / {game.maxPlayers}
         </span>
       </div>

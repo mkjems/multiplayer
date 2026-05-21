@@ -1,5 +1,6 @@
 import type { RoomDiagnostics } from "../../../shared/diagnostics.ts";
 import { formatNumber } from "./diagnostics-format.ts";
+import styles from "./DiagnosticsSummary.module.css";
 
 interface DiagnosticsSummaryProps {
   rooms: RoomDiagnostics[];
@@ -16,7 +17,7 @@ export function DiagnosticsSummary(
   );
 
   return (
-    <section className="diagnostics-summary-grid" aria-label="Server summary">
+    <section className={styles.summaryGrid} aria-label="Server summary">
       <SummaryTile label="Rooms" value={rooms.length} />
       <SummaryTile label="Active" value={activeRooms} />
       <SummaryTile label="Players" value={playerCount} />
@@ -32,8 +33,8 @@ interface SummaryTileProps {
 
 function SummaryTile({ label, value }: SummaryTileProps): React.JSX.Element {
   return (
-    <div className="diagnostics-summary-tile">
-      <span className="diagnostics-summary-label">{label}</span>
+    <div className={styles.summaryTile}>
+      <span className={styles.summaryLabel}>{label}</span>
       <strong>{formatNumber(value)}</strong>
     </div>
   );

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import styles from "./HomeScreenSuggestion.module.css";
 
 interface StandaloneNavigator extends Navigator {
   readonly standalone?: boolean;
@@ -71,9 +72,9 @@ export function HomeScreenSuggestion(): React.JSX.Element | null {
   if (!isVisible) return null;
 
   return (
-    <aside className="home-screen-suggestion" aria-live="polite">
+    <aside className={styles.homeScreenSuggestion} aria-live="polite">
       <button
-        className="dismiss-suggestion"
+        className={styles.dismissSuggestion}
         type="button"
         aria-label="Dismiss home screen suggestion"
         onClick={() => setIsDismissed(true)}
