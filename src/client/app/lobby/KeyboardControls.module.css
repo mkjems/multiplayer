@@ -38,7 +38,7 @@
   min-width: 24px;
   padding: 3px 6px;
   border: 1px solid var(--color-border-strong);
-  border-bottom-color: #252542;
+  border-bottom-color: var(--color-key-border-shadow);
   border-radius: 4px;
   background: var(--color-background);
   color: var(--color-text);

@@ -48,7 +48,7 @@
   padding: 14px;
   border: none;
   border-radius: 8px;
-  background: linear-gradient(360deg, #63aaff, #9cd3f1);
+  background: var(--gradient-primary-button);
   color: var(--color-white);
   font-size: 1rem;
   font-weight: 600;

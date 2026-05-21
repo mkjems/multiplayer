@@ -21,9 +21,9 @@
 .liveBadge {
   margin-left: 8px;
   padding: 2px 6px;
-  border: 1px solid rgba(108, 99, 255, 0.27);
+  border: 1px solid var(--color-accent-primary-border-subtle);
   border-radius: 4px;
-  background: rgba(108, 99, 255, 0.15);
+  background: var(--color-accent-primary-surface-subtle);
   color: var(--color-accent-primary);
   font-size: 0.7rem;
   vertical-align: middle;

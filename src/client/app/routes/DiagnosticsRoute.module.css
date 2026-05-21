@@ -13,6 +13,7 @@
   --diagnostics-color-info: #64a6d9;
   --diagnostics-color-bar-track: #273244;
   --diagnostics-color-shadow: rgba(0, 0, 0, 0.24);
+  --diagnostics-shadow-card: 0 12px 28px var(--diagnostics-color-shadow);
   min-height: 100vh;
   background: var(--diagnostics-color-page);
   color: var(--diagnostics-color-text);
@@ -107,7 +108,7 @@
   border: 1px solid var(--diagnostics-color-border);
   border-radius: 8px;
   background: var(--diagnostics-color-surface);
-  box-shadow: 0 12px 28px var(--diagnostics-color-shadow);
+  box-shadow: var(--diagnostics-shadow-card);
   color: var(--diagnostics-color-text-muted);
 }
 

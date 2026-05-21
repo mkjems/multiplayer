@@ -44,12 +44,12 @@
 
 ## Sprint 42
 - Sprint Goal: Improve maintainability without changing the visual design.
-- [ ] Replace hardcoded colors in moved CSS with descriptively named variables from `tokens.css`.
-- [ ] Add missing design tokens for repeated shadows, borders, spacing, and status colors when the names are clear.
-- [ ] Remove duplicate declarations introduced during the split.
-- [ ] Confirm responsive rules live with the components or routes they affect.
-- [ ] Check that CSS module imports preserve IDE navigation and rename support in TypeScript.
-- [ ] Do a browser pass across desktop and mobile widths for landing, lobby, game, diagnostics, and the parked parallax component if it is rendered anywhere.
+- [x] Replace hardcoded colors in moved CSS with descriptively named variables from `tokens.css`.
+- [x] Add missing design tokens for repeated shadows, borders, spacing, and status colors when the names are clear.
+- [x] Remove duplicate declarations introduced during the split.
+- [x] Confirm responsive rules live with the components or routes they affect.
+- [x] Check that CSS module imports preserve IDE navigation and rename support in TypeScript.
+- [x] Do a browser pass across desktop and mobile widths for landing, lobby, game, diagnostics, and the parked parallax component if it is rendered anywhere.
 
 ## Backlog 
 - The arena should have a background of tiles the 

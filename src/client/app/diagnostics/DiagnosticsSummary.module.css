@@ -11,7 +11,7 @@
   border: 1px solid var(--diagnostics-color-border);
   border-radius: 8px;
   background: var(--diagnostics-color-surface);
-  box-shadow: 0 12px 28px var(--diagnostics-color-shadow);
+  box-shadow: var(--diagnostics-shadow-card);
 }
 
 .summaryLabel {
