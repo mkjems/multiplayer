@@ -2,12 +2,12 @@ import type { FormEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { HomeScreenSuggestion } from "../components/HomeScreenSuggestion.tsx";
-import { WesternParallaxBackground } from "../components/westernParallaxBackground.tsx";
 import { getStoredPlayerName, storePlayerName } from "../client-session.ts";
 import { playLandingPageTune } from "../landingTune.ts";
 import { appRoutes } from "../routes.ts";
 import { useDocumentTitle } from "../use-document-title.ts";
 import { notifyVisitor } from "../visitor.ts";
+import styles from "./LandingRoute.module.css";
 
 export function LandingRoute(): React.JSX.Element {
   const navigate = useNavigate();
@@ -49,38 +49,37 @@ export function LandingRoute(): React.JSX.Element {
   }
 
   return (
-    
-      <main className="landing-page">
-        <section className="card">
-          <h1>Gunfight</h1>
-          <p className="subtitle">Pick a name and jump into a game</p>
+    <main className={styles.landingPage}>
+      <section className={styles.card}>
+        <h1>Gunfight</h1>
+        <p className={styles.subtitle}>Pick a name and jump into a game</p>
 
-          <HomeScreenSuggestion />
+        <HomeScreenSuggestion />
 
-          <form onSubmit={(event) => void handleSubmit(event)}>
-            <input
-              ref={nameInputRef}
-              type="text"
-              id="name"
-              aria-label="Your name"
-              placeholder="Enter your name..."
-              maxLength={20}
-              autoComplete="off"
-              value={playerName}
-              onChange={(event) => setPlayerName(event.currentTarget.value)}
-            />
+        <form onSubmit={(event) => void handleSubmit(event)}>
+          <input
+            ref={nameInputRef}
+            type="text"
+            id="name"
+            aria-label="Your name"
+            className={styles.playerNameInput}
+            placeholder="Enter your name..."
+            maxLength={20}
+            autoComplete="off"
+            value={playerName}
+            onChange={(event) => setPlayerName(event.currentTarget.value)}
+          />
 
-            <button
-              className="primary-button"
-              id="enter"
-              type="submit"
-              disabled={isSubmitting || playerName.trim().length === 0}
-            >
-              Enter Lobby
-            </button>
-          </form>
-        </section>
-      </main>
-    
+          <button
+            className={styles.primaryButton}
+            id="enter"
+            type="submit"
+            disabled={isSubmitting || playerName.trim().length === 0}
+          >
+            Enter Lobby
+          </button>
+        </form>
+      </section>
+    </main>
   );
 }

@@ -1,17 +1,27 @@
 # TODO
 
+## Sprint 38
+- Sprint Goal: Split true global CSS concerns out of `src/client/app/app.css` so future styling work has an obvious home.
+- [x] Create `src/client/app/styles/` for global CSS files.
+- [x] Move reset rules into `src/client/app/styles/reset.css`.
+- [x] Move `:root` design tokens into `src/client/app/styles/tokens.css`.
+- [x] Move document-level defaults such as `body` and global link styling into `src/client/app/styles/base.css`.
+- [x] Update `src/client/app/main.tsx` to import the new global CSS files explicitly.
+- [x] Keep `src/client/touch-controls.css` global until the touch controls ownership is reviewed.
+- [x] Run the app and verify landing, lobby, game, diagnostics, and touch controls still receive their expected base styles.
+
 ## Sprint 39
 - Sprint Goal: Make route-level styles statically discoverable from the React files that use them.
-- [ ] Create `LandingRoute.module.css` beside `LandingRoute.tsx`.
-- [ ] Move landing page and name-entry card styles out of `app.css`.
-- [ ] Create `LobbyRoute.module.css` beside `LobbyRoute.tsx`.
-- [ ] Move lobby layout styles out of `app.css`.
-- [ ] Create `GameRoute.module.css` beside `GameRoute.tsx`.
-- [ ] Move game page, canvas, nav, HUD, ammo, status banner, and winner overlay styles out of `app.css`.
-- [ ] Create `DiagnosticsRoute.module.css` beside `DiagnosticsRoute.tsx`.
-- [ ] Move diagnostics page layout styles out of `app.css`.
-- [ ] Update route components to import module styles and replace string class names with typed `styles.className` references.
-- [ ] Preserve kebab-case CSS class names where plain global CSS remains; use camelCase module properties in TypeScript where CSS Modules are introduced.
+- [x] Create `LandingRoute.module.css` beside `LandingRoute.tsx`.
+- [x] Move landing page and name-entry card styles out of `app.css`.
+- [x] Create `LobbyRoute.module.css` beside `LobbyRoute.tsx`.
+- [x] Move lobby layout styles out of `app.css`.
+- [x] Create `GameRoute.module.css` beside `GameRoute.tsx`.
+- [x] Move game page, canvas, nav, HUD, ammo, status banner, and winner overlay styles out of `app.css`.
+- [x] Create `DiagnosticsRoute.module.css` beside `DiagnosticsRoute.tsx`.
+- [x] Move diagnostics page layout styles out of `app.css`.
+- [x] Update route components to import module styles and replace string class names with typed `styles.className` references.
+- [x] Preserve kebab-case CSS class names where plain global CSS remains; use camelCase module properties in TypeScript where CSS Modules are introduced.
 
 ## Sprint 40
 - Sprint Goal: Keep reusable component styling local to the component that owns it.

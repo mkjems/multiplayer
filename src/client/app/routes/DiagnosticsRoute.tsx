@@ -2,21 +2,26 @@ import { DiagnosticsRoomCard } from "../diagnostics/DiagnosticsRoomCard.tsx";
 import { DiagnosticsSummary } from "../diagnostics/DiagnosticsSummary.tsx";
 import { useDiagnostics } from "../diagnostics/use-diagnostics.ts";
 import { useDocumentTitle } from "../use-document-title.ts";
+import styles from "./DiagnosticsRoute.module.css";
 
 export function DiagnosticsRoute(): React.JSX.Element {
   const diagnostics = useDiagnostics();
   const rooms = diagnostics.data?.rooms ?? [];
   useDocumentTitle("Diagnostics - Multiplayer");
 
+  const statePillClassName = `${styles.diagnosticsStatePill}${
+    diagnostics.status === "live" ? ` ${styles.live}` : ""
+  }${diagnostics.status === "offline" ? ` ${styles.offline}` : ""}`;
+
   return (
-    <div className="diagnostics-page">
-      <header className="diagnostics-page-header">
+    <div className={styles.diagnosticsPage}>
+      <header className={styles.diagnosticsPageHeader}>
         <div>
-          <p className="diagnostics-eyebrow">Developer diagnostics</p>
+          <p className={styles.diagnosticsEyebrow}>Developer diagnostics</p>
           <h1>Room Performance</h1>
         </div>
-        <div className="diagnostics-refresh-status">
-          <span className={`diagnostics-state-pill ${diagnostics.status}`}>
+        <div className={styles.diagnosticsRefreshStatus}>
+          <span className={statePillClassName}>
             {getConnectionStatusLabel(diagnostics.status)}
           </span>
           <span>
@@ -27,14 +32,11 @@ export function DiagnosticsRoute(): React.JSX.Element {
         </div>
       </header>
 
-      <main className="diagnostics-main">
+      <main className={styles.diagnosticsMain}>
         <DiagnosticsSummary rooms={rooms} />
 
-        <section
-          className="diagnostics-room-section"
-          aria-labelledby="rooms-title"
-        >
-          <div className="diagnostics-section-heading">
+        <section aria-labelledby="rooms-title">
+          <div className={styles.diagnosticsSectionHeading}>
             <h2 id="rooms-title">Rooms</h2>
             <p>
               {diagnostics.data
@@ -47,7 +49,7 @@ export function DiagnosticsRoute(): React.JSX.Element {
 
           {rooms.length > 0
             ? (
-              <div className="diagnostics-room-grid">
+              <div className={styles.diagnosticsRoomGrid}>
                 {rooms.map((room) => (
                   <DiagnosticsRoomCard
                     room={room}
@@ -58,7 +60,7 @@ export function DiagnosticsRoute(): React.JSX.Element {
               </div>
             )
             : (
-              <div className="diagnostics-empty-state">
+              <div className={styles.diagnosticsEmptyState}>
                 {diagnostics.status === "offline"
                   ? "Diagnostics endpoint unavailable."
                   : "Loading diagnostics..."}

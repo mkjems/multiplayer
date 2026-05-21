@@ -10,6 +10,7 @@ import {
   type GameUiEvent,
   type LocalPlayerHudSnapshot,
 } from "../../game/game-session.ts";
+import styles from "./GameRoute.module.css";
 
 interface GameRouteParams {
   gameId?: string;
@@ -126,15 +127,15 @@ function GameRouteContent(
   }
 
   return (
-    <main className="game-page">
-      <canvas ref={canvasRef} className="game-canvas"></canvas>
+    <main className={styles.gamePage}>
+      <canvas ref={canvasRef} className={styles.gameCanvas}></canvas>
 
-      <nav className="game-nav" aria-label="Game actions">
-        <span className="game-player-count">
+      <nav className={styles.gameNav} aria-label="Game actions">
+        <span className={styles.gamePlayerCount}>
           {playerCount} player{playerCount === 1 ? "" : "s"}
         </span>
         <button
-          className="game-mute-button"
+          className={styles.gameMuteButton}
           type="button"
           title="Toggle sound"
           onClick={toggleMuted}
@@ -142,7 +143,7 @@ function GameRouteContent(
           {isMuted ? "🔇" : "🔊"}
         </button>
         <button
-          className="game-mute-button"
+          className={styles.gameMuteButton}
           type="button"
           onClick={leaveGame}
         >
@@ -152,7 +153,11 @@ function GameRouteContent(
 
       <GameHud hud={localPlayerHud} connectionStatus={connectionStatus} />
 
-      <div className={`game-overlay${winnerName ? " visible" : ""}`}>
+      <div
+        className={`${styles.gameOverlay}${
+          winnerName ? ` ${styles.visible}` : ""
+        }`}
+      >
         <h2>{winnerName ? `🏆 ${winnerName} wins!` : ""}</h2>
         <p>
           {remainingSeconds !== null
@@ -171,21 +176,24 @@ interface GameHudProps {
 
 function GameHud({ hud, connectionStatus }: GameHudProps): React.JSX.Element {
   return (
-    <section className="game-hud" aria-label="Player status">
+    <section className={styles.gameHud} aria-label="Player status">
       {connectionStatus === "disconnected"
-        ? <div className="game-status-banner">Disconnected</div>
+        ? <div className={styles.gameStatusBanner}>Disconnected</div>
         : null}
 
       {hud
         ? (
           <>
-            <div className="game-hud-row">
+            <div className={styles.gameHudRow}>
               <span>Ammo</span>
-              <div className="game-ammo" aria-label={`${hud.ammo} bullets`}>
+              <div
+                className={styles.gameAmmo}
+                aria-label={`${hud.ammo} bullets`}
+              >
                 {Array.from({ length: 6 }, (_, index) => (
                   <span
-                    className={`game-ammo-dot${
-                      index < hud.ammo ? " filled" : ""
+                    className={`${styles.gameAmmoDot}${
+                      index < hud.ammo ? ` ${styles.filled}` : ""
                     }`}
                     key={index}
                   >
@@ -194,17 +202,17 @@ function GameHud({ hud, connectionStatus }: GameHudProps): React.JSX.Element {
               </div>
             </div>
 
-            <div className="game-hud-callout">
+            <div className={styles.gameHudCallout}>
               {hud.reloading ? "Reloading" : ""}
             </div>
 
-            <div className="game-hud-row">
+            <div className={styles.gameHudRow}>
               <span>Kills</span>
               <strong>{hud.kills}</strong>
             </div>
           </>
         )
-        : <div className="game-hud-callout">Joining</div>}
+        : <div className={styles.gameHudCallout}>Joining</div>}
     </section>
   );
 }

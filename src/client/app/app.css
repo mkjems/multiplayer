@@ -1,4 +1,3 @@
-.landing-page,
 .simple-page {
   min-height: 100vh;
   display: flex;
@@ -14,8 +13,7 @@
   text-align: center;
 }
 
-.card h1,
-.lobby-header h1 {
+.card h1 {
   font-weight: 700;
   color: var(--color-white);
 }
@@ -73,105 +71,6 @@
   font-weight: 500;
   line-height: 1;
   cursor: pointer;
-}
-
-
-input[type="text"] {
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: 8px;
-  border: 1px solid var(--color-border);
-  background: var(--color-background);
-  color: var(--color-text);
-  font-size: 1rem;
-  margin-bottom: 24px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-input[type="text"]:focus {
-  border-color: var(--color-accent-primary);
-}
-
-.primary-button {
-  width: 100%;
-  padding: 14px;
-  border-radius: 8px;
-  border: none;
-  background: linear-gradient(360deg, #63aaff, #9cd3f1);
-
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s, transform 0.1s;
-}
-
-.primary-button:hover {
-  opacity: 0.9;
-}
-
-.primary-button:active {
-  transform: scale(0.98);
-}
-
-.primary-button:disabled {
-  cursor: not-allowed;
-}
-
-.lobby-page {
-  min-height: 100vh;
-  padding: 40px 24px;
-}
-
-.lobby-header {
-  max-width: 800px;
-  margin: 0 auto 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-.lobby-header h1 {
-  font-size: 1.5rem;
-}
-
-.live-badge {
-  font-size: 0.7rem;
-  background: rgba(108, 99, 255, 0.15);
-  color: var(--color-accent-primary);
-  border: 1px solid rgba(108, 99, 255, 0.27);
-  border-radius: 4px;
-  padding: 2px 6px;
-  margin-left: 8px;
-  vertical-align: middle;
-  -webkit-text-fill-color: var(--color-accent-primary);
-}
-
-.player-info {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  gap: 40px;
-}
-
-.player-name {
-  font-size: 0.85rem;
-  color: var(--color-text-subtle);
-}
-
-.player-name span {
-  color: var(--color-text);
-  font-weight: 600;
-}
-
-.lobby-section-title {
-  max-width: 800px;
-  margin: 0 auto 20px;
-  font-size: 1.1rem;
-  color: var(--color-text-muted);
-  font-weight: 500;
 }
 
 .keyboard-controls {
@@ -304,248 +203,6 @@ kbd {
   font-size: 0.9rem;
 }
 
-.game-page {
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  background: var(--color-background);
-}
-
-.game-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 16px;
-  padding: 10px 20px;
-}
-
-.game-player-count {
-  font-size: 0.8rem;
-  color: var(--color-text-subtle);
-}
-
-.game-nav a,
-.game-nav button {
-  color: var(--color-text-subtle);
-}
-
-.game-nav a {
-  text-decoration: none;
-  font-size: 0.85rem;
-}
-
-.game-nav a:hover {
-  color: var(--color-text);
-}
-
-.game-mute-button {
-  background: none;
-  border: 1px solid var(--color-border);
-  font-size: 1rem;
-  padding: 3px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-  line-height: 1;
-}
-
-.game-mute-button:hover {
-  color: var(--color-text);
-}
-
-.game-canvas {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  image-rendering: pixelated;
-}
-
-.game-hud {
-  position: fixed;
-  top: 56px;
-  left: 14px;
-  z-index: 6;
-  display: grid;
-  gap: 8px;
-  min-width: 170px;
-  padding: 10px 12px;
-  border: 1px solid rgba(224, 224, 224, 0.14);
-  border-radius: 8px;
-  background: rgba(15, 15, 26, 0.62);
-  color: var(--color-text);
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.game-hud-row {
-  display: grid;
-  grid-template-columns: 48px 1fr;
-  align-items: center;
-  gap: 12px;
-  min-height: 18px;
-}
-
-.game-hud-row span {
-  color: var(--color-text-muted);
-}
-
-.game-hud-row strong {
-  color: var(--color-accent-secondary);
-  font-size: 1.15rem;
-  line-height: 1;
-}
-
-.game-ammo {
-  display: grid;
-  grid-template-columns: repeat(6, 10px);
-  gap: 5px;
-}
-
-.game-ammo-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.24);
-}
-
-.game-ammo-dot.filled {
-  background: #f9ca24;
-  border-color: #f9ca24;
-}
-
-.game-hud-callout,
-.game-status-banner {
-  min-height: 18px;
-  color: #f9ca24;
-  line-height: 18px;
-}
-
-.game-status-banner {
-  color: #ff6b6b;
-}
-
-.game-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 16px;
-  z-index: 10;
-}
-
-.game-overlay.visible {
-  display: flex;
-}
-
-.game-overlay h2 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #f9ca24, #f0932b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.game-overlay p {
-  color: var(--color-text-muted);
-  font-size: 1rem;
-}
-
-.diagnostics-page {
-  --diagnostics-color-page: #10141d;
-  --diagnostics-color-surface: #171d29;
-  --diagnostics-color-surface-strong: #202838;
-  --diagnostics-color-border: #303b50;
-  --diagnostics-color-border-active: #4e8f7f;
-  --diagnostics-color-text: #edf2f7;
-  --diagnostics-color-text-muted: #9ba8ba;
-  --diagnostics-color-text-soft: #718096;
-  --diagnostics-color-good: #45b883;
-  --diagnostics-color-warn: #e7b84b;
-  --diagnostics-color-bad: #d96868;
-  --diagnostics-color-info: #64a6d9;
-  --diagnostics-color-bar-track: #273244;
-  --diagnostics-color-shadow: rgba(0, 0, 0, 0.24);
-  min-height: 100vh;
-  background: var(--diagnostics-color-page);
-  color: var(--diagnostics-color-text);
-}
-
-.diagnostics-page-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 28px 32px 20px;
-  border-bottom: 1px solid var(--diagnostics-color-border);
-  background: var(--diagnostics-color-surface);
-}
-
-.diagnostics-eyebrow {
-  margin: 0 0 6px;
-  color: var(--diagnostics-color-info);
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.diagnostics-page h1,
-.diagnostics-page h2,
-.diagnostics-page p {
-  margin: 0;
-}
-
-.diagnostics-page h1 {
-  font-size: 1.55rem;
-  line-height: 1.2;
-}
-
-.diagnostics-page h2 {
-  font-size: 1rem;
-}
-
-.diagnostics-main {
-  width: min(1180px, calc(100vw - 32px));
-  margin: 24px auto 40px;
-}
-
-.diagnostics-refresh-status {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--diagnostics-color-text-muted);
-  font-size: 0.86rem;
-}
-
-.diagnostics-state-pill {
-  min-width: 86px;
-  padding: 5px 10px;
-  border: 1px solid var(--diagnostics-color-border);
-  border-radius: 4px;
-  color: var(--diagnostics-color-text);
-  text-align: center;
-}
-
-.diagnostics-state-pill.live {
-  border-color: var(--diagnostics-color-good);
-  color: var(--diagnostics-color-good);
-}
-
-.diagnostics-state-pill.offline {
-  border-color: var(--diagnostics-color-bad);
-  color: var(--diagnostics-color-bad);
-}
-
 .diagnostics-summary-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -574,27 +231,7 @@ kbd {
   line-height: 1;
 }
 
-.diagnostics-section-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 12px;
-  color: var(--diagnostics-color-text-muted);
-}
-
-.diagnostics-section-heading h2 {
-  color: var(--diagnostics-color-text);
-}
-
-.diagnostics-room-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 14px;
-}
-
-.diagnostics-room-card,
-.diagnostics-empty-state {
+.diagnostics-room-card {
   border: 1px solid var(--diagnostics-color-border);
   border-radius: 8px;
   background: var(--diagnostics-color-surface);
@@ -752,28 +389,7 @@ kbd {
   vector-effect: non-scaling-stroke;
 }
 
-.diagnostics-empty-state {
-  padding: 24px;
-  color: var(--diagnostics-color-text-muted);
-}
-
-@media (max-width: 640px) {
-  .lobby-header,
-  .player-info {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 12px;
-  }
-}
-
 @media (max-width: 760px) {
-  .diagnostics-page-header,
-  .diagnostics-section-heading,
-  .diagnostics-refresh-status {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
   .diagnostics-summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -789,12 +405,5 @@ kbd {
 
   .diagnostics-graph-grid {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 420px) {
-  .card {
-    width: 100%;
-    padding: 36px 24px;
   }
 }

@@ -1,0 +1,65 @@
+.lobbyPage {
+  min-height: 100vh;
+  padding: 40px 24px;
+}
+
+.lobbyHeader {
+  max-width: 800px;
+  margin: 0 auto 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.lobbyHeader h1 {
+  color: var(--color-white);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.liveBadge {
+  margin-left: 8px;
+  padding: 2px 6px;
+  border: 1px solid rgba(108, 99, 255, 0.27);
+  border-radius: 4px;
+  background: rgba(108, 99, 255, 0.15);
+  color: var(--color-accent-primary);
+  font-size: 0.7rem;
+  vertical-align: middle;
+  -webkit-text-fill-color: var(--color-accent-primary);
+}
+
+.playerInfo {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 40px;
+}
+
+.playerName {
+  color: var(--color-text-subtle);
+  font-size: 0.85rem;
+}
+
+.playerName span {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.lobbySectionTitle {
+  max-width: 800px;
+  margin: 0 auto 20px;
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .lobbyHeader,
+  .playerInfo {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
