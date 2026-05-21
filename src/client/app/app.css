@@ -18,25 +18,10 @@
   --color-accent-secondary: #3ecfcf;
   --color-status-ready: #f39c12;
   --color-status-playing: #2ecc71;
-  --color-western-sky-top: #7ec8f0;
-  --color-western-sky-bottom: #f8c27a;
-  --color-bright-sun: #f9f924;
   --color-black: #000;
   --color-white: #fff;
   --shadow-card: 0 8px 40px rgba(0, 0, 0, 0.4);
   --shadow-interactive: 0 8px 24px rgba(108, 99, 255, 0.15);
-  --western-layer-overlap-ratio: 0.8;
-  --western-mountain-height: 36vh;
-  --western-hill-height: 28vh;
-  --western-foreground-height: 400px;
-  --western-mountain-bottom: 35vh;
-  --western-hill-bottom: 20vh;
-  --western-foreground-bottom: 0px;
-  --western-sky-drift-distance: 620px;
-  --western-clouds-height: 700px;
-  --western-mountain-drift-distance: 480px;
-  --western-hill-drift-distance: 560px;
-  --western-foreground-drift-distance: 720px;
 }
 
 body {
@@ -50,88 +35,7 @@ a {
   color: var(--color-accent-secondary);
 }
 
-.western-parallax-background {
-  position: relative;
-  min-height: 100vh;
-  overflow: hidden;
-  background: var(--color-western-sky-bottom);
-}
 
-.western-parallax-layers {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.western-parallax-layer {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  will-change: background-position;
-}
-
-.western-parallax-sky {
-  inset: 0;
-  background-image:
-    var(--western-clouds-image),
-    linear-gradient(
-      180deg,
-      var(--color-western-sky-top) 0%,
-      var(--color-western-sky-bottom) 100%
-    );
-  background-position: 0 0, center;
-  background-repeat: repeat-x, no-repeat;
-  background-size: auto var(--western-clouds-height), cover;
-  animation: western-sky-drift 90s linear infinite alternate;
-  image-rendering: pixelated;
-}
-
-.western-parallax-mountains {
-  bottom: var(--western-mountain-bottom);
-  height: var(--western-mountain-height);
-  background-image: var(--western-distant-mountain-image);
-  background-position: 0 100%;
-  background-repeat: repeat-x;
-  background-size: auto 100%;
-  animation: western-mountain-drift 80s linear infinite alternate;
-  image-rendering: pixelated;
-}
-
-.western-parallax-hills {
-  bottom: var(--western-hill-bottom);
-  height: var(--western-hill-height);
-  background-image: var(--western-hills-and-cacti-image);
-  background-position: 0 100%;
-  background-repeat: repeat-x;
-  background-size: auto 100%;
-  animation: western-hill-drift 30s linear infinite alternate;
-  image-rendering: pixelated;
-}
-
-.western-parallax-foreground {
-  bottom: var(--western-foreground-bottom);
-  height: var(--western-foreground-height);
-  background-image: var(--western-foreground-image);
-  background-position: 0 100%;
-  background-repeat: repeat-x;
-  background-size: auto 100%;
-  animation: western-foreground-drift 10s linear infinite alternate;
-  image-rendering: pixelated;
-}
-
-.western-parallax-content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  justify-content: center;
-  min-height: 100vh;
-}
-
-.western-parallax-content > * {
-  width: 100%;
-}
 
 .landing-page,
 .simple-page {
@@ -152,7 +56,7 @@ a {
 .card h1,
 .lobby-header h1 {
   font-weight: 700;
-  color: var(--color-black);
+  color: var(--color-white);
 }
 
 .card h1 {
@@ -161,7 +65,7 @@ a {
 }
 
 .subtitle {
-  color: var(--color-black);
+  color: var(--color-white);
   margin-bottom: 36px;
   font-size: 0.9rem;
 }
@@ -738,46 +642,6 @@ kbd {
 
 .diagnostics-room-card.active {
   border-color: var(--diagnostics-color-border-active);
-}
-
-@keyframes western-sky-drift {
-  from {
-    background-position: 0 0, center;
-  }
-
-  to {
-    background-position: var(--western-sky-drift-distance) 0, center;
-  }
-}
-
-@keyframes western-mountain-drift {
-  from {
-    background-position: 0 100%;
-  }
-
-  to {
-    background-position: var(--western-mountain-drift-distance) 100%;
-  }
-}
-
-@keyframes western-hill-drift {
-  from {
-    background-position: 0 100%;
-  }
-
-  to {
-    background-position: var(--western-hill-drift-distance) 100%;
-  }
-}
-
-@keyframes western-foreground-drift {
-  from {
-    background-position: 0 100%;
-  }
-
-  to {
-    background-position: var(--western-foreground-drift-distance) 100%;
-  }
 }
 
 .diagnostics-room-header {

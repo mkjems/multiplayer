@@ -1,9 +1,11 @@
 import type { CSSProperties, ReactNode } from "react";
 
+import "./westernParallaxBackground.css";
+
 const cloudsImagePath = "/clouds5.png";
 const distantMountainImagePath = "/distant_mountain4.png";
 const hillsAndCactiImagePath = "/hills_and_cacti.png";
-const foregroundImagePath = "/Foreground_layer.png";
+const foregroundImagePath = "/Foreground_layer2.png";
 
 interface WesternParallaxBackgroundProps {
   children: ReactNode;

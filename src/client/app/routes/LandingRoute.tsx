@@ -49,7 +49,7 @@ export function LandingRoute(): React.JSX.Element {
   }
 
   return (
-    <WesternParallaxBackground>
+    
       <main className="landing-page">
         <section className="card">
           <h1>Gunfight</h1>
@@ -80,6 +80,6 @@ export function LandingRoute(): React.JSX.Element {
           </form>
         </section>
       </main>
-    </WesternParallaxBackground>
+    
   );
 }

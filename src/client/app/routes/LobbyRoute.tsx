@@ -28,7 +28,6 @@ function LobbyContent(): React.JSX.Element {
   }
 
   return (
-    <WesternParallaxBackground>
       <main className="lobby-page">
         <header className="lobby-header">
           <h1>
@@ -52,6 +51,5 @@ function LobbyContent(): React.JSX.Element {
           onJoinGame={joinGame}
         />
       </main>
-    </WesternParallaxBackground>
   );
 }
