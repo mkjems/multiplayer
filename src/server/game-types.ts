@@ -63,7 +63,7 @@ export interface GameRoom {
   rocks: Rock[];
   cacti: Cactus[];
   gameOver: boolean;
-  interval: number | null;
+  interval: ReturnType<typeof setInterval> | null;
   metrics: RoomPerformanceMetrics;
   handleSocketError(playerId: string): void;
 }
